@@ -32,7 +32,7 @@ Currently, this application is only available and tested on macOS. Support for W
 
 Since this application is not yet signed, you'll need to follow these steps to open it on macOS:
 
-1.  **Download the latest `.dmg` or `.app` file** from the [Releases page](https://github.com/felipe/hosts-editor/releases) (link will be updated once releases are available).
+1.  **Download the latest `.dmg` or `.app` file** from the [Releases page](https://github.com/valtlfelipe/hedit/releases) (link will be updated once releases are available).
 2.  **Drag the application** to your Applications folder.
 3.  **Right-click** on the `Hosts Editor.app` icon in your Applications folder.
 4.  Select **"Open"** from the context menu.
