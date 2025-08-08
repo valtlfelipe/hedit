@@ -47,7 +47,7 @@
         </button>
 
         <transition name="fade-scale">
-          <div v-if="showSettings" class="absolute right-3 top-10 z-10 bg-gray-50/95 dark:bg-zinc-800/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg w-56">
+          <div v-if="showSettings" class="absolute right-0 top-8 z-10 bg-gray-50/95 dark:bg-zinc-800/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg w-56">
             <ul class="p-1 text-sm text-gray-800 dark:text-gray-200">
               <li @click="toggleDarkMode" class="rounded-lg flex items-center gap-3 px-3 py-1.5 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out">
                 <Sun class="w-4 h-4" v-if="settingsStore.isDarkTheme" />
