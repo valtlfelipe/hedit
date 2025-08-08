@@ -1,6 +1,6 @@
 <template>
-  <div class="bg-gray-50/80 dark:bg-zinc-900/80 border-b border-gray-200 dark:border-zinc-800 px-3 py-2">
-    <div class="flex items-center space-x-2">
+  <div class="bg-gray-50/80 dark:bg-zinc-900/80 border-b border-gray-200 dark:border-zinc-800 px-3 py-2 flex items-center">
+    <div class="flex items-center space-x-2 flex-grow">
       <!-- <button
         @click="$emit('createFile')"
         class="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
@@ -41,11 +41,37 @@
         <ChevronDown class="w-4 h-4" />
       </button> -->
     </div>
+    <div class="relative" ref="settingsContainer">
+        <button class="p-1.5 hover:bg-gray-300/80 dark:hover:bg-zinc-700/80 rounded-md transition-colors" @click="showSettings = !showSettings">
+          <Settings class="w-4 h-4 text-gray-600 dark:text-gray-200" />
+        </button>
+
+        <transition name="fade-scale">
+          <div v-if="showSettings" class="absolute right-3 top-10 z-10 bg-gray-50/95 dark:bg-zinc-800/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg w-56">
+            <ul class="p-1 text-sm text-gray-800 dark:text-gray-200">
+              <li @click="toggleDarkMode" class="rounded-lg flex items-center gap-3 px-3 py-1.5 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out">
+                <Sun class="w-4 h-4" v-if="settingsStore.isDarkTheme" />
+                <Moon class="w-4 h-4" v-else />
+                <span>{{ settingsStore.isDarkTheme ? 'Light Mode' : 'Dark Mode' }}</span>
+              </li>
+              <div class="border-t border-gray-200 dark:border-zinc-700 my-1"></div>
+              <li @click="openFeedbackLink" class="rounded-lg flex items-center gap-3 px-3 py-1.5 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out">
+                <MessageSquare class="w-4 h-4" />
+                <span>Feedback</span>
+              </li>
+            </ul>
+          </div>
+        </transition>
+      </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Save } from 'lucide-vue-next'
+import { openUrl } from '@tauri-apps/plugin-opener'
+import { load } from '@tauri-apps/plugin-store'
+import { MessageSquare, Moon, Save, Settings, Sun } from 'lucide-vue-next'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { settingsStore } from '../stores/settings'
 
 defineEmits<{
   createFile: []
@@ -53,4 +79,50 @@ defineEmits<{
   saveFile: []
   activateFile: []
 }>()
+
+const showSettings = ref(false)
+const settingsContainer = ref<HTMLElement | null>(null)
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (settingsContainer.value && !settingsContainer.value.contains(event.target as Node)) {
+    showSettings.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
+
+const toggleDarkMode = async () => {
+  const store = await load('settings.json', { autoSave: false })
+  await store.set('theme', {
+    value: document.documentElement.classList.contains('dark') ? 'light' : 'dark',
+  })
+  await store.save()
+  settingsStore.set(!settingsStore.isDarkTheme)
+
+  showSettings.value = false
+}
+
+const openFeedbackLink = () => {
+  openUrl('https://github.com/valtlfelipe/hedit/issues/new')
+  showSettings.value = false
+}
 </script>
+
+<style scoped>
+.fade-scale-enter-active,
+.fade-scale-leave-active {
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+.fade-scale-enter-from,
+.fade-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.95) translateY(-10px);
+}
+</style>

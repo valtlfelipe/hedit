@@ -5,6 +5,7 @@ use tauri::{TitleBarStyle, WebviewUrl, WebviewWindowBuilder};
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .setup(|app| {
             let win_builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::default())
