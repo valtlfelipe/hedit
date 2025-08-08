@@ -31,11 +31,11 @@ Since this application is not yet signed, you'll need to follow these steps to o
 
 1.  **Download the latest `.dmg` or `.app` file** from the [Releases page](https://github.com/valtlfelipe/hedit/releases) (link will be updated once releases are available).
 2.  **Drag the application** to your Applications folder.
-3.  **Right-click** on the `Hosts Editor.app` icon in your Applications folder.
+3.  **Right-click** on the `Hedit.app` icon in your Applications folder.
 4.  Select **"Open"** from the context menu.
-5.  If a warning dialog appears stating "Hosts Editor.app cannot be opened because it is from an unidentified developer," click **"Open"** again.
+5.  If a warning dialog appears stating "Hedit.app cannot be opened because it is from an unidentified developer," click **"Open"** again.
 6.  If the app still doesn't open, go to **System Settings** (or System Preferences) > **Privacy & Security**.
-7.  Scroll down to the "Security" section. You should see a message like "Hosts Editor.app was blocked from opening because it is not from an identified developer."
+7.  Scroll down to the "Security" section. You should see a message like "Hedit.app was blocked from opening because it is not from an identified developer."
 8.  Click the **"Open Anyway"** button next to this message.
 9.  You will be prompted to confirm. Click **"Open"**.
 
