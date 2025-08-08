@@ -1,4 +1,5 @@
 name: 'publish'
+
 on:
   push:
     tags: [ v* ]
@@ -11,15 +12,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+          - platform: 'macos-15' # for Arm based macs (M1 and above).
             args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest' # for Intel based macs.
+          - platform: 'macos-15' # for Intel based macs.
             args: '--target x86_64-apple-darwin'
 
     runs-on: ${{ matrix.platform }}
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
 
       - uses: oven-sh/setup-bun@v2
 
