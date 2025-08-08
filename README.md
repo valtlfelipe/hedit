@@ -1,4 +1,4 @@
-# 🚀 Hosts Editor
+# Hedit
 
 A sleek and intuitive hosts file editor built with Tauri, Vue.js, and Rust. Simplify managing your `/etc/hosts` file with a modern, cross-platform application.
 
