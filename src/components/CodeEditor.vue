@@ -1,15 +1,17 @@
 <template>
-  <div class="w-full bg-white dark:bg-zinc-900 flex-1 flex flex-col">
-    <div class="flex overflow-hidden flex-1">
+  <div class="w-full bg-white dark:bg-zinc-900 flex-1 flex flex-col min-h-0">
+    <div class="flex flex-1 min-h-0">
       <!-- Line numbers -->
-      <div class="line-numbers select-none text-gray-500 dark:text-gray-400 text-sm font-mono py-3 px-3 text-right bg-gray-50 dark:bg-zinc-800/50">
-        <div v-for="n in lineCount" :key="n" class="leading-6">
-          {{ n }}
+      <div class="line-numbers select-none text-gray-500 dark:text-gray-400 text-sm font-mono py-3 px-3 text-right bg-gray-50 dark:bg-zinc-800/50 overflow-hidden">
+        <div class="h-full overflow-hidden">
+          <div v-for="n in lineCount" :key="n" class="leading-6">
+            {{ n }}
+          </div>
         </div>
       </div>
 
       <!-- Editor area -->
-      <div class="relative flex-1 h-full w-full">
+      <div class="relative flex-1 min-h-0">
         <!-- Syntax highlighted preview (overlay) -->
         <div
           class="syntax-highlight absolute inset-0 font-mono text-sm py-3 px-4 pointer-events-none whitespace-pre overflow-auto"
@@ -22,7 +24,7 @@
           @input="updateContent"
           @scroll="syncScroll"
           ref="textarea"
-          class="w-full h-full font-mono text-sm py-3 px-4 bg-transparent text-transparent caret-gray-800 dark:caret-gray-200 resize-none outline-none leading-6"
+          class="w-full h-full font-mono text-sm py-3 px-4 bg-transparent text-transparent caret-gray-800 dark:caret-gray-200 resize-none outline-none leading-6 overflow-auto"
           spellcheck="false"
         ></textarea>
       </div>
@@ -66,7 +68,7 @@ const highlightLine = (line: string) => {
   }
 
   // IP address and hostname line
-  const ipRegex = /^(\s*)([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|[0-9a-fA-F:]+)(.*)/
+  const ipRegex = /^(\s*)([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|[0-9a-fA-F:]+)(.*)/ 
   const match = line.match(ipRegex)
 
   if (match) {
@@ -107,7 +109,7 @@ const syncScroll = (event: Event) => {
 onMounted(() => {
   // Set initial height if needed
   if (textarea.value) {
-    textarea.value.style.height = '400px'
+    // textarea.value.style.height = '400px'
   }
 })
 </script>
@@ -118,37 +120,61 @@ onMounted(() => {
 textarea {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 0.875rem;
-  line-height: 1.3rem;
+  line-height: 1.5rem;
   tab-size: 4;
 }
 
-/* Custom scrollbar for dark theme */
+/* Custom scrollbar styling */
 textarea::-webkit-scrollbar,
 .syntax-highlight::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
 }
 
 textarea::-webkit-scrollbar-track,
 .syntax-highlight::-webkit-scrollbar-track {
-  background-color: #1F2937;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+}
+
+.dark textarea::-webkit-scrollbar-track,
+.dark .syntax-highlight::-webkit-scrollbar-track {
+  background-color: #374151;
 }
 
 textarea::-webkit-scrollbar-thumb,
 .syntax-highlight::-webkit-scrollbar-thumb {
-  background-color: #4B5563;
+  background-color: #9ca3af;
+  border-radius: 6px;
+  border: 2px solid #f3f4f6;
+}
+
+.dark textarea::-webkit-scrollbar-thumb,
+.dark .syntax-highlight::-webkit-scrollbar-thumb {
+  background-color: #6b7280;
+  border: 2px solid #374151;
 }
 
 textarea::-webkit-scrollbar-thumb:hover,
 .syntax-highlight::-webkit-scrollbar-thumb:hover {
-  background-color: #6B7280;
+  background-color: #6b7280;
+}
+
+.dark textarea::-webkit-scrollbar-thumb:hover,
+.dark .syntax-highlight::-webkit-scrollbar-thumb:hover {
+  background-color: #9ca3af;
 }
 
 /* Firefox scrollbar */
 textarea,
 .syntax-highlight {
-  scrollbar-width: thin;
-  scrollbar-color: #4B5563 #1F2937;
+  scrollbar-width: auto;
+  scrollbar-color: #9ca3af #f3f4f6;
+}
+
+.dark textarea,
+.dark .syntax-highlight {
+  scrollbar-color: #6b7280 #374151;
 }
 
 /* Ensure line numbers stay aligned */
