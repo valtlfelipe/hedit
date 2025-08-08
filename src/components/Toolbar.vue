@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 px-2 py-2">
+  <div class="bg-gray-50/80 dark:bg-zinc-900/80 border-b border-gray-200 dark:border-zinc-800 px-3 py-2">
     <div class="flex items-center space-x-2">
       <!-- <button
         @click="$emit('createFile')"
@@ -19,10 +19,10 @@
 
       <button
         @click="$emit('saveFile')"
-        class="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
+        class="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
       >
-        <Save class="w-4 h-4" />
-        <span>Save</span>
+        <Save class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+        <span class="text-gray-800 dark:text-gray-200 font-medium">Save</span>
       </button>
 
       <!-- <button

@@ -12,28 +12,3 @@ body,
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
-
-/* Custom scrollbar for better macOS feel */
-/* ::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.3);
-} */
-
-/* :not(a),
-:not(input):not(textarea),
-:not(input):not(textarea)::after,
-:not(input):not(textarea)::before {
-    @apply select-none cursor-default;
-} */

@@ -1,9 +1,9 @@
 <template>
-  <div class="w-full bg-white dark:bg-gray-800 min-h-screen">
-    <div class="flex overflow-hidden min-h-full">
+  <div class="w-full bg-white dark:bg-zinc-900 flex-1 flex flex-col">
+    <div class="flex overflow-hidden flex-1">
       <!-- Line numbers -->
-      <div class="line-numbers select-none text-gray-500 dark:text-gray-400 text-sm font-mono py-3 px-3 text-right bg-gray-50 dark:bg-gray-700">
-        <div v-for="n in lineCount" :key="n" class="leading-5">
+      <div class="line-numbers select-none text-gray-500 dark:text-gray-400 text-sm font-mono py-3 px-3 text-right bg-gray-50 dark:bg-zinc-800/50">
+        <div v-for="n in lineCount" :key="n" class="leading-6">
           {{ n }}
         </div>
       </div>
@@ -22,7 +22,7 @@
           @input="updateContent"
           @scroll="syncScroll"
           ref="textarea"
-          class="w-full min-h-full font-mono text-sm py-3 px-4 bg-transparent text-transparent caret-gray-800 dark:caret-gray-200 resize-none outline-none leading-6"
+          class="w-full h-full font-mono text-sm py-3 px-4 bg-transparent text-transparent caret-gray-800 dark:caret-gray-200 resize-none outline-none leading-6"
           spellcheck="false"
         ></textarea>
       </div>

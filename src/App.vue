@@ -1,12 +1,14 @@
 <template>
   <MacOSWindow title="Hedit">
-    <Toolbar @create-file="handleCreateFile" @remove-file="handleRemoveFile" @save-file="handleSaveFile"
-      @activate-file="handleActivateFile" />
+    <div class="flex flex-col h-full flex-1">
+      <Toolbar @create-file="handleCreateFile" @remove-file="handleRemoveFile" @save-file="handleSaveFile"
+        @activate-file="handleActivateFile" />
 
-    <div class="flex h-full">
-      <Sidebar :files="files" @file-select="handleFileSelect" :status="selectedFile?.status || ''" />
+      <div class="flex h-full flex-1">
+        <Sidebar :files="files" @file-select="handleFileSelect" :status="selectedFile?.status || ''" />
 
-      <CodeEditor :content="selectedFile?.content || ''" @change="handleContentChange" />
+        <CodeEditor :content="selectedFile?.content || ''" @change="handleContentChange" />
+      </div>
     </div>
   </MacOSWindow>
 </template>
