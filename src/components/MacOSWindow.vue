@@ -35,8 +35,8 @@
 // const appWindow = getCurrentWindow();
 
 interface Props {
-  title: string;
+  title: string
 }
 
-defineProps<Props>();
+defineProps<Props>()
 </script>

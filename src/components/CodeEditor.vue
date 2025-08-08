@@ -31,17 +31,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 interface Props {
-  content: string;
+  content: string
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  change: [content: string];
-}>();
+  change: [content: string]
+}>()
 
 const textarea = ref<HTMLTextAreaElement | null>(null)
 
@@ -52,7 +52,7 @@ const lineCount = computed(() => {
 const highlightedContent = computed(() => {
   return props.content
     .split('\n')
-    .map(line => highlightLine(line))
+    .map((line) => highlightLine(line))
     .join('\n')
 })
 
@@ -83,18 +83,18 @@ const escapeHtml = (text: string) => {
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
-    "'": '&#039;'
+    "'": '&#039;',
   }
   return text.replace(/[&<>"']/g, (m: string) => map[m as keyof typeof map])
 }
 
 const updateContent = (e: Event) => {
-  const target = e.target as HTMLTextAreaElement;
-  emit('change', target.value);
+  const target = e.target as HTMLTextAreaElement
+  emit('change', target.value)
 }
 
 const syncScroll = (event: Event) => {
-  const target = event.target as HTMLTextAreaElement;
+  const target = event.target as HTMLTextAreaElement
   const scrollTop = target.scrollTop
   const scrollLeft = target.scrollLeft
   const highlight = target.previousElementSibling

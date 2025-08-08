@@ -37,41 +37,41 @@
 </template>
 
 <script setup lang="ts">
-import { File, Folder, Check } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { Check, File, Folder } from 'lucide-vue-next'
+import { computed } from 'vue'
 
 export interface FileItem {
-  id: string;
-  name: string;
-  isActive: boolean;
-  isSelected: boolean;
+  id: string
+  name: string
+  isActive: boolean
+  isSelected: boolean
 }
 
 interface Props {
-  files: FileItem[];
-  status: string;
+  files: FileItem[]
+  status: string
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
 defineEmits<{
-  fileSelect: [fileId: string];
-}>();
+  fileSelect: [fileId: string]
+}>()
 
 const statusText = computed(() => {
   switch (props.status) {
     case 'saving':
-      return 'Saving...';
+      return 'Saving...'
     case 'saved':
-      return 'Saved successfully';
+      return 'Saved successfully'
     case 'error':
-      return 'Error occurred while saving';
+      return 'Error occurred while saving'
     case 'loaded':
-      return 'File loaded successfully';
+      return 'File loaded successfully'
     case 'modified':
-      return 'File has been modified';
+      return 'File has been modified'
     default:
-      return '';
+      return ''
   }
-});
+})
 </script>

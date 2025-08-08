@@ -12,17 +12,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, onUnmounted } from 'vue';
-import MacOSWindow from './components/MacOSWindow.vue';
-import Toolbar from './components/Toolbar.vue';
-import Sidebar from './components/Sidebar.vue';
-import CodeEditor from './components/CodeEditor.vue';
-import type { FileItem } from './components/Sidebar.vue';
-import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
+import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import type { FileItem } from './components/Sidebar.vue'
 
 async function readHostsFile() {
   try {
-    const content = await readTextFile('/etc/hosts');
+    const content = await readTextFile('/etc/hosts')
 
     files.value.push({
       id: '1',
@@ -30,91 +26,85 @@ async function readHostsFile() {
       isActive: true,
       isSelected: true,
       content: content as string,
-      status: 'Loaded successfully'
-    });
-
+      status: 'Loaded successfully',
+    })
   } catch (error) {
-    console.error(error);
+    console.error(error)
   }
 }
 
 async function resetStatus() {
   if (!selectedFile.value) {
-    return;
+    return
   }
 
   setTimeout(() => {
     if (!selectedFile.value) {
-      return;
+      return
     }
 
-    selectedFile.value.status = '';
-  }, 3000);
-
+    selectedFile.value.status = ''
+  }, 3000)
 }
 
 async function writeHostsFile() {
   if (!selectedFile.value) {
-    return;
+    return
   }
 
-  selectedFile.value.status = 'saving';
+  selectedFile.value.status = 'saving'
 
   try {
-    await writeTextFile('/etc/hosts', selectedFile.value.content);
-    selectedFile.value.status = 'saved';
+    await writeTextFile('/etc/hosts', selectedFile.value.content)
+    selectedFile.value.status = 'saved'
     resetStatus()
-    console.log("Hosts file saved successfully");
+    console.log('Hosts file saved successfully')
   } catch (error) {
-    selectedFile.value.status = 'error';
-    console.error(error);
+    selectedFile.value.status = 'error'
+    console.error(error)
   }
 }
 
 onMounted(() => {
-  readHostsFile();
-  window.addEventListener('keydown', handleKeydown);
-});
+  readHostsFile()
+  window.addEventListener('keydown', handleKeydown)
+})
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown);
-});
+  window.removeEventListener('keydown', handleKeydown)
+})
 
 function handleKeydown(e: KeyboardEvent) {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
-    e.preventDefault();
-    handleSaveFile();
+    e.preventDefault()
+    handleSaveFile()
   }
 }
 
 interface FileItemWithContent extends FileItem {
-  content: string;
-  status: string;
+  content: string
+  status: string
 }
 
-const files = ref<FileItemWithContent[]>([]);
+const files = ref<FileItemWithContent[]>([])
 
-const selectedFileId = ref('1');
+const selectedFileId = ref('1')
 
-const selectedFile = computed(() =>
-  files.value.find(f => f.id === selectedFileId.value)
-);
+const selectedFile = computed(() => files.value.find((f) => f.id === selectedFileId.value))
 
 const handleFileSelect = (fileId: string) => {
-  selectedFileId.value = fileId;
-  files.value = files.value.map(f => ({
+  selectedFileId.value = fileId
+  files.value = files.value.map((f) => ({
     ...f,
-    isSelected: f.id === fileId
-  }));
-};
+    isSelected: f.id === fileId,
+  }))
+}
 
 const handleContentChange = (content: string) => {
-  files.value = files.value.map(f =>
-    f.id === selectedFileId.value
-      ? { ...f, content, status: 'modified' }
-      : f
-  );
-};
+  files.value = files.value.map((f) =>
+    f.id === selectedFileId.value ? { ...f, content, status: 'modified' } : f,
+  )
+}
 
 const handleCreateFile = () => {
   const newFile: FileItemWithContent = {
@@ -123,28 +113,28 @@ const handleCreateFile = () => {
     isActive: false,
     isSelected: false,
     content: '',
-    status: ''
-  };
-  files.value = [...files.value, newFile];
-};
+    status: '',
+  }
+  files.value = [...files.value, newFile]
+}
 
 const handleRemoveFile = () => {
   if (files.value.length > 1) {
-    const updatedFiles = files.value.filter(f => f.id !== selectedFileId.value);
-    files.value = updatedFiles;
-    selectedFileId.value = updatedFiles[0]?.id || '';
+    const updatedFiles = files.value.filter((f) => f.id !== selectedFileId.value)
+    files.value = updatedFiles
+    selectedFileId.value = updatedFiles[0]?.id || ''
   }
-};
+}
 
 const handleSaveFile = () => {
-  console.log('Saving file:', selectedFile.value?.name);
-  writeHostsFile();
-};
+  console.log('Saving file:', selectedFile.value?.name)
+  writeHostsFile()
+}
 
 const handleActivateFile = () => {
-  files.value = files.value.map(f => ({
+  files.value = files.value.map((f) => ({
     ...f,
-    isActive: f.id === selectedFileId.value
-  }));
-};
+    isActive: f.id === selectedFileId.value,
+  }))
+}
 </script>

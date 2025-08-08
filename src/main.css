@@ -3,12 +3,12 @@
 html,
 body,
 #app {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    outline: none;
-    border: none;
-    background-color: transparent;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  outline: none;
+  border: none;
+  background-color: transparent;
 }
 
 /* Custom scrollbar for better macOS feel */
