@@ -32,6 +32,11 @@ jobs:
       - name: install frontend dependencies
         run: bun install
 
+      - name: Set version
+        run: bun run set-version
+        env:
+          APP_VERSION: ${{ github.ref_name }}
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
