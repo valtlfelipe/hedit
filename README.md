@@ -1,5 +1,10 @@
 # Hedit
 
-Hedit is a Hosts file `/etc/hosts` editor & manager.
+Hedit is a Hosts file (`/etc/hosts`) editor & manager. It's built using [Tauri](https://tauri.app), Rust and Vue.
 
-![](https://github.com/user-attachments/assets/183a1bfb-3888-4f7f-8283-eb011fbf1297)
+It's inspired by [2ndalpha/gasmask](https://github.com/2ndalpha/gasmask).
+
+![](https://github.com/user-attachments/assets/50f58bdb-aecb-4852-a820-bf3edd5441a9)
+
+# Useful Resources
+- [Feedback and Bug Reports](https://github.com/valtlfelipe/hedit/issues/new)
