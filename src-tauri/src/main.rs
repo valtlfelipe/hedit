@@ -10,7 +10,7 @@ fn main() {
         .setup(|app| {
             let win_builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::default())
                 .title("Hedit")
-                .min_inner_size(800.0, 600.0);
+                .min_inner_size(1000.0, 650.0);
 
             // set transparent title bar only when building for macOS
             #[cfg(target_os = "macos")]

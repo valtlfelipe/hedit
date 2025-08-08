@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "hedit",
+  "productName": "Hedit",
   "version": "0.1.0",
   "identifier": "com.felipevm.hedit",
   "build": {
@@ -17,8 +17,17 @@
     }
   },
   "bundle": {
+    "publisher": "FVM",
+    "license": "MIT",
+    "copyright": "FVM - Hedit",
+    "homepage": "https://github.com/valtlfelipe/hedit",
+    "category": "DeveloperTool",
+    "longDescription": "A cross-platform desktop app for managing your hosts file.",
     "active": true,
-    "targets": "all",
+    "targets": [
+      "app",
+      "dmg"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -27,21 +36,5 @@
       "icons/icon.ico"
     ]
   },
-  "plugins": {
-    "shell": {
-      "scope": [
-        {
-          "name": "sudo-cp",
-          "cmd": "sudo",
-          "args": [
-            "cp",
-            {
-              "validator": "\\S+"
-            },
-            "/etc/hosts"
-          ]
-        }
-      ]
-    }
-  }
+  "plugins": {}
 }
