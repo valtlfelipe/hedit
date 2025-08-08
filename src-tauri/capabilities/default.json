@@ -25,6 +25,7 @@
           "path": "/etc/hosts"
         }
       ]
-    }
+    },
+    "store:default"
   ]
 }

@@ -13,8 +13,14 @@
 
 <script setup lang="ts">
 import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { load } from '@tauri-apps/plugin-store'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import CodeEditor from './components/CodeEditor.vue'
+import MacOSWindow from './components/MacOSWindow.vue'
 import type { FileItem } from './components/Sidebar.vue'
+import Sidebar from './components/Sidebar.vue'
+import Toolbar from './components/Toolbar.vue'
+import { settingsStore } from './stores/settings'
 
 async function readHostsFile() {
   try {
@@ -65,8 +71,23 @@ async function writeHostsFile() {
   }
 }
 
+async function setTheme() {
+  const store = await load('settings.json', { autoSave: false })
+  const val = await store.get<{ value: string }>('theme')
+  settingsStore.set(val?.value === 'dark')
+}
+
+watch(() => settingsStore.isDarkTheme, (isDark) => {
+  if (isDark) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+}, { immediate: true }) // Ensure the theme is set immediately on mount
+
 onMounted(() => {
   readHostsFile()
+  setTheme()
   window.addEventListener('keydown', handleKeydown)
 })
 

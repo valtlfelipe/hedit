@@ -11,6 +11,8 @@ body,
   background-color: transparent;
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Custom scrollbar for better macOS feel */
 /* ::-webkit-scrollbar {
     width: 8px;

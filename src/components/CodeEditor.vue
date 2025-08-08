@@ -1,8 +1,8 @@
 <template>
-  <div class="w-full bg-white min-h-screen">
+  <div class="w-full bg-white dark:bg-gray-800 min-h-screen">
     <div class="flex overflow-hidden min-h-full">
       <!-- Line numbers -->
-      <div class="line-numbers select-none text-gray-500 text-sm font-mono py-3 px-3 text-right bg-gray-50">
+      <div class="line-numbers select-none text-gray-500 dark:text-gray-400 text-sm font-mono py-3 px-3 text-right bg-gray-50 dark:bg-gray-700">
         <div v-for="n in lineCount" :key="n" class="leading-5">
           {{ n }}
         </div>
@@ -22,7 +22,7 @@
           @input="updateContent"
           @scroll="syncScroll"
           ref="textarea"
-          class="w-full min-h-full font-mono text-sm py-3 px-4 bg-transparent text-transparent caret-gray-800 resize-none outline-none leading-6"
+          class="w-full min-h-full font-mono text-sm py-3 px-4 bg-transparent text-transparent caret-gray-800 dark:caret-gray-200 resize-none outline-none leading-6"
           spellcheck="false"
         ></textarea>
       </div>
@@ -62,7 +62,7 @@ const highlightLine = (line: string) => {
 
   // Comment line
   if (line.trim().startsWith('#')) {
-    return `<span class="text-green-600">${escapeHtml(line)}</span>`
+    return `<span class="text-green-600 dark:text-green-400">${escapeHtml(line)}</span>`
   }
 
   // IP address and hostname line
@@ -71,10 +71,10 @@ const highlightLine = (line: string) => {
 
   if (match) {
     const [, whitespace, ip, rest] = match
-    return `${escapeHtml(whitespace)}<span class="text-blue-600">${escapeHtml(ip)}</span><span class="text-gray-800">${escapeHtml(rest)}</span>`
+    return `${escapeHtml(whitespace)}<span class="text-blue-600 dark:text-blue-400">${escapeHtml(ip)}</span><span class="text-gray-800 dark:text-gray-200">${escapeHtml(rest)}</span>`
   }
 
-  return `<span class="text-gray-800">${escapeHtml(line)}</span>`
+  return `<span class="text-gray-800 dark:text-gray-200">${escapeHtml(line)}</span>`
 }
 
 const escapeHtml = (text: string) => {
