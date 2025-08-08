@@ -26,6 +26,7 @@
           ref="textarea"
           class="w-full h-full font-mono text-sm py-3 px-4 bg-transparent text-transparent caret-gray-800 dark:caret-gray-200 resize-none outline-none leading-6 overflow-auto"
           spellcheck="false"
+          autofocus
         ></textarea>
       </div>
     </div>
@@ -68,7 +69,7 @@ const highlightLine = (line: string) => {
   }
 
   // IP address and hostname line
-  const ipRegex = /^(\s*)([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|[0-9a-fA-F:]+)(.*)/ 
+  const ipRegex = /^(\s*)([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|[0-9a-fA-F:]+)(.*)/
   const match = line.match(ipRegex)
 
   if (match) {

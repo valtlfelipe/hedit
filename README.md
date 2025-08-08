@@ -22,9 +22,6 @@ Currently, this application is only available and tested on macOS. Support for W
 
 *   **Intuitive UI:** Clean and user-friendly interface for easy hosts file management.
 *   **Fast & Secure:** Built with Rust (Tauri) for performance and system-level access.
-*   **Real-time Editing:** Instantly apply changes to your hosts file.
-*   **Syntax Highlighting:** (Planned/Coming Soon) For better readability.
-*   **Profile Management:** (Planned/Coming Soon) Easily switch between different hosts configurations.
 
 ---
 
