@@ -66,6 +66,16 @@ export const hostsStore = reactive({
       }),
     )
   },
+  renameFile(id: string, newName: string) {
+    this.files = this.files.map((file) => (file.id === id ? { ...file, name: newName } : file))
+  },
+  async deleteFile(id: string) {
+    this.files = this.files.filter((file) => file.id !== id)
+    await metadataStore.set(
+      'profiles',
+      this.files.map(({ id, name, isActive, isSelected }) => ({ id, name, isActive, isSelected })),
+    )
+  },
 })
 
 // export const useProfileStore = defineStore('profiles', () => {

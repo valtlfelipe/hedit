@@ -33,18 +33,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 
 const modelValue = defineModel<string>({
   type: String,
   default: '',
 })
-
-// const props = defineProps<Props>()
-
-const emit = defineEmits<{
-  change: [content: string]
-}>()
 
 const textarea = ref<HTMLTextAreaElement | null>(null)
 
@@ -91,11 +85,6 @@ const escapeHtml = (text: string) => {
   return text.replace(/[&<>"']/g, (m: string) => map[m as keyof typeof map])
 }
 
-const updateContent = (e: Event) => {
-  const target = e.target as HTMLTextAreaElement
-  emit('change', target.value)
-}
-
 const syncScroll = (event: Event) => {
   const target = event.target as HTMLTextAreaElement
   const scrollTop = target.scrollTop
@@ -108,10 +97,11 @@ const syncScroll = (event: Event) => {
 }
 
 onMounted(() => {
-  // Set initial height if needed
-  if (textarea.value) {
-    // textarea.value.style.height = '400px'
-  }
+  nextTick(() => {
+    if (textarea.value) {
+      textarea.value?.focus()
+    }
+  })
 })
 </script>
 
