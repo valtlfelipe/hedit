@@ -23,6 +23,12 @@
       "allow": [
         {
           "path": "/etc/hosts"
+        },
+        {
+          "path": "$APPDATA/*"
+        },
+        {
+          "path": "$APPDATA/profiles/*"
         }
       ]
     },

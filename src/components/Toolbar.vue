@@ -1,13 +1,13 @@
 <template>
   <div class="bg-gray-50/80 dark:bg-zinc-900/80 border-b border-gray-200 dark:border-zinc-800 px-3 py-2 flex items-center">
     <div class="flex items-center space-x-2 flex-grow">
-      <!-- <button
+      <button
         @click="$emit('createFile')"
-        class="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
+        class="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
       >
         <Plus class="w-4 h-4" />
         <span>Create</span>
-      </button> -->
+      </button>
 
       <!-- <button
         @click="$emit('removeFile')"
@@ -69,7 +69,7 @@
 <script setup lang="ts">
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { load } from '@tauri-apps/plugin-store'
-import { MessageSquare, Moon, Save, Settings, Sun } from 'lucide-vue-next'
+import { MessageSquare, Moon, Plus, Save, Settings, Sun } from 'lucide-vue-next'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { settingsStore } from '../stores/settings'
 

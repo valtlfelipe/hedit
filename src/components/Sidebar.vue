@@ -39,16 +39,10 @@
 <script setup lang="ts">
 import { Check, File, Folder } from 'lucide-vue-next'
 import { computed } from 'vue'
-
-export interface FileItem {
-  id: string
-  name: string
-  isActive: boolean
-  isSelected: boolean
-}
+import type { HostsFile } from '../stores/files'
 
 interface Props {
-  files: FileItem[]
+  files: HostsFile[]
   status: string
 }
 

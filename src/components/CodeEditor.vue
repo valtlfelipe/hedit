@@ -20,8 +20,7 @@
 
         <!-- Actual textarea (transparent text) -->
         <textarea
-          :value="content"
-          @input="updateContent"
+          v-model="modelValue"
           @scroll="syncScroll"
           ref="textarea"
           class="w-full h-full font-mono text-sm py-3 px-4 bg-transparent text-transparent caret-gray-800 dark:caret-gray-200 resize-none outline-none leading-6 overflow-auto"
@@ -36,11 +35,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 
-interface Props {
-  content: string
-}
+const modelValue = defineModel<string>({
+  type: String,
+  default: '',
+})
 
-const props = defineProps<Props>()
+// const props = defineProps<Props>()
 
 const emit = defineEmits<{
   change: [content: string]
@@ -49,11 +49,11 @@ const emit = defineEmits<{
 const textarea = ref<HTMLTextAreaElement | null>(null)
 
 const lineCount = computed(() => {
-  return props.content.split('\n').length
+  return modelValue.value.split('\n').length
 })
 
 const highlightedContent = computed(() => {
-  return props.content
+  return modelValue.value
     .split('\n')
     .map((line) => highlightLine(line))
     .join('\n')

@@ -5,41 +5,25 @@
         @activate-file="handleActivateFile" />
 
       <div class="flex flex-1 min-h-0">
-        <Sidebar :files="files" @file-select="handleFileSelect" :status="selectedFile?.status || ''" />
+        <Sidebar :files="hostsStore.files" @file-select="handleFileSelect" :status="selectedFile?.status || ''" />
 
-        <CodeEditor :content="selectedFile?.content || ''" @change="handleContentChange" class="flex-1 min-w-0" />
+        <CodeEditor v-model="selectedFileContent" class="flex-1 min-w-0" />
       </div>
     </div>
   </MacOSWindow>
 </template>
 
 <script setup lang="ts">
+/** biome-ignore-all lint/correctness/noUnusedImports: biomejs is bugged */
 import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
 import { load } from '@tauri-apps/plugin-store'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import CodeEditor from './components/CodeEditor.vue'
 import MacOSWindow from './components/MacOSWindow.vue'
-import type { FileItem } from './components/Sidebar.vue'
 import Sidebar from './components/Sidebar.vue'
 import Toolbar from './components/Toolbar.vue'
+import { hostsStore } from './stores/files'
 import { settingsStore } from './stores/settings'
-
-async function readHostsFile() {
-  try {
-    const content = await readTextFile('/etc/hosts')
-
-    files.value.push({
-      id: '1',
-      name: 'Original File',
-      isActive: true,
-      isSelected: true,
-      content: content as string,
-      status: 'Loaded successfully',
-    })
-  } catch (error) {
-    console.error(error)
-  }
-}
 
 async function resetStatus() {
   if (!selectedFile.value) {
@@ -73,29 +57,32 @@ async function writeHostsFile() {
   }
 }
 
+async function loadFiles() {
+  await hostsStore.load()
+  if (hostsStore.files.length === 0) {
+    const content = await readTextFile('/etc/hosts')
+    hostsStore.create('Original File', content, true)
+  }
+  selectedFileContent.value = hostsStore.files.find((f) => f.isSelected)?.content || ''
+}
+
 async function setTheme() {
   const store = await load('settings.json', { autoSave: false })
   const val = await store.get<{ value: string }>('theme')
   settingsStore.set(val?.value === 'dark')
 }
 
-watch(() => settingsStore.isDarkTheme, (isDark) => {
-  if (isDark) {
-    document.documentElement.classList.add('dark')
-  } else {
-    document.documentElement.classList.remove('dark')
-  }
-}, { immediate: true }) // Ensure the theme is set immediately on mount
-
-onMounted(() => {
-  readHostsFile()
-  setTheme()
-  window.addEventListener('keydown', handleKeydown)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown)
-})
+watch(
+  () => settingsStore.isDarkTheme,
+  (isDark) => {
+    if (isDark) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  },
+  { immediate: true },
+) // Ensure the theme is set immediately on mount
 
 function handleKeydown(e: KeyboardEvent) {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
@@ -104,49 +91,27 @@ function handleKeydown(e: KeyboardEvent) {
   }
 }
 
-interface FileItemWithContent extends FileItem {
-  content: string
-  status: string
-}
-
-const files = ref<FileItemWithContent[]>([])
-
-const selectedFileId = ref('1')
-
-const selectedFile = computed(() => files.value.find((f) => f.id === selectedFileId.value))
+const selectedFile = computed(() => hostsStore.files.find((f) => f.isSelected))
+const selectedFileContent = ref('')
 
 const handleFileSelect = (fileId: string) => {
-  selectedFileId.value = fileId
-  files.value = files.value.map((f) => ({
-    ...f,
-    isSelected: f.id === fileId,
-  }))
+  hostsStore.setSelected(fileId)
+  selectedFileContent.value = selectedFile.value?.content || ''
 }
 
-const handleContentChange = (content: string) => {
-  files.value = files.value.map((f) =>
-    f.id === selectedFileId.value ? { ...f, content, status: 'modified' } : f,
-  )
-}
-
-const handleCreateFile = () => {
-  const newFile: FileItemWithContent = {
-    id: Date.now().toString(),
-    name: `New File ${files.value.length}`,
-    isActive: false,
-    isSelected: false,
-    content: '',
-    status: '',
+const handleCreateFile = async () => {
+  const id = await hostsStore.create(`New File ${hostsStore.files.length}`, '')
+  if (id) {
+    handleFileSelect(id)
   }
-  files.value = [...files.value, newFile]
 }
 
 const handleRemoveFile = () => {
-  if (files.value.length > 1) {
-    const updatedFiles = files.value.filter((f) => f.id !== selectedFileId.value)
-    files.value = updatedFiles
-    selectedFileId.value = updatedFiles[0]?.id || ''
-  }
+  // if (files.value.length > 1) {
+  //   const updatedFiles = files.value.filter((f) => f.id !== selectedFileId.value)
+  //   files.value = updatedFiles
+  //   selectedFileId.value = updatedFiles[0]?.id || ''
+  // }
 }
 
 const handleSaveFile = () => {
@@ -155,9 +120,17 @@ const handleSaveFile = () => {
 }
 
 const handleActivateFile = () => {
-  files.value = files.value.map((f) => ({
-    ...f,
-    isActive: f.id === selectedFileId.value,
-  }))
+  if(!selectedFile.value?.id) return
+  hostsStore.setActive(selectedFile.value?.id)
 }
+
+onMounted(() => {
+  setTheme()
+  loadFiles()
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
