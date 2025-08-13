@@ -20,8 +20,9 @@ Currently, this application is only available and tested on macOS. Support for W
 
 ## ✨ Features
 
-*   **Intuitive UI:** Clean and user-friendly interface for easy hosts file management.
+*   **Intuitive UI:** Clean and user-friendly interface for easy hosts file management with Light & Dark mode.
 *   **Fast & Secure:** Built with Rust (Tauri) for performance and system-level access.
+*   **Multiple Files:** Manage multiple files and activate the one you need.
 
 ---
 
