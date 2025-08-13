@@ -65,12 +65,6 @@ async function loadFiles() {
   }
 }
 
-async function setTheme() {
-  const store = await load('settings.json', { autoSave: false })
-  const val = await store.get<{ value: string }>('theme')
-  settingsStore.set(val?.value ? val?.value === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches)
-}
-
 watch(
   () => settingsStore.isDarkTheme,
   (isDark) => {
@@ -130,7 +124,7 @@ const handleActivateFile = () => {
 }
 
 onMounted(() => {
-  setTheme()
+  settingsStore.load()
   loadFiles()
   window.addEventListener('keydown', handleKeydown)
 })
