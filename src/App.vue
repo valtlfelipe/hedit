@@ -68,7 +68,7 @@ async function loadFiles() {
 async function setTheme() {
   const store = await load('settings.json', { autoSave: false })
   const val = await store.get<{ value: string }>('theme')
-  settingsStore.set(val?.value === 'dark')
+  settingsStore.set(val?.value ? val?.value === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches)
 }
 
 watch(
