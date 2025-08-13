@@ -99,6 +99,7 @@ const syncScroll = (event: Event) => {
 onMounted(() => {
   nextTick(() => {
     if (textarea.value) {
+      // TODO: not working as expected
       textarea.value?.focus()
     }
   })

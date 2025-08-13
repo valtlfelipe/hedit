@@ -9,14 +9,6 @@
         <span>Create</span>
       </button>
 
-      <!-- <button
-        @click="$emit('removeFile')"
-        class="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
-      >
-        <Trash2 class="w-4 h-4" />
-        <span>Remove</span>
-      </button> -->
-
       <button
         @click="$emit('saveFile')"
         class="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
@@ -25,13 +17,15 @@
         <span class="text-gray-800 dark:text-gray-200 font-medium">Save</span>
       </button>
 
-      <!-- <button
+      <button
         @click="$emit('activateFile')"
         class="flex items-center space-x-1 px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+        :disabled="!allowActivate"
+        :class="{ 'opacity-50 cursor-not-allowed': !allowActivate }"
       >
         <Play class="w-4 h-4" />
         <span>Activate</span>
-      </button> -->
+      </button>
 
       <div class="flex-1"></div>
 
@@ -69,13 +63,16 @@
 <script setup lang="ts">
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { load } from '@tauri-apps/plugin-store'
-import { MessageSquare, Moon, Plus, Save, Settings, Sun } from 'lucide-vue-next'
+import { MessageSquare, Moon, Play, Plus, Save, Settings, Sun } from 'lucide-vue-next'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { settingsStore } from '../stores/settings'
 
+defineProps<{
+  allowActivate: boolean
+}>();
+
 defineEmits<{
   createFile: []
-  removeFile: []
   saveFile: []
   activateFile: []
 }>()

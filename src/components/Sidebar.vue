@@ -41,6 +41,7 @@
         v-if="contextMenu.show"
         :x="contextMenu.x"
         :y="contextMenu.y"
+        :allow-delete="!contextMenu.file?.isActive"
         @edit="editFile"
         @delete="showConfirmModal"
         @click.stop
@@ -126,8 +127,8 @@ function editFile() {
 
 function showConfirmModal() {
   if (contextMenu.file) {
-    confirmModal.title = `Delete ${contextMenu.file.name}`
-    confirmModal.message = `Are you sure you want to delete ${contextMenu.file.name}? This action cannot be undone.`
+    confirmModal.title = `Delete '${contextMenu.file.name}'`
+    confirmModal.message = `Are you sure you want to delete '${contextMenu.file.name}'? This action cannot be undone.`
     confirmModal.fileId = contextMenu.file.id
     confirmModal.show = true
     hideContextMenu()
@@ -140,6 +141,7 @@ function hideConfirmModal() {
 
 function confirmDelete() {
   hostsStore.deleteFile(confirmModal.fileId)
+  hostsStore.setSelected(hostsStore.files[0]?.id)
   hideConfirmModal()
 }
 
@@ -156,6 +158,10 @@ const statusText = computed(() => {
   switch (props.status) {
     case 'saving':
       return 'Saving...'
+    case 'activating':
+      return 'Activating...'
+    case 'activated':
+      return 'Activated successfully'
     case 'saved':
       return 'Saved successfully'
     case 'error':
