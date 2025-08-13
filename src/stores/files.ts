@@ -1,4 +1,4 @@
-import { BaseDirectory, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
+import { BaseDirectory, exists, mkdir, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
 import { load } from '@tauri-apps/plugin-store'
 import { reactive } from 'vue'
 
@@ -11,14 +11,7 @@ export interface HostsFile {
   status: string
 }
 
-const metadataStore = await load('hosts-metadata.json', { autoSave: 100 })
-
-async function writeProfileContent(id: string, content: string) {
-  // TODO: await mkdir(`profiles`, { baseDir: BaseDirectory.AppData })
-  await writeTextFile(`profiles/${id}.hosts`, content, {
-    baseDir: BaseDirectory.AppData,
-  })
-}
+const metadataStore = await load('files-metadata.json', { autoSave: 100 })
 
 export const hostsStore = reactive({
   files: [] as HostsFile[],
@@ -36,7 +29,7 @@ export const hostsStore = reactive({
   },
   async create(name: string, content: string, isFirst?: boolean): Promise<string> {
     const id = crypto.randomUUID()
-    const profile: HostsFile = {
+    const file: HostsFile = {
       id,
       name,
       isActive: !!isFirst,
@@ -45,21 +38,31 @@ export const hostsStore = reactive({
       status: '',
     }
 
-    await writeProfileContent(id, content)
+    const dirExists = await exists('files', {
+      baseDir: BaseDirectory.AppData,
+    })
 
-    this.files = [...this.files, profile]
+    if (!dirExists) {
+      await mkdir(`files`, { baseDir: BaseDirectory.AppData })
+    }
+
+    await writeTextFile(`files/${id}.hosts`, content, {
+      baseDir: BaseDirectory.AppData,
+    })
+
+    this.files = [...this.files, file]
     this.saveMetadata()
 
     return id
   },
   async load() {
-    const profilesData = await metadataStore.get<HostsFile[]>('profiles')
-    if (profilesData) {
-      this.files = profilesData
+    const filesData = await metadataStore.get<HostsFile[]>('files')
+    if (filesData) {
+      this.files = filesData
     }
     await Promise.all(
       this.files.map(async (file) => {
-        file.content = await readTextFile(`profiles/${file.id}.hosts`, {
+        file.content = await readTextFile(`files/${file.id}.hosts`, {
           baseDir: BaseDirectory.AppData,
         })
       }),
@@ -76,9 +79,20 @@ export const hostsStore = reactive({
     this.files = this.files.filter((file) => file.id !== id)
     this.saveMetadata()
   },
+  async saveContent(id: string) {
+    const file = this.files.find((file) => file.id === id)
+    if (!file) return
+
+    await writeTextFile(`files/${file.id}.hosts`, file.content, {
+      baseDir: BaseDirectory.AppData,
+    })
+    if (file.isActive) {
+      await writeTextFile('/etc/hosts', file.content)
+    }
+  },
   saveMetadata() {
     return metadataStore.set(
-      'profiles',
+      'files',
       this.files.map(({ id, name, isActive, isSelected }) => ({ id, name, isActive, isSelected })),
     )
   },

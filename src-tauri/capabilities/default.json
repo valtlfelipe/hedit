@@ -28,7 +28,7 @@
           "path": "$APPDATA/*"
         },
         {
-          "path": "$APPDATA/profiles/*"
+          "path": "$APPDATA/files/*"
         }
       ]
     },

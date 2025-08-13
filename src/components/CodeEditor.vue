@@ -40,6 +40,19 @@ const modelValue = defineModel<string>({
   default: '',
 })
 
+const focus = () => {
+  nextTick(() => {
+    if (textarea.value) {
+      // TODO: not working as expected
+      textarea.value?.focus()
+    }
+  })
+}
+
+defineExpose({
+  focus,
+})
+
 const textarea = ref<HTMLTextAreaElement | null>(null)
 
 const lineCount = computed(() => {
@@ -99,7 +112,6 @@ const syncScroll = (event: Event) => {
 onMounted(() => {
   nextTick(() => {
     if (textarea.value) {
-      // TODO: not working as expected
       textarea.value?.focus()
     }
   })

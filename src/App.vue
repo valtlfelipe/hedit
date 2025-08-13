@@ -7,7 +7,7 @@
       <div class="flex flex-1 min-h-0">
         <Sidebar :files="hostsStore.files" @file-select="handleFileSelect" :status="selectedFile?.status || ''" />
 
-        <CodeEditor v-if="selectedFile?.content" v-model="selectedFile.content" class="flex-1 min-w-0" />
+        <CodeEditor v-if="selectedFile?.content || selectedFile?.content === ''" v-model="selectedFile.content" class="flex-1 min-w-0" ref="codeEditor" />
       </div>
     </div>
   </MacOSWindow>
@@ -15,15 +15,18 @@
 
 <script setup lang="ts">
 /** biome-ignore-all lint/correctness/noUnusedImports: biomejs is bugged */
-import { BaseDirectory, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
+import { readTextFile } from '@tauri-apps/plugin-fs'
 import { load } from '@tauri-apps/plugin-store'
-import { computed, onMounted, onUnmounted, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+// biome-ignore lint/style/useImportType: biomejs is bugged
 import CodeEditor from './components/CodeEditor.vue'
 import MacOSWindow from './components/MacOSWindow.vue'
 import Sidebar from './components/Sidebar.vue'
 import Toolbar from './components/Toolbar.vue'
 import { hostsStore } from './stores/files'
 import { settingsStore } from './stores/settings'
+
+const codeEditor = ref<InstanceType<typeof CodeEditor> | null>(null)
 
 const selectedFile = computed(() => hostsStore.files.find((f) => f.isSelected))
 
@@ -45,12 +48,7 @@ async function writeHostsFile(isActivating?: boolean) {
   selectedFile.value.status = isActivating ? 'activating' : 'saving'
 
   try {
-    await writeTextFile(`profiles/${selectedFile.value.id}.hosts`, selectedFile.value.content, {
-      baseDir: BaseDirectory.AppData,
-    })
-    if (selectedFile.value.isActive) {
-      await writeTextFile('/etc/hosts', selectedFile.value.content)
-    }
+    await hostsStore.saveContent(selectedFile.value.id)
     selectedFile.value.status = isActivating ? 'activated' : 'saved'
     resetStatus()
   } catch (error) {
@@ -96,7 +94,7 @@ watch(
       return
     }
     selectedFile.value.status = 'modified'
-  }
+  },
 )
 
 function handleKeydown(e: KeyboardEvent) {
@@ -109,6 +107,9 @@ function handleKeydown(e: KeyboardEvent) {
 const handleFileSelect = (fileId: string) => {
   fileSelectedChanged = true
   hostsStore.setSelected(fileId)
+  if (codeEditor.value) {
+    codeEditor.value.focus()
+  }
 }
 
 const handleCreateFile = async () => {
@@ -123,7 +124,7 @@ const handleSaveFile = () => {
 }
 
 const handleActivateFile = () => {
-  if(!selectedFile.value?.id) return
+  if (!selectedFile.value?.id) return
   hostsStore.setActive(selectedFile.value?.id)
   writeHostsFile(true)
 }
