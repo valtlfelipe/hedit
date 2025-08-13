@@ -9,6 +9,9 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .setup(|app| {
+            let app_data_dir = app.path().app_data_dir().unwrap();
+            create_dir_all(app_data_dir.clone()).expect("Problem creating App directory!");
+
             tauri::async_runtime::spawn(telemetry::send_telemetry(app.handle().clone()));
 
             let win_builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::default())
@@ -44,9 +47,6 @@ pub fn run() {
                     ns_window.setBackgroundColor_(bg_color);
                 }
             }
-
-            let app_data_dir = app.path().app_data_dir().unwrap();
-            create_dir_all(app_data_dir.clone()).expect("Problem creating App directory!");
 
             Ok(())
         })
