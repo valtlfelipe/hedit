@@ -14,6 +14,9 @@ publish = false
 name = "hedit_app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+[profile.release]
+strip = true # Ensures debug symbols are removed.
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
@@ -24,6 +27,8 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tauri-plugin-fs = "2"
 tauri-plugin-store = "2"
+posthog-rs = "0.3.7"
+tokio = { version = "1", features = ["full"] }
 
 [target."cfg(target_os = \"macos\")".dependencies]
 cocoa = "0.26"

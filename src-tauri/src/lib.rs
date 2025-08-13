@@ -1,3 +1,5 @@
+use std::env;
+mod telemetry;
 use std::fs::create_dir_all;
 
 use tauri::{Manager, TitleBarStyle, WebviewUrl, WebviewWindowBuilder};
@@ -7,6 +9,8 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .setup(|app| {
+            tauri::async_runtime::spawn(telemetry::send_telemetry(app.handle().clone()));
+
             let win_builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::default())
                 .title("Hedit")
                 .min_inner_size(1000.0, 650.0);
