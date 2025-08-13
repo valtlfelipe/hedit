@@ -1,4 +1,6 @@
-use tauri::{TitleBarStyle, WebviewUrl, WebviewWindowBuilder};
+use std::fs::create_dir_all;
+
+use tauri::{Manager, TitleBarStyle, WebviewUrl, WebviewWindowBuilder};
 
 pub fn run() {
     tauri::Builder::default()
@@ -38,6 +40,9 @@ pub fn run() {
                     ns_window.setBackgroundColor_(bg_color);
                 }
             }
+
+            let app_data_dir = app.path().app_data_dir().unwrap();
+            create_dir_all(app_data_dir.clone()).expect("Problem creating App directory!");
 
             Ok(())
         })
