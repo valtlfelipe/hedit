@@ -74,7 +74,7 @@ import LicenseModal from './LicenseModal.vue'
 
 defineProps<{
   allowActivate: boolean
-}>();
+}>()
 
 defineEmits<{
   createFile: []

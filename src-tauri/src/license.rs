@@ -43,8 +43,6 @@ pub async fn check_license(app_handle: AppHandle) {
         "isTest": tauri::is_dev(),
     });
 
-    println!("Checking license with payload: {:?}", payload);
-
     let client = reqwest::Client::new();
     let res = match client
         .post("https://licensing.felipevm.dev/api/check")

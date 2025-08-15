@@ -7,14 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": [
-      "src/**",
-      "./*.json",
-      "./*.js",
-      "./*.ts",
-      "./*.vue",
-      "!src/vite-env.d.ts"
-    ]
+    "includes": ["src/**", "./*.json", "./*.js", "./*.ts", "./*.vue", "!src/vite-env.d.ts"]
   },
   "formatter": {
     "enabled": true,

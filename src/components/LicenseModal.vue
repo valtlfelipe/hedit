@@ -12,6 +12,9 @@
           <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
             If you are using this app for commercial use, you need to activate a license.
           </p>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Hedit is a fully indie project, and every license helps keep it that way. Thank you for your support!
+          </p>
           <div class="flex items-center mt-4">
             <input
               id="personal-use"
