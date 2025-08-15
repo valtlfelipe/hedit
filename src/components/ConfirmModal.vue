@@ -4,6 +4,7 @@
       v-if="show"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
       @click.self="$emit('close')"
+      data-tauri-drag-region
     >
       <transition name="slide-up">
         <div v-if="show" class="w-full max-w-md p-6 bg-white rounded-lg shadow-xl dark:bg-zinc-800">

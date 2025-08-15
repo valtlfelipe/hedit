@@ -1,4 +1,5 @@
 use std::env;
+mod license;
 mod telemetry;
 use std::fs::create_dir_all;
 
@@ -6,6 +7,7 @@ use tauri::{Manager, TitleBarStyle, WebviewUrl, WebviewWindowBuilder};
 
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .setup(|app| {
@@ -13,6 +15,7 @@ pub fn run() {
             create_dir_all(app_data_dir.clone()).expect("Problem creating App directory!");
 
             tauri::async_runtime::spawn(telemetry::send_telemetry(app.handle().clone()));
+            tauri::async_runtime::spawn(license::check_license(app.handle().clone()));
 
             let win_builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::default())
                 .title("Hedit")
@@ -51,7 +54,7 @@ pub fn run() {
             Ok(())
         })
         .plugin(tauri_plugin_fs::init())
-        // .invoke_handler(tauri::generate_handler![read_hosts_file, write_hosts_file])
+        .invoke_handler(tauri::generate_handler![license::activate])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

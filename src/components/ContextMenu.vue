@@ -1,13 +1,13 @@
 <template>
   <transition name="fade-scale">
     <div
-      class="absolute z-10 bg-gray-50/95 dark:bg-zinc-800/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg w-56"
+      class="absolute z-10 bg-gray-50/95 dark:bg-zinc-800/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg w-40"
       :style="{ top: `${y}px`, left: `${x}px` }"
     >
       <ul class="p-1 text-sm text-gray-800 dark:text-gray-200">
         <li
           @click.prevent="$emit('edit')"
-          class="rounded-lg flex items-center gap-3 px-3 py-1.5 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
+          class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
         >
           <Pencil class="w-4 h-4" />
           <span>Rename File</span>
@@ -15,7 +15,7 @@
         <div class="border-t border-gray-200 dark:border-zinc-700 my-1"></div>
         <li
           @click.prevent="allowDelete ? $emit('delete') : null"
-          class="rounded-lg flex items-center gap-3 px-3 py-1.5 text-red-600 dark:text-red-400 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
+          class="rounded-lg flex items-center gap-2 px-2 py-1 text-red-600 dark:text-red-400 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
           :class="{ 'cursor-not-allowed opacity-50': !allowDelete }"
         >
           <Trash2 class="w-4 h-4" />

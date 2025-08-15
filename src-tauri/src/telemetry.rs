@@ -9,10 +9,10 @@ fn is_telemetry_disabled(app_handle: &AppHandle) -> bool {
     }
 
     let store = match app_handle.path().app_data_dir() {
-        Ok(app_dir) => {
-            StoreBuilder::new(&app_handle.clone(), app_dir.join("settings.json")).build()
-        }
-        Err(_) => return true
+        Ok(app_dir) => StoreBuilder::new(&app_handle.clone(), app_dir.join("settings.json"))
+            .disable_auto_save()
+            .build(),
+        Err(_) => return true,
     };
 
     let store = match store {

@@ -15,8 +15,9 @@
 
 <script setup lang="ts">
 /** biome-ignore-all lint/correctness/noUnusedImports: biomejs is bugged */
+
+import { listen } from '@tauri-apps/api/event'
 import { readTextFile } from '@tauri-apps/plugin-fs'
-import { load } from '@tauri-apps/plugin-store'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 // biome-ignore lint/style/useImportType: biomejs is bugged
 import CodeEditor from './components/CodeEditor.vue'
@@ -25,6 +26,11 @@ import Sidebar from './components/Sidebar.vue'
 import Toolbar from './components/Toolbar.vue'
 import { hostsStore } from './stores/files'
 import { settingsStore } from './stores/settings'
+
+listen('license-invalid', async () => {
+  // TODO:
+  console.warn('License is invalid, do something')
+})
 
 const codeEditor = ref<InstanceType<typeof CodeEditor> | null>(null)
 
