@@ -13,8 +13,7 @@ body:
     attributes:
       label: What happened?
       description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
-      value: "A bug happened!"
+      placeholder: Tell us about the bug. Feel free to attach screenshots.
     validations:
       required: true
   - type: textarea

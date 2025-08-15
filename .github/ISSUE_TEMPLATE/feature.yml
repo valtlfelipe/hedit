@@ -1,0 +1,18 @@
+name: Feature Request
+description: File a feature request.
+title: "[Feature]: "
+labels: ["feature", "triage"]
+# projects: ["octo-org/1", "octo-org/44"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        You have an idea for a new feature? Please fill out the form below to help us understand your request better.
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: What is your feature request?
+      description: Please provide a detailed description of your feature request.
+      placeholder: Tell us about your feature request...
+    validations:
+      required: true
