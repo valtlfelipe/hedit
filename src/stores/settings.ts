@@ -9,10 +9,6 @@ listen('reload-settings', async () => {
   await settingsStore.load()
 })
 
-function getFromEntries<T>(values: [string, unknown][], key: string): T | undefined {
-  return values.find(([k]) => k === key)?.[1] as T
-}
-
 export const settingsStore = reactive({
   isDarkTheme: false,
   license: '',
@@ -20,18 +16,13 @@ export const settingsStore = reactive({
   personalUseOnly: false,
   isActivated: false,
   async load() {
-    const values = await store.entries()
-
-    const themeValue = getFromEntries<string>(values, 'theme')
-    this.isDarkTheme = themeValue === 'dark'
-    if (!themeValue) {
-      this.isDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-    }
-
-    this.license = getFromEntries<string>(values, 'license') || ''
-    this.activationId = getFromEntries<string>(values, 'activationId') || ''
-    this.personalUseOnly = getFromEntries<boolean>(values, 'personalUseOnly') || false
-    this.isActivated = getFromEntries<boolean>(values, 'isActivated') || false
+    this.isDarkTheme =
+      (await store.get<string>('theme')) === 'dark' ||
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    this.license = (await store.get<string>('license')) || ''
+    this.activationId = (await store.get<string>('activationId')) || ''
+    this.personalUseOnly = (await store.get<boolean>('personalUseOnly')) || false
+    this.isActivated = (await store.get<boolean>('isActivated')) || false
   },
   setTheme(isDark: boolean) {
     this.isDarkTheme = isDark
@@ -39,17 +30,14 @@ export const settingsStore = reactive({
   },
   setPersonalUseOnly(personalUseOnly: boolean) {
     this.personalUseOnly = personalUseOnly
-    console.log('Personal use only set to:', personalUseOnly)
     this.save()
   },
   async save() {
-    await Promise.all([
-      store.set('theme', this.isDarkTheme ? 'dark' : 'light'),
-      store.set('license', this.license),
-      store.set('activationId', this.activationId),
-      store.set('personalUseOnly', this.personalUseOnly),
-      store.set('isActivated', this.isActivated),
-    ])
-    return store.save()
+    await store.set('theme', this.isDarkTheme ? 'dark' : 'light')
+    await store.set('license', this.license)
+    await store.set('activationId', this.activationId)
+    await store.set('personalUseOnly', this.personalUseOnly)
+    await store.set('isActivated', this.isActivated)
+    await store.save()
   },
 })

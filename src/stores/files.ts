@@ -1,4 +1,11 @@
-import { BaseDirectory, exists, mkdir, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
+import {
+  BaseDirectory,
+  exists,
+  mkdir,
+  readTextFile,
+  writeTextFile,
+  remove,
+} from '@tauri-apps/plugin-fs'
 import { load } from '@tauri-apps/plugin-store'
 import { reactive } from 'vue'
 
@@ -77,6 +84,7 @@ export const hostsStore = reactive({
       return
     }
     this.files = this.files.filter((file) => file.id !== id)
+    await remove(`files/${id}.hosts`, { baseDir: BaseDirectory.AppData })
     this.saveMetadata()
   },
   async saveContent(id: string) {

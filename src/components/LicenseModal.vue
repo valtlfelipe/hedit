@@ -96,10 +96,12 @@ const isLoading = ref(false)
 
 watch(
   () => props.show,
-  (val) => {
-    if (val) {
+  (show) => {
+    if (show) {
       personalUseOnly.value = settingsStore.personalUseOnly
       license.value = settingsStore.license
+      error.value = false
+      errorText.value = ''
     }
   },
 )
@@ -122,7 +124,7 @@ async function activate() {
 
   try {
     await invoke('activate', { licenseKey: license.value })
-  } catch (e) {
+  } catch (_) {
     error.value = true
     errorText.value = 'Activation failed. Please check your license key.'
   }

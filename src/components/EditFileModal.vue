@@ -57,20 +57,14 @@ const filenameInput = ref<HTMLInputElement | null>(null)
 const newName = ref(props.currentName)
 
 watch(
-  () => props.currentName,
-  (name) => {
-    newName.value = name
-  },
-)
-
-watch(
   () => props.show,
   (show) => {
-    nextTick(() => {
-      if (show && filenameInput.value) {
+    if (show) {
+      newName.value = props.currentName
+      nextTick(() => {
         filenameInput.value?.focus()
-      }
-    })
+      })
+    }
   },
 )
 
