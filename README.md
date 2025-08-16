@@ -2,7 +2,7 @@
 
 A sleek and intuitive hosts file editor built with Tauri, Vue.js, and Rust. Simplify managing your `/etc/hosts` file with a modern, cross-platform application.
 
-![](https://github.com/user-attachments/assets/4bd419c7-18c7-4223-bbb2-f91c606f4d67)
+![](https://github.com/user-attachments/assets/fa0e871a-edbf-45b8-925c-8e55dbf6c08e)
 
 ---
 
