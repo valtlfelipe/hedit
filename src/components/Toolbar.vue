@@ -19,7 +19,7 @@
 
       <button
         @click="$emit('activateFile')"
-        class="flex items-center space-x-1 px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+        class="flex items-center space-x-1 px-3 py-1.5 text-sm text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors"
         :disabled="!allowActivate"
         :class="{ 'opacity-50 cursor-not-allowed': !allowActivate }"
       >
@@ -66,6 +66,7 @@
 </template>
 
 <script setup lang="ts">
+import { listen } from '@tauri-apps/api/event'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { KeyRound, MessageSquare, Moon, Play, Plus, Save, Settings, Sun } from 'lucide-vue-next'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
@@ -85,6 +86,10 @@ defineEmits<{
 const showSettings = ref(false)
 const showLicenseModal = ref(false)
 const settingsContainer = ref<HTMLElement | null>(null)
+
+listen('activate_license', async () => {
+  showLicenseModal.value = true
+})
 
 const handleClickOutside = (event: MouseEvent) => {
   if (settingsContainer.value && !settingsContainer.value.contains(event.target as Node)) {
@@ -115,7 +120,7 @@ const toggleDarkMode = async () => {
 }
 
 const openFeedbackLink = () => {
-  openUrl('https://github.com/valtlfelipe/hedit/issues/new')
+  openUrl('https://github.com/valtlfelipe/hedit/issues/new/choose')
   showSettings.value = false
 }
 </script>

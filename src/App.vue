@@ -97,10 +97,44 @@ watch(
   },
 )
 
+listen('new_file', async () => handleCreateFile())
+listen('activate_file', async () => handleActivateFile())
+listen('save_file', async () => handleSaveFile())
+listen('zoom_reset', () => {
+  document.body.style.zoom = '100%'
+})
+listen('zoom_in', () => handleZoomIn())
+listen('zoom_out', () => handleZoomOut())
+
+const handleZoomIn = () => {
+  const currentZoom = parseInt(document.body.style.zoom.replace('%', '')) || 100
+  document.body.style.zoom = `${currentZoom + 10}%`
+}
+
+const handleZoomOut = () => {
+  const currentZoom = parseInt(document.body.style.zoom.replace('%', '')) || 100
+  document.body.style.zoom = `${currentZoom - 10}%`
+}
+
 function handleKeydown(e: KeyboardEvent) {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
     e.preventDefault()
     handleSaveFile()
+  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
+    e.preventDefault()
+    handleCreateFile()
+  } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'a') {
+    e.preventDefault()
+    handleActivateFile()
+  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === '-') {
+    e.preventDefault()
+    handleZoomOut()
+  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === '=') {
+    e.preventDefault()
+    handleZoomIn()
+  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === '0') {
+    e.preventDefault()
+    document.body.style.zoom = '100%'
   }
 }
 
@@ -124,7 +158,7 @@ const handleSaveFile = () => {
 }
 
 const handleActivateFile = () => {
-  if (!selectedFile.value?.id) return
+  if (!selectedFile.value?.id || selectedFile.value.isActive) return
   hostsStore.setActive(selectedFile.value?.id)
   writeHostsFile(true)
 }

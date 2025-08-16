@@ -12,3 +12,11 @@ body,
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+.text-ip {
+  color: #db70b8;
+}
+
+.dark .text-ip {
+  color: #db70b8;
+}

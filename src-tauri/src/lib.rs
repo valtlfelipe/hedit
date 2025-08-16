@@ -1,5 +1,6 @@
 use std::env;
 mod license;
+mod menu;
 mod telemetry;
 use std::fs::create_dir_all;
 
@@ -16,6 +17,13 @@ pub fn run() {
 
             tauri::async_runtime::spawn(telemetry::send_telemetry(app.handle().clone()));
             tauri::async_runtime::spawn(license::check_license(app.handle().clone()));
+
+            let menu = menu::get_menu(app.handle()).unwrap();
+            app.set_menu(menu)?;
+
+            app.on_menu_event(move |app_handle: &tauri::AppHandle, event| {
+                menu::handle_menu_event(app_handle, &event);
+            });
 
             let win_builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::default())
                 .title("Hedit")

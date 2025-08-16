@@ -81,7 +81,7 @@ const highlightLine = (line: string) => {
 
   if (match) {
     const [, whitespace, ip, rest] = match
-    return `${escapeHtml(whitespace)}<span class="text-blue-600 dark:text-blue-400">${escapeHtml(ip)}</span><span class="text-gray-800 dark:text-gray-200">${escapeHtml(rest)}</span>`
+    return `${escapeHtml(whitespace)}<span class="text-ip">${escapeHtml(ip)}</span><span class="text-gray-800 dark:text-gray-200">${escapeHtml(rest)}</span>`
   }
 
   return `<span class="text-gray-800 dark:text-gray-200">${escapeHtml(line)}</span>`

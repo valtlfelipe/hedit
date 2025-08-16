@@ -21,7 +21,7 @@
               v-model="personalUseOnly"
               :disabled="settingsStore.isActivated"
               type="checkbox"
-              class="h-4 w-4 text-blue-600 border-gray-300 rounded dark:border-zinc-600 focus:ring-blue-500"
+              class="h-4 w-4 text-purple-600 border-gray-300 rounded dark:border-zinc-600 focus:ring-purple-500"
               @change="onPersonalUseChange"
             />
             <label for="personal-use" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
@@ -38,7 +38,7 @@
               :disabled="settingsStore.isActivated"
               :required="true"
               type="text"
-              :class="['block w-full px-3 py-2 mt-1 text-gray-900 bg-white rounded-md shadow-sm dark:bg-zinc-700 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm border', error ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-zinc-600']"
+              :class="['block w-full px-3 py-2 mt-1 text-gray-900 bg-white rounded-md shadow-sm dark:bg-zinc-700 dark:text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm border', error ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-zinc-600']"
               placeholder="Enter your license key"
             />
               <div v-if="error" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errorText }}</div>
@@ -46,7 +46,7 @@
           <div class="mt-6 flex justify-end space-x-3">
             <button
               @click="$emit('close')"
-              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-zinc-700 dark:border-zinc-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-zinc-700 dark:border-zinc-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
             >
               {{ settingsStore.isActivated || personalUseOnly ? 'Close' : 'Cancel' }}
             </button>
@@ -55,7 +55,7 @@
                 v-if="!settingsStore.isActivated"
                 @click="activate"
                 :disabled="isLoading"
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center justify-center"
+                class="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 flex items-center justify-center"
               >
                 <span v-if="isLoading" class="mr-2">
                 <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
