@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { Check, File, Folder, Play } from 'lucide-vue-next'
+import { File, Folder, Play } from 'lucide-vue-next'
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import type { HostsFile } from '../stores/files'
 import { hostsStore } from '../stores/files'

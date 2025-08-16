@@ -95,7 +95,7 @@ pub fn get_menu<R: Runtime>(app_handle: &AppHandle<R>) -> tauri::Result<Menu<R>>
         ],
     )?;
 
-    let dev = Submenu::with_items(
+    let _dev = Submenu::with_items(
         app_handle,
         "Dev",
         true,
@@ -150,7 +150,7 @@ pub fn get_menu<R: Runtime>(app_handle: &AppHandle<R>) -> tauri::Result<Menu<R>>
             &window,
             &help,
             #[cfg(dev)]
-            &dev,
+            &_dev,
         ],
     )?;
 
@@ -158,6 +158,7 @@ pub fn get_menu<R: Runtime>(app_handle: &AppHandle<R>) -> tauri::Result<Menu<R>>
 }
 
 pub fn handle_menu_event(app_handle: &tauri::AppHandle, event: &MenuEvent) {
+    #[cfg(dev)]
     let window = app_handle.get_webview_window("main").unwrap();
 
     match event.id().0.as_str() {
@@ -176,7 +177,9 @@ pub fn handle_menu_event(app_handle: &tauri::AppHandle, event: &MenuEvent) {
                 println!("Failed to open feedback {e:?}")
             }
         }
+        #[cfg(dev)]
         "dev_refresh" => window.eval("location.reload()").unwrap(),
+        #[cfg(dev)]
         "dev_toggle_devtools" => {
             if window.is_devtools_open() {
                 window.close_devtools();
