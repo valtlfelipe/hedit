@@ -33,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { watchDebounced } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref } from 'vue'
 
 const modelValue = defineModel<string>({
@@ -54,6 +55,38 @@ defineExpose({
 })
 
 const textarea = ref<HTMLTextAreaElement | null>(null)
+const errorLines = ref(new Set<number>)
+
+const validateLine = (line: string): boolean => {
+  const trimmedLine = line.trim()
+  if (trimmedLine === '' || trimmedLine.startsWith('#')) {
+    return true
+  }
+
+  const parts = trimmedLine.split(/\s+/)
+  if (parts.length < 2) {
+    return false
+  }
+
+  const ip = parts[0]
+  const ipRegex = /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$|^[0-9a-fA-F:]+$/
+  return ipRegex.test(ip)
+}
+
+watchDebounced(
+  modelValue,
+  (newValue) => {
+    const newErrorLines = new Set<number>()
+    const lines = newValue.split('\n')
+    lines.forEach((line, index) => {
+      if (!validateLine(line)) {
+        newErrorLines.add(index + 1)
+      }
+    })
+    errorLines.value = newErrorLines
+  },
+  { immediate: true, debounce: 500, maxWait: 1000 },
+)
 
 const lineCount = computed(() => {
   return modelValue.value.split('\n').length
@@ -62,11 +95,15 @@ const lineCount = computed(() => {
 const highlightedContent = computed(() => {
   return modelValue.value
     .split('\n')
-    .map((line) => highlightLine(line))
+    .map((line, index) => highlightLine(line, index + 1))
     .join('\n')
 })
 
-const highlightLine = (line: string) => {
+const highlightLine = (line: string, lineNumber: number) => {
+  if (errorLines.value.has(lineNumber)) {
+    return `<span class="text-gray-800 dark:text-gray-200 invalid-line">${escapeHtml(line)}</span>`
+  }
+
   // Empty line
   if (!line.trim()) return line
 
@@ -95,7 +132,7 @@ const escapeHtml = (text: string) => {
     '"': '&quot;',
     "'": '&#039;',
   }
-  return text.replace(/[&<>"']/g, (m: string) => map[m as keyof typeof map])
+  return text.replace(/[&<>'"']/g, (m: string) => map[m as keyof typeof map])
 }
 
 const syncScroll = (event: Event) => {
@@ -118,7 +155,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style>
 /* Ensure the textarea and highlight overlay are perfectly aligned */
 .syntax-highlight,
 textarea {
@@ -126,6 +163,12 @@ textarea {
   font-size: 0.875rem;
   line-height: 1.5rem;
   tab-size: 4;
+}
+
+.invalid-line {
+  text-decoration: underline;
+  text-decoration-color: #ef4444;
+  text-decoration-style: wavy;
 }
 
 /* Custom scrollbar styling */
