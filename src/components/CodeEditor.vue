@@ -229,7 +229,7 @@ watch(
       overlayScroll.measure()
       lineNumbersScroll.measure()
     })
-  }
+  },
 )
 
 // Validation Watcher - Only revalidate if content actually changed
@@ -254,8 +254,137 @@ const focus = (): void => {
   })
 }
 
+const toggleComment = (): void => {
+  if (!textarea.value) return
+
+  const text = modelValue.value
+  const lines = text.split('\n')
+  const start = textarea.value.selectionStart
+  const end = textarea.value.selectionEnd
+  const isSelectionCollapsed = start === end
+
+  // Calculate which lines are selected
+  let startLine = 0
+  let endLine = 0
+  let charCount = 0
+
+  for (let i = 0; i < lines.length; i++) {
+    const lineLength = lines[i].length + 1 // +1 for the newline character
+    if (charCount <= start && start < charCount + lineLength) {
+      startLine = i
+    }
+    if (charCount <= end && end < charCount + lineLength) {
+      endLine = i
+    }
+    charCount += lineLength
+  }
+
+  // Toggle comments for selected lines
+  const newLines = [...lines]
+  let allCommented = true
+
+  // Check if all selected lines are already commented
+  for (let i = startLine; i <= endLine; i++) {
+    if (!newLines[i].trim().startsWith('#') && newLines[i].trim() !== '') {
+      allCommented = false
+      break
+    }
+  }
+
+  // Calculate cursor position adjustments
+  let startAdjustment = 0
+  let endAdjustment = 0
+
+  // Toggle comments
+  for (let i = startLine; i <= endLine; i++) {
+    if (allCommented) {
+      // Uncomment: Remove '# ' or '#' from the beginning of the line
+      if (newLines[i].trim().startsWith('# ')) {
+        const match = newLines[i].match(/^(\s*)#\s(.*)/)
+        if (match) {
+          const leadingWhitespace = match[1]
+          newLines[i] = leadingWhitespace + match[2]
+          // Adjust cursor position if this line is before or at the cursor
+          const charsRemoved = 2 // '# '
+          if (i < startLine) {
+            startAdjustment -= charsRemoved
+          } else if (i === startLine && start > leadingWhitespace.length) {
+            // Cursor is within the line content
+            startAdjustment -= Math.min(charsRemoved, start - leadingWhitespace.length)
+          }
+          if (i < endLine) {
+            endAdjustment -= charsRemoved
+          } else if (i === endLine && end > leadingWhitespace.length) {
+            endAdjustment -= Math.min(charsRemoved, end - leadingWhitespace.length)
+          }
+        }
+      } else if (newLines[i].trim().startsWith('#')) {
+        const match = newLines[i].match(/^(\s*)#(.*)/)
+        if (match) {
+          const leadingWhitespace = match[1]
+          newLines[i] = leadingWhitespace + match[2]
+          // Adjust cursor position if this line is before or at the cursor
+          const charsRemoved = 1 // '#'
+          if (i < startLine) {
+            startAdjustment -= charsRemoved
+          } else if (i === startLine && start > leadingWhitespace.length) {
+            startAdjustment -= charsRemoved
+          }
+          if (i < endLine) {
+            endAdjustment -= charsRemoved
+          } else if (i === endLine && end > leadingWhitespace.length) {
+            endAdjustment -= charsRemoved
+          }
+        }
+      }
+    } else {
+      // Comment: Add '# ' to the beginning of the line if it's not empty
+      if (newLines[i].trim() !== '') {
+        // Preserve leading whitespace
+        const leadingWhitespace = newLines[i].match(/^\s*/)?.[0] || ''
+        const content = newLines[i].substring(leadingWhitespace.length)
+        newLines[i] = leadingWhitespace + '# ' + content
+
+        // Adjust cursor position if this line is before or at the cursor
+        const charsAdded = 2 // '# '
+        if (i < startLine) {
+          startAdjustment += charsAdded
+        } else if (i === startLine) {
+          startAdjustment += charsAdded
+        }
+        if (i < endLine) {
+          endAdjustment += charsAdded
+        } else if (i === endLine) {
+          endAdjustment += charsAdded
+        }
+      }
+    }
+  }
+
+  // Update the model value
+  modelValue.value = newLines.join('\n')
+
+  // Calculate new cursor positions
+  const newStart = start + startAdjustment
+  const newEnd = end + endAdjustment
+
+  // Restore cursor position
+  nextTick(() => {
+    if (textarea.value) {
+      textarea.value.focus()
+      // If it was a collapsed selection (just cursor), keep it collapsed
+      if (isSelectionCollapsed) {
+        textarea.value.setSelectionRange(newStart, newStart)
+      } else {
+        textarea.value.setSelectionRange(newStart, newEnd)
+      }
+    }
+  })
+}
+
 defineExpose({
   focus,
+  toggleComment,
   hasErrors: computed(() => errorLines.value.size > 0),
 })
 

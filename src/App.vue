@@ -75,8 +75,14 @@ const handleActivateFile = () => {
   fileOperations.handleActivateFile()
 }
 
+const handleToggleComment = () => {
+  if (codeEditor.value) {
+    codeEditor.value.toggleComment()
+  }
+}
+
 // Initialize event listeners and watchers
-const keyboardShortcuts = useKeyboardShortcuts(handleCreateFile, handleSaveFile, handleActivateFile)
+const keyboardShortcuts = useKeyboardShortcuts(handleCreateFile, handleSaveFile, handleActivateFile, handleToggleComment)
 
 keyboardShortcuts.initializeEventListeners()
 initializeTheme()
