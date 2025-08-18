@@ -4,7 +4,7 @@
       <!-- Line numbers -->
       <div
         ref="lineNumbers"
-        class="line-numbers select-none text-gray-500 dark:text-gray-400 text-sm font-mono py-3 px-4 text-right bg-gray-50 dark:bg-zinc-800/50 overflow-y-auto overflow-x-hidden"
+        class="line-numbers select-none text-gray-500 dark:text-gray-400 text-sm font-mono py-3 px-4 text-right bg-gray-50 dark:bg-zinc-800/50 overflow-hidden shadow-sm"
         role="presentation"
         aria-label="Line numbers"
       >
@@ -30,13 +30,15 @@
           <template v-for="(line, index) in highlightedLines" :key="index">
             <span v-html="line"></span><br v-if="index < highlightedLines.length - 1">
           </template>
+          <!-- Add extra line to match textarea behavior -->
+          <br>
         </div>
 
         <!-- Actual textarea (transparent text) -->
         <textarea
           ref="textarea"
           v-model="modelValue"
-          class="editor-textarea w-full h-full font-mono text-sm py-3 px-4 bg-transparent text-transparent caret-gray-800 dark:caret-gray-200 resize-none outline-none leading-6 overflow-auto"
+          class="editor-textarea w-full h-full font-mono text-sm py-3 px-4 bg-transparent resize-none outline-none leading-6 overflow-auto overscroll-none"
           :class="textareaClasses"
           spellcheck="false"
           autocomplete="off"
@@ -45,6 +47,7 @@
           role="textbox"
           aria-label="Code editor"
           aria-multiline="true"
+          resize="none"
         />
       </div>
     </div>
@@ -78,61 +81,8 @@ const textareaScroll = useScroll(textarea)
 const overlayScroll = useScroll(highlightOverlay)
 const lineNumbersScroll = useScroll(lineNumbers)
 
-watch(
-  () => modelValue.value,
-  () => {
-    nextTick(() => {
-      textareaScroll.measure()
-      overlayScroll.measure()
-      lineNumbersScroll.measure()
-    })
-  }
-)
-
 // Prevent circular scroll updates
 const isScrollSyncing = ref(false)
-
-// Sync scroll positions
-const syncScrollPositions = (x: number, y: number) => {
-  if (isScrollSyncing.value) return
-
-  isScrollSyncing.value = true
-
-  nextTick(() => {
-    // Sync overlay with both X and Y coordinates
-    overlayScroll.x.value = x
-    overlayScroll.y.value = y
-
-    // Sync line numbers with Y coordinate only (vertical scroll)
-    lineNumbersScroll.y.value = y
-
-    isScrollSyncing.value = false
-  })
-}
-
-// Watch for textarea scroll changes (primary scroll source)
-watch(
-  () => [textareaScroll.x.value, textareaScroll.y.value],
-  ([x, y]) => syncScrollPositions(x, y),
-  { flush: 'sync' },
-)
-
-// Watch for line numbers scroll changes (when user scrolls line numbers directly)
-watch(
-  () => lineNumbersScroll.y.value,
-  (y) => {
-    if (!isScrollSyncing.value) {
-      isScrollSyncing.value = true
-      nextTick(() => {
-        // Sync textarea and overlay to match line numbers scroll
-        textareaScroll.y.value = y
-        overlayScroll.y.value = y
-        isScrollSyncing.value = false
-      })
-    }
-  },
-  { flush: 'sync' },
-)
 
 // Computed Properties
 const lineCount = computed((): number => {
@@ -241,6 +191,47 @@ const highlightLine = (line: string, lineNumber: number): string => {
   return `<span class="text-gray-800 dark:text-gray-200">${escapedLine}</span>`
 }
 
+// Sync scroll positions
+const syncScrollPositions = (x: number, y: number) => {
+  if (isScrollSyncing.value) return
+
+  isScrollSyncing.value = true
+
+  nextTick(() => {
+    // Sync overlay with both X and Y coordinates
+    if (highlightOverlay.value) {
+      highlightOverlay.value.scrollLeft = x
+      highlightOverlay.value.scrollTop = y
+    }
+
+    // Sync line numbers with Y coordinate only (vertical scroll)
+    if (lineNumbers.value) {
+      lineNumbers.value.scrollTop = y
+    }
+
+    isScrollSyncing.value = false
+  })
+}
+
+// Watch for textarea scroll changes (primary scroll source)
+watch(
+  () => [textareaScroll.x.value, textareaScroll.y.value],
+  ([x, y]) => syncScrollPositions(x, y),
+  { flush: 'sync' },
+)
+
+// Watch for modelValue changes to update scroll
+watch(
+  () => modelValue.value,
+  () => {
+    nextTick(() => {
+      textareaScroll.measure()
+      overlayScroll.measure()
+      lineNumbersScroll.measure()
+    })
+  }
+)
+
 // Validation Watcher - Only revalidate if content actually changed
 watchDebounced(
   modelValue,
@@ -274,6 +265,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.editor-textarea {
+  color: transparent;
+  caret-color: #374151; /* gray-700 for light mode */
+}
+
+.dark .editor-textarea {
+  caret-color: #d1d5db; /* gray-300 for dark mode */
+}
+
 /* Ensure the textarea and highlight overlay are perfectly aligned */
 .syntax-highlight,
 .editor-textarea {
@@ -328,6 +328,8 @@ onMounted(() => {
 .syntax-highlight::-webkit-scrollbar-track {
   background-color: #f3f4f6;
   border-radius: 6px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .dark .editor-textarea::-webkit-scrollbar-track,
