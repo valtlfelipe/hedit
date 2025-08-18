@@ -3,19 +3,18 @@
     <div class="flex flex-1 min-h-0">
       <!-- Line numbers -->
       <div
-        class="line-numbers select-none text-gray-500 dark:text-gray-400 text-sm font-mono py-3 px-3 text-right bg-gray-50 dark:bg-zinc-800/50 overflow-hidden"
+        ref="lineNumbers"
+        class="line-numbers select-none text-gray-500 dark:text-gray-400 text-sm font-mono py-3 px-4 text-right bg-gray-50 dark:bg-zinc-800/50 overflow-y-auto overflow-x-hidden"
         role="presentation"
         aria-label="Line numbers"
       >
-        <div class="h-full overflow-hidden">
-          <div
-            v-for="n in lineCount"
-            :key="n"
-            class="leading-6"
-            :class="{ 'text-red-500 font-bold': errorLines.has(n) }"
-          >
-            {{ n }}
-          </div>
+        <div
+          v-for="n in lineCount"
+          :key="n"
+          class="leading-6 h-6"
+          :class="{ 'text-red-500 font-bold': errorLines.has(n) }"
+        >
+          {{ n }}
         </div>
       </div>
 
@@ -46,7 +45,6 @@
           role="textbox"
           aria-label="Code editor"
           aria-multiline="true"
-          @scroll="handleScroll"
         />
       </div>
     </div>
@@ -54,8 +52,8 @@
 </template>
 
 <script setup lang="ts">
-import { watchDebounced } from '@vueuse/core'
-import { computed, nextTick, onMounted, type Ref, ref, shallowRef } from 'vue'
+import { useScroll, watchDebounced } from '@vueuse/core'
+import { computed, nextTick, onMounted, type Ref, ref, shallowRef, watch } from 'vue'
 
 // Constants
 const VALIDATION_DEBOUNCE = 300
@@ -71,8 +69,70 @@ const modelValue = defineModel<string>({
 // Refs
 const textarea: Ref<HTMLTextAreaElement | null> = ref(null)
 const highlightOverlay: Ref<HTMLDivElement | null> = ref(null)
+const lineNumbers: Ref<HTMLDivElement | null> = ref(null)
 const errorLines = shallowRef(new Set<number>())
 const lastValidatedContent = ref('')
+
+// Scroll synchronization
+const textareaScroll = useScroll(textarea)
+const overlayScroll = useScroll(highlightOverlay)
+const lineNumbersScroll = useScroll(lineNumbers)
+
+watch(
+  () => modelValue.value,
+  () => {
+    nextTick(() => {
+      textareaScroll.measure()
+      overlayScroll.measure()
+      lineNumbersScroll.measure()
+    })
+  }
+)
+
+// Prevent circular scroll updates
+const isScrollSyncing = ref(false)
+
+// Sync scroll positions
+const syncScrollPositions = (x: number, y: number) => {
+  if (isScrollSyncing.value) return
+
+  isScrollSyncing.value = true
+
+  nextTick(() => {
+    // Sync overlay with both X and Y coordinates
+    overlayScroll.x.value = x
+    overlayScroll.y.value = y
+
+    // Sync line numbers with Y coordinate only (vertical scroll)
+    lineNumbersScroll.y.value = y
+
+    isScrollSyncing.value = false
+  })
+}
+
+// Watch for textarea scroll changes (primary scroll source)
+watch(
+  () => [textareaScroll.x.value, textareaScroll.y.value],
+  ([x, y]) => syncScrollPositions(x, y),
+  { flush: 'sync' },
+)
+
+// Watch for line numbers scroll changes (when user scrolls line numbers directly)
+watch(
+  () => lineNumbersScroll.y.value,
+  (y) => {
+    if (!isScrollSyncing.value) {
+      isScrollSyncing.value = true
+      nextTick(() => {
+        // Sync textarea and overlay to match line numbers scroll
+        textareaScroll.y.value = y
+        overlayScroll.y.value = y
+        isScrollSyncing.value = false
+      })
+    }
+  },
+  { flush: 'sync' },
+)
 
 // Computed Properties
 const lineCount = computed((): number => {
@@ -181,17 +241,6 @@ const highlightLine = (line: string, lineNumber: number): string => {
   return `<span class="text-gray-800 dark:text-gray-200">${escapedLine}</span>`
 }
 
-// Event Handlers
-const handleScroll = (event: Event): void => {
-  const target = event.target as HTMLTextAreaElement
-  const overlay = highlightOverlay.value
-
-  if (overlay) {
-    overlay.scrollTop = target.scrollTop
-    overlay.scrollLeft = target.scrollLeft
-  }
-}
-
 // Validation Watcher - Only revalidate if content actually changed
 watchDebounced(
   modelValue,
@@ -208,43 +257,16 @@ watchDebounced(
   },
 )
 
-// Public Methods
 const focus = (): void => {
   nextTick(() => {
     textarea.value?.focus()
   })
 }
 
-const setCursorPosition = (line: number, column: number = 0): void => {
-  nextTick(() => {
-    if (!textarea.value) return
-
-    const lines = modelValue.value.split('\n')
-    let position = 0
-
-    for (let i = 0; i < Math.min(line - 1, lines.length - 1); i++) {
-      position += lines[i].length + 1 // +1 for newline
-    }
-
-    position += Math.min(column, lines[line - 1]?.length || 0)
-
-    textarea.value.setSelectionRange(position, position)
-    textarea.value.focus()
-  })
-}
-
-const getErrorLines = (): Set<number> => {
-  return new Set(errorLines.value)
-}
-
-// Expose public API
 defineExpose({
   focus,
-  setCursorPosition,
-  getErrorLines,
 })
 
-// Lifecycle
 onMounted(() => {
   focus()
 })
@@ -259,6 +281,20 @@ onMounted(() => {
   line-height: 1.5rem;
   tab-size: 4;
   white-space: pre;
+}
+
+/* Ensure line numbers have identical vertical spacing */
+.line-numbers {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  box-sizing: border-box;
+}
+
+/* Force consistent line height for line numbers */
+.line-numbers div {
+  height: 1.5rem;
+  line-height: 1.5rem;
 }
 
 .invalid-line {
@@ -333,6 +369,16 @@ onMounted(() => {
   scrollbar-color: #6b7280 #374151;
 }
 
+/* Hide scrollbars for line numbers while keeping scroll functionality */
+.line-numbers {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.line-numbers::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
 /* Ensure line numbers stay aligned */
 .line-numbers {
   min-width: v-bind(MIN_LINE_NUMBER_WIDTH);
@@ -345,5 +391,12 @@ onMounted(() => {
 
 .editor-textarea {
   contain: layout style;
+}
+
+/* Ensure perfect pixel alignment */
+.line-numbers,
+.syntax-highlight,
+.editor-textarea {
+  box-sizing: border-box;
 }
 </style>
