@@ -116,7 +116,8 @@ const validateLine = (line: string): boolean => {
   const trimmedLine = line.trim()
 
   // Empty lines and comments are valid
-  if (trimmedLine === '' || trimmedLine.startsWith('#')) {
+  // This includes lines that are only "# " which we now treat as empty commented lines
+  if (trimmedLine === '' || trimmedLine === '# ' || trimmedLine.startsWith('#')) {
     return true
   }
 
@@ -164,8 +165,8 @@ const highlightLine = (line: string, lineNumber: number): string => {
     return `<span class="text-gray-800 dark:text-gray-200 invalid-line">${escapedLine}</span>`
   }
 
-  // Empty line
-  if (!line.trim()) {
+  // Empty line or line with only "# "
+  if (!line.trim() || line.trim() === '# ') {
     return escapedLine
   }
 
@@ -257,128 +258,94 @@ const focus = (): void => {
 const toggleComment = (): void => {
   if (!textarea.value) return
 
-  const text = modelValue.value
-  const lines = text.split('\n')
-  const start = textarea.value.selectionStart
-  const end = textarea.value.selectionEnd
-  const isSelectionCollapsed = start === end
+  const el = textarea.value
+  const { selectionStart, selectionEnd, value } = el
 
-  // Calculate which lines are selected
-  let startLine = 0
-  let endLine = 0
-  let charCount = 0
-
-  for (let i = 0; i < lines.length; i++) {
-    const lineLength = lines[i].length + 1 // +1 for the newline character
-    if (charCount <= start && start < charCount + lineLength) {
-      startLine = i
-    }
-    if (charCount <= end && end < charCount + lineLength) {
-      endLine = i
-    }
-    charCount += lineLength
+  // Find the start and end of the lines affected by the selection
+  const lineStart = value.lastIndexOf('\n', selectionStart - 1) + 1
+  // If selection ends on a newline, don't include the next line
+  const effectiveEnd =
+    selectionEnd > lineStart && value[selectionEnd - 1] === '\n'
+      ? selectionEnd - 1
+      : selectionEnd
+  let lineEnd = value.indexOf('\n', effectiveEnd)
+  if (lineEnd === -1) {
+    lineEnd = value.length
   }
 
-  // Toggle comments for selected lines
-  const newLines = [...lines]
-  let allCommented = true
+  const affectedText = value.substring(lineStart, lineEnd)
+  const lines = affectedText.split('\n')
+  const COMMENT_PREFIX = '# '
 
-  // Check if all selected lines are already commented
-  for (let i = startLine; i <= endLine; i++) {
-    if (!newLines[i].trim().startsWith('#') && newLines[i].trim() !== '') {
-      allCommented = false
-      break
-    }
-  }
+  // Check if all selected non-empty lines are commented
+  const allCommented = lines
+    .filter(line => line.trim() !== '')
+    .every(line => line.startsWith(COMMENT_PREFIX))
 
-  // Calculate cursor position adjustments
-  let startAdjustment = 0
-  let endAdjustment = 0
-
-  // Toggle comments
-  for (let i = startLine; i <= endLine; i++) {
+  const lineDiffs: number[] = []
+  const newLines = lines.map(line => {
+    let diff = 0
     if (allCommented) {
-      // Uncomment: Remove '# ' or '#' from the beginning of the line
-      if (newLines[i].trim().startsWith('# ')) {
-        const match = newLines[i].match(/^(\s*)#\s(.*)/)
-        if (match) {
-          const leadingWhitespace = match[1]
-          newLines[i] = leadingWhitespace + match[2]
-          // Adjust cursor position if this line is before or at the cursor
-          const charsRemoved = 2 // '# '
-          if (i < startLine) {
-            startAdjustment -= charsRemoved
-          } else if (i === startLine && start > leadingWhitespace.length) {
-            // Cursor is within the line content
-            startAdjustment -= Math.min(charsRemoved, start - leadingWhitespace.length)
-          }
-          if (i < endLine) {
-            endAdjustment -= charsRemoved
-          } else if (i === endLine && end > leadingWhitespace.length) {
-            endAdjustment -= Math.min(charsRemoved, end - leadingWhitespace.length)
-          }
-        }
-      } else if (newLines[i].trim().startsWith('#')) {
-        const match = newLines[i].match(/^(\s*)#(.*)/)
-        if (match) {
-          const leadingWhitespace = match[1]
-          newLines[i] = leadingWhitespace + match[2]
-          // Adjust cursor position if this line is before or at the cursor
-          const charsRemoved = 1 // '#'
-          if (i < startLine) {
-            startAdjustment -= charsRemoved
-          } else if (i === startLine && start > leadingWhitespace.length) {
-            startAdjustment -= charsRemoved
-          }
-          if (i < endLine) {
-            endAdjustment -= charsRemoved
-          } else if (i === endLine && end > leadingWhitespace.length) {
-            endAdjustment -= charsRemoved
-          }
-        }
-      }
-    } else {
-      // Comment: Add '# ' to the beginning of the line if it's not empty
-      if (newLines[i].trim() !== '') {
-        // Preserve leading whitespace
-        const leadingWhitespace = newLines[i].match(/^\s*/)?.[0] || ''
-        const content = newLines[i].substring(leadingWhitespace.length)
-        newLines[i] = leadingWhitespace + '# ' + content
-
-        // Adjust cursor position if this line is before or at the cursor
-        const charsAdded = 2 // '# '
-        if (i < startLine) {
-          startAdjustment += charsAdded
-        } else if (i === startLine) {
-          startAdjustment += charsAdded
-        }
-        if (i < endLine) {
-          endAdjustment += charsAdded
-        } else if (i === endLine) {
-          endAdjustment += charsAdded
-        }
+      if (line.startsWith(COMMENT_PREFIX)) {
+        diff = -COMMENT_PREFIX.length
       }
     }
+    else {
+      if (line.trim() !== '') {
+        diff = COMMENT_PREFIX.length
+      }
+    }
+    lineDiffs.push(diff)
+    return diff > 0
+      ? COMMENT_PREFIX + line
+      : diff < 0
+        ? line.substring(COMMENT_PREFIX.length)
+        : line
+  })
+
+  const isCursor = selectionStart === selectionEnd
+
+  const getOffset = (pos: number): number => {
+    let offset = 0
+    let currentPos = lineStart
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]
+      const diff = lineDiffs[i]
+      const lineEndPos = currentPos + line.length
+
+      if (pos > lineEndPos) {
+        offset += diff
+      }
+      else {
+        //- If it's a cursor, we shift it when commenting.
+        //- If it's a selection, we only shift if it's not at the very beginning of the line.
+        //- When uncommenting, the cursor should only move if it's after the comment prefix.
+        if ((isCursor && diff > 0) || pos > currentPos) {
+          offset += diff
+        }
+        break
+      }
+      currentPos += line.length + 1
+    }
+    return offset
   }
 
-  // Update the model value
-  modelValue.value = newLines.join('\n')
+  const newSelectionStart = selectionStart + getOffset(selectionStart)
+  const newSelectionEnd = selectionEnd + getOffset(selectionEnd)
 
-  // Calculate new cursor positions
-  const newStart = start + startAdjustment
-  const newEnd = end + endAdjustment
+  const newSelectedText = newLines.join('\n')
+  const newValue =
+    value.substring(0, lineStart) +
+    newSelectedText +
+    value.substring(lineEnd)
 
-  // Restore cursor position
+  // Update the model and textarea value
+  modelValue.value = newValue
+
+  // Restore selection and focus
   nextTick(() => {
-    if (textarea.value) {
-      textarea.value.focus()
-      // If it was a collapsed selection (just cursor), keep it collapsed
-      if (isSelectionCollapsed) {
-        textarea.value.setSelectionRange(newStart, newStart)
-      } else {
-        textarea.value.setSelectionRange(newStart, newEnd)
-      }
-    }
+    el.focus()
+    el.setSelectionRange(newSelectionStart, newSelectionEnd)
   })
 }
 
