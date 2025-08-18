@@ -16,9 +16,9 @@ export const settingsStore = reactive({
   personalUseOnly: false,
   isActivated: false,
   async load() {
-    this.isDarkTheme =
-      (await store.get<string>('theme')) === 'dark' ||
-      window.matchMedia('(prefers-color-scheme: dark)').matches
+    const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const savedTheme = await store.get<string>('theme')
+    this.isDarkTheme = !savedTheme ? preferredTheme : savedTheme === 'dark'
     this.license = (await store.get<string>('license')) || ''
     this.activationId = (await store.get<string>('activationId')) || ''
     this.personalUseOnly = (await store.get<boolean>('personalUseOnly')) || false
