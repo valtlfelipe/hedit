@@ -1,13 +1,26 @@
 <template>
   <MacOSWindow title="Hedit">
     <div class="flex flex-col h-full flex-1 min-h-0">
-      <Toolbar :allow-activate="!selectedFile?.isActive" @create-file="handleCreateFile" @save-file="handleSaveFile"
-        @activate-file="handleActivateFile" />
+      <Toolbar
+        :allow-activate="!selectedFile?.isActive"
+        @create-file="handleCreateFile"
+        @save-file="() => handleSaveFile()"
+        @activate-file="handleActivateFile"
+      />
 
       <div class="flex flex-1 min-h-0">
-        <Sidebar :files="hostsStore.files" @file-select="handleFileSelect" :status="selectedFile?.status || ''" />
+        <Sidebar
+          :files="hostsStore.files"
+          @file-select="handleFileSelect"
+          :status="selectedFile?.status || ''"
+        />
 
-        <CodeEditor v-if="selectedFile?.content || selectedFile?.content === ''" v-model="selectedFile.content" class="flex-1 min-w-0" ref="codeEditor" />
+        <CodeEditor
+          v-if="selectedFile?.content || selectedFile?.content === ''"
+          v-model="selectedFile.content"
+          class="flex-1 min-w-0"
+          ref="codeEditor"
+        />
       </div>
     </div>
   </MacOSWindow>
@@ -16,163 +29,113 @@
 <script setup lang="ts">
 /** biome-ignore-all lint/correctness/noUnusedImports: biomejs is bugged */
 import { listen } from '@tauri-apps/api/event'
-import { readTextFile } from '@tauri-apps/plugin-fs'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 // biome-ignore lint/style/useImportType: biomejs is bugged
 import CodeEditor from './components/CodeEditor.vue'
 import MacOSWindow from './components/MacOSWindow.vue'
 import Sidebar from './components/Sidebar.vue'
 import Toolbar from './components/Toolbar.vue'
+import { useFileOperations } from './composables/useFileOperations'
+import { useFileWatcher } from './composables/useFileWatcher'
+import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts'
+import { useTheme } from './composables/useTheme'
 import { hostsStore } from './stores/files'
 import { settingsStore } from './stores/settings'
 
-listen('license-invalid', async () => {
-  // TODO:
-  console.warn('License is invalid, do something')
-})
+// Initialize composables
+const fileOperations = useFileOperations()
+const { initializeTheme } = useTheme()
+const fileWatcher = useFileWatcher()
+
+const { selectedFile } = fileOperations
 
 const codeEditor = ref<InstanceType<typeof CodeEditor> | null>(null)
 
-const selectedFile = computed(() => hostsStore.files.find((f) => f.isSelected))
-
-async function resetStatus() {
-  setTimeout(() => {
-    if (!selectedFile.value) {
-      return
-    }
-
-    selectedFile.value.status = ''
-  }, 3000)
-}
-
-async function writeHostsFile(isActivating?: boolean) {
-  if (!selectedFile.value) {
-    return
-  }
-
-  selectedFile.value.status = isActivating ? 'activating' : 'saving'
-
-  try {
-    await hostsStore.saveContent(selectedFile.value.id)
-    selectedFile.value.status = isActivating ? 'activated' : 'saved'
-    resetStatus()
-  } catch (error) {
-    selectedFile.value.status = 'save_error'
-    console.error(error)
-  }
-}
-
-async function loadFiles() {
-  await hostsStore.load()
-  if (hostsStore.files.length === 0) {
-    const content = await readTextFile('/etc/hosts')
-    hostsStore.create('Original File', content, true)
-  }
-}
-
-watch(
-  () => settingsStore.isDarkTheme,
-  (isDark) => {
-    if (isDark) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  },
-  { immediate: true },
-)
-
-let fileSelectedChanged = true
-
-watch(
-  () => selectedFile.value?.content,
-  () => {
-    if (!selectedFile.value) return
-    if (fileSelectedChanged) {
-      fileSelectedChanged = false
-      return
-    }
-    selectedFile.value.status = 'modified'
-  },
-)
-
-listen('new_file', async () => handleCreateFile())
-listen('activate_file', async () => handleActivateFile())
-listen('save_file', async () => handleSaveFile())
-listen('zoom_reset', () => {
-  document.body.style.zoom = '100%'
-})
-listen('zoom_in', () => handleZoomIn())
-listen('zoom_out', () => handleZoomOut())
-
-const handleZoomIn = () => {
-  const currentZoom = parseInt(document.body.style.zoom.replace('%', '')) || 100
-  document.body.style.zoom = `${currentZoom + 10}%`
-}
-
-const handleZoomOut = () => {
-  const currentZoom = parseInt(document.body.style.zoom.replace('%', '')) || 100
-  document.body.style.zoom = `${currentZoom - 10}%`
-}
-
-function handleKeydown(e: KeyboardEvent) {
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
-    e.preventDefault()
-    handleSaveFile()
-  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
-    e.preventDefault()
-    handleCreateFile()
-  } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'a') {
-    e.preventDefault()
-    handleActivateFile()
-  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === '-') {
-    e.preventDefault()
-    handleZoomOut()
-  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === '=') {
-    e.preventDefault()
-    handleZoomIn()
-  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === '0') {
-    e.preventDefault()
-    document.body.style.zoom = '100%'
-  }
-}
-
+// Enhanced handlers with additional logic
 const handleFileSelect = (fileId: string) => {
-  fileSelectedChanged = true
-  hostsStore.setSelected(fileId)
+  fileOperations.handleFileSelect(fileId)
   if (codeEditor.value) {
     codeEditor.value.focus()
   }
 }
 
 const handleCreateFile = async () => {
-  const id = await hostsStore.create(`New File ${hostsStore.files.length}`, '')
+  const id = await fileOperations.handleCreateFile()
   if (id) {
     handleFileSelect(id)
   }
 }
 
 const handleSaveFile = () => {
-  if (selectedFile.value && codeEditor.value?.hasErrors) {
-    selectedFile.value.status = 'syntax_error'
-    return
-  }
-  writeHostsFile()
+  const hasErrors = selectedFile.value && codeEditor.value?.hasErrors
+  fileOperations.handleSaveFile(!!hasErrors)
 }
 
 const handleActivateFile = () => {
-  if (!selectedFile.value?.id || selectedFile.value.isActive) return
-  hostsStore.setActive(selectedFile.value?.id)
-  writeHostsFile(true)
+  fileOperations.handleActivateFile()
 }
 
-onMounted(() => {
-  settingsStore.load()
-  loadFiles()
-  window.addEventListener('keydown', handleKeydown)
+// Initialize event listeners and watchers
+const keyboardShortcuts = useKeyboardShortcuts(handleCreateFile, handleSaveFile, handleActivateFile)
+
+keyboardShortcuts.initializeEventListeners()
+initializeTheme()
+fileWatcher.initializeFileWatcher(fileOperations.fileSelectedChanged)
+
+// Handle license invalid event
+listen('license-invalid', async () => {
+  // TODO:
+  console.warn('License is invalid, do something')
 })
 
-onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown)
+// Watch for file content changes
+let isProgrammaticChange = false
+
+// Function to mark the next change as programmatic (not user-initiated)
+const markProgrammaticChange = () => {
+  isProgrammaticChange = true
+}
+
+// Watch for file content changes
+watch(
+  () => selectedFile.value?.content,
+  () => {
+    if (!selectedFile.value) return
+
+    // If this is a programmatic change, don't mark as modified
+    if (isProgrammaticChange) {
+      isProgrammaticChange = false
+      return
+    }
+
+    // If file was just selected, don't mark as modified
+    if (fileOperations.fileSelectedChanged.value) {
+      fileOperations.fileSelectedChanged.value = false
+      return
+    }
+
+    // Only mark as modified if it's a real user change
+    selectedFile.value.status = 'modified'
+  },
+)
+
+// Watch for file selection changes
+watch(
+  () => selectedFile.value?.id,
+  () => {
+    // When file changes, mark the next content update as programmatic
+    markProgrammaticChange()
+  },
+)
+
+// Initialize on mount
+onMounted(() => {
+  settingsStore.load()
+  fileOperations.loadFiles().then(() => {
+    // After loading files, mark the initial content load as programmatic
+    if (selectedFile.value) {
+      markProgrammaticChange()
+    }
+  })
 })
 </script>
