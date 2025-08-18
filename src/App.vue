@@ -15,7 +15,6 @@
 
 <script setup lang="ts">
 /** biome-ignore-all lint/correctness/noUnusedImports: biomejs is bugged */
-
 import { listen } from '@tauri-apps/api/event'
 import { readTextFile } from '@tauri-apps/plugin-fs'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -58,7 +57,7 @@ async function writeHostsFile(isActivating?: boolean) {
     selectedFile.value.status = isActivating ? 'activated' : 'saved'
     resetStatus()
   } catch (error) {
-    selectedFile.value.status = 'error'
+    selectedFile.value.status = 'save_error'
     console.error(error)
   }
 }
@@ -154,6 +153,10 @@ const handleCreateFile = async () => {
 }
 
 const handleSaveFile = () => {
+  if (selectedFile.value && codeEditor.value?.hasErrors) {
+    selectedFile.value.status = 'syntax_error'
+    return
+  }
   writeHostsFile()
 }
 

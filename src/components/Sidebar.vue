@@ -164,8 +164,10 @@ const statusText = computed(() => {
       return 'Activated successfully'
     case 'saved':
       return 'Saved successfully'
-    case 'error':
+    case 'save_error':
       return 'Error occurred while saving'
+    case 'syntax_error':
+      return 'Not saved. Syntax error detected.'
     case 'loaded':
       return 'File loaded successfully'
     case 'modified':

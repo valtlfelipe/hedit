@@ -12,7 +12,7 @@
           v-for="n in lineCount"
           :key="n"
           class="leading-6 h-6"
-          :class="{ 'text-red-500 font-bold': errorLines.has(n) }"
+          :class="{ 'text-red-500': errorLines.has(n) }"
         >
           {{ n }}
         </div>
@@ -265,6 +265,7 @@ const focus = (): void => {
 
 defineExpose({
   focus,
+  hasErrors: computed(() => errorLines.value.size > 0),
 })
 
 onMounted(() => {
