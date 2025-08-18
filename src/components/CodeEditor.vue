@@ -277,10 +277,13 @@ const toggleComment = (): void => {
   const lines = affectedText.split('\n')
   const COMMENT_PREFIX = '# '
 
-  // Check if all selected non-empty lines are commented
-  const allCommented = lines
-    .filter(line => line.trim() !== '')
-    .every(line => line.startsWith(COMMENT_PREFIX))
+  // Check if all selected non-empty lines are commented.
+  // If there are no non-empty lines (e.g., only empty or whitespace lines),
+  // we default to "commenting" mode.
+  const nonEmptyLines = lines.filter(line => line.trim() !== '')
+  const allCommented =
+    nonEmptyLines.length > 0 &&
+    nonEmptyLines.every(line => line.startsWith(COMMENT_PREFIX))
 
   const lineDiffs: number[] = []
   const newLines = lines.map(line => {
@@ -291,7 +294,7 @@ const toggleComment = (): void => {
       }
     }
     else {
-      if (line.trim() !== '') {
+      if (!line.startsWith(COMMENT_PREFIX)) {
         diff = COMMENT_PREFIX.length
       }
     }
