@@ -6,6 +6,10 @@ use tauri::{AppHandle, Emitter};
 use tauri::{Manager, Runtime};
 use tauri_plugin_opener::OpenerExt;
 
+/// Feedback URL for macOS menu
+const FEEDBACK_URL: &str = "https://github.com/valtlfelipe/hedit/issues/new/choose";
+
+/// Create the application menu
 pub fn get_menu<R: Runtime>(app_handle: &AppHandle<R>) -> tauri::Result<Menu<R>> {
     let pkg_info = app_handle.package_info();
     let config = app_handle.config();
@@ -157,36 +161,71 @@ pub fn get_menu<R: Runtime>(app_handle: &AppHandle<R>) -> tauri::Result<Menu<R>>
     Ok(menu)
 }
 
+/// Handle menu events
 pub fn handle_menu_event(app_handle: &tauri::AppHandle, event: &MenuEvent) {
-    #[cfg(dev)]
-    let window = app_handle.get_webview_window("main").unwrap();
-
     match event.id().0.as_str() {
-        "new_file" => app_handle.emit("new_file", true).unwrap(),
-        "activate_file" => app_handle.emit("activate_file", true).unwrap(),
-        "save_file" => app_handle.emit("save_file", true).unwrap(),
-        "activate_license" => app_handle.emit("activate_license", true).unwrap(),
-        "zoom_reset" => app_handle.emit("zoom_reset", true).unwrap(),
-        "zoom_in" => app_handle.emit("zoom_in", true).unwrap(),
-        "zoom_out" => app_handle.emit("zoom_out", true).unwrap(),
+        "new_file" => {
+            if let Err(e) = app_handle.emit("new_file", true) {
+                eprintln!("Failed to emit new_file event: {}", e);
+            }
+        },
+        "activate_file" => {
+            if let Err(e) = app_handle.emit("activate_file", true) {
+                eprintln!("Failed to emit activate_file event: {}", e);
+            }
+        },
+        "save_file" => {
+            if let Err(e) = app_handle.emit("save_file", true) {
+                eprintln!("Failed to emit save_file event: {}", e);
+            }
+        },
+        "activate_license" => {
+            if let Err(e) = app_handle.emit("activate_license", true) {
+                eprintln!("Failed to emit activate_license event: {}", e);
+            }
+        },
+        "zoom_reset" => {
+            if let Err(e) = app_handle.emit("zoom_reset", true) {
+                eprintln!("Failed to emit zoom_reset event: {}", e);
+            }
+        },
+        "zoom_in" => {
+            if let Err(e) = app_handle.emit("zoom_in", true) {
+                eprintln!("Failed to emit zoom_in event: {}", e);
+            }
+        },
+        "zoom_out" => {
+            if let Err(e) = app_handle.emit("zoom_out", true) {
+                eprintln!("Failed to emit zoom_out event: {}", e);
+            }
+        },
         "open_feedback" => {
-            if let Err(e) = app_handle.opener().open_url(
-                "https://github.com/valtlfelipe/hedit/issues/new/choose",
-                None::<&str>,
-            ) {
-                println!("Failed to open feedback {e:?}")
+            if let Err(e) = app_handle.opener().open_url(FEEDBACK_URL, None::<&str>) {
+                eprintln!("Failed to open feedback URL: {}", e);
             }
         }
         #[cfg(dev)]
-        "dev_refresh" => window.eval("location.reload()").unwrap(),
+        "dev_refresh" => {
+            if let Some(window) = app_handle.get_webview_window("main") {
+                if let Err(e) = window.eval("location.reload()") {
+                    eprintln!("Failed to refresh window: {}", e);
+                }
+            } else {
+                eprintln!("Failed to get main window for refresh");
+            }
+        },
         #[cfg(dev)]
         "dev_toggle_devtools" => {
-            if window.is_devtools_open() {
-                window.close_devtools();
+            if let Some(window) = app_handle.get_webview_window("main") {
+                if window.is_devtools_open() {
+                    window.close_devtools();
+                } else {
+                    window.open_devtools();
+                }
             } else {
-                window.open_devtools();
+                eprintln!("Failed to get main window for devtools");
             }
         }
-        _ => println!("unexpected menu event: {}", event.id().0),
+        _ => eprintln!("Unexpected menu event: {}", event.id().0),
     }
 }

@@ -2,20 +2,34 @@ use tauri::{command, AppHandle, Emitter};
 use tauri_plugin_http::reqwest;
 use tauri_plugin_store::StoreBuilder;
 
-pub type Result<T> = std::result::Result<T, String>;
+/// License activation endpoint
+const ACTIVATE_ENDPOINT: &str = "https://licensing.felipevm.dev/api/activate";
+/// License check endpoint
+const CHECK_ENDPOINT: &str = "https://licensing.felipevm.dev/api/check";
+/// Product identifier
+const PRODUCT_NAME: &str = "hedit";
 
 #[command]
-pub async fn activate(app_handle: AppHandle, license_key: &str) -> Result<()> {
+pub async fn activate(app_handle: AppHandle, license_key: String) -> Result<(), String> {
     println!("Activating license {}", license_key);
-    activate_license(app_handle, license_key).await
+    activate_license(app_handle, &license_key).await.map_err(|e| e.to_string())
 }
 
+/// Check if the current license is valid
 pub async fn check_license(app_handle: AppHandle) {
-    let store = StoreBuilder::new(&app_handle.clone(), "settings.json")
+    // Load license data from store
+    let store = match StoreBuilder::new(&app_handle, "settings.json")
         .disable_auto_save()
         .build()
-        .unwrap();
+    {
+        Ok(store) => store,
+        Err(e) => {
+            eprintln!("Failed to create store: {}", e);
+            return;
+        }
+    };
 
+    // Check if app is activated
     let is_activated = store
         .get("isActivated")
         .and_then(|v| v.as_bool())
@@ -26,93 +40,108 @@ pub async fn check_license(app_handle: AppHandle) {
         return;
     }
 
+    // Extract license information (clone to avoid borrowing issues)
     let license_key = store
         .get("license")
         .and_then(|v| v.as_str().map(|s| s.to_string()))
-        .unwrap_or("".to_string());
+        .unwrap_or_default();
 
     let activation_id = store
         .get("activationId")
         .and_then(|v| v.as_str().map(|s| s.to_string()))
-        .unwrap_or("".to_string());
+        .unwrap_or_default();
 
+    // Prepare check payload
     let payload = serde_json::json!({
-        "licenseKey": license_key.to_string(),
-        "activationId": activation_id.to_string(),
-        "product": "hedit",
+        "licenseKey": license_key,
+        "activationId": activation_id,
+        "product": PRODUCT_NAME,
         "isTest": tauri::is_dev(),
     });
 
+    // Send check request
     let client = reqwest::Client::new();
     let res = match client
-        .post("https://licensing.felipevm.dev/api/check")
+        .post(CHECK_ENDPOINT)
         .json(&payload)
         .send()
         .await
     {
         Ok(response) => response,
         Err(e) => {
-            println!("Error sending license check request: {}", e);
+            eprintln!("Error sending license check request: {}", e);
             return;
         }
     };
 
+    // Handle response errors
     if res.status().is_client_error() {
         let error_text = match res.text().await {
             Ok(text) => text,
             Err(e) => e.to_string(),
         };
-        println!("ClientError: {}", error_text);
-        app_handle.emit("license-invalid", true).unwrap();
+        eprintln!("ClientError: {}", error_text);
+        if let Err(e) = app_handle.emit("license-invalid", true) {
+            eprintln!("Failed to emit license-invalid event: {}", e);
+        }
         return;
     }
 
     if res.status().is_server_error() {
-        println!("ServerError: Something went wrong checking license");
+        eprintln!("ServerError: Something went wrong checking license");
         return;
     }
 
+    // Parse response
     let body: serde_json::Value = match res.json().await {
         Ok(val) => val,
         Err(e) => {
-            println!("Error parsing license check response: {}", e);
+            eprintln!("Error parsing license check response: {}", e);
             return;
         }
     };
 
+    // Check if license is active
     if !body["isActive"].as_bool().unwrap_or(false) {
-        app_handle.emit("license-invalid", true).unwrap();
+        if let Err(e) = app_handle.emit("license-invalid", true) {
+            eprintln!("Failed to emit license-invalid event: {}", e);
+        }
     }
 }
 
-pub async fn activate_license(app_handle: AppHandle, license_key: &str) -> Result<()> {
+/// Activate a license key
+async fn activate_license(app_handle: AppHandle, license_key: &str) -> Result<(), Box<dyn std::error::Error>> {
+    // Prepare activation payload
     let payload = serde_json::json!({
-        "licenseKey": license_key.to_string(),
-        "product": "hedit",
+        "licenseKey": license_key,
+        "product": PRODUCT_NAME,
         "isTest": tauri::is_dev(),
-        // "app_platform": env::consts::OS.to_string(),
-        // "app_version": window.app_handle().package_info().version.to_string(),
     });
+    
+    // Send activation request
     let client = reqwest::Client::new();
     let res = client
-        .post("https://licensing.felipevm.dev/api/activate")
+        .post(ACTIVATE_ENDPOINT)
         .json(&payload)
         .send()
-        .await
-        .map_err(|e| e.to_string())?;
+        .await?;
 
+    // Handle server/client errors
     if res.status().is_client_error() {
-        return Err(res.text().await.map_err(|e| e.to_string())?);
+        let error_text = res.text().await?;
+        return Err(error_text.into());
     }
 
     if res.status().is_server_error() {
-        return Err("ServerError: Something went wrong".to_string());
+        return Err("ServerError: Something went wrong".into());
     }
 
-    let body: serde_json::Value = res.json().await.map_err(|e| e.to_string())?;
+    // Parse response
+    let body: serde_json::Value = res.json().await?;
 
+    // Check if activation was successful
     if !body["success"].as_bool().unwrap_or(false) {
-        return Err("License activation failed".to_string());
+        return Err("License activation failed".into());
     }
 
     println!(
@@ -120,19 +149,25 @@ pub async fn activate_license(app_handle: AppHandle, license_key: &str) -> Resul
         body["activationId"].as_str().unwrap_or("<unknown>")
     );
 
-    let store = StoreBuilder::new(&app_handle.clone(), "settings.json")
+    // Save license information to store
+    let store = StoreBuilder::new(&app_handle, "settings.json")
         .disable_auto_save()
         .build()
-        .unwrap();
+        .map_err(|e| format!("Store error: {}", e))?;
+        
     store.set("license", license_key.to_string());
     store.set(
         "activationId",
         body["activationId"].as_str().unwrap_or("<unknown>"),
     );
     store.set("isActivated", true);
-    store.save().unwrap();
+    
+    store.save()
+        .map_err(|e| format!("Failed to save store: {}", e))?;
 
-    app_handle.emit("reload-settings", true).unwrap();
+    // Notify frontend to reload settings
+    app_handle.emit("reload-settings", true)
+        .map_err(|e| format!("Failed to emit reload-settings event: {}", e))?;
 
     Ok(())
 }
