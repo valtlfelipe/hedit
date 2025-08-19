@@ -30,7 +30,8 @@
       "app",
       "dmg",
       "deb",
-      "appimage"
+      "appimage",
+      "rpm"
     ],
     "icon": [
       "icons/32x32.png",
