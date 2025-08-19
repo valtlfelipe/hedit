@@ -4,7 +4,7 @@ mod menu;
 mod telemetry;
 use std::fs::create_dir_all;
 
-use tauri::{Manager, TitleBarStyle, WebviewUrl, WebviewWindowBuilder};
+use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 
 /// Background color for macOS window (RGB values)
 #[cfg(target_os = "macos")]
@@ -50,6 +50,7 @@ pub fn run() {
             // Platform-specific window configuration
             #[cfg(target_os = "macos")]
             {
+                use tauri::TitleBarStyle;
                 win_builder = win_builder
                     .hidden_title(true)
                     .title_bar_style(TitleBarStyle::Overlay);
