@@ -20,6 +20,7 @@
   "bundle": {
     "publisher": "FVM",
     "license": "MIT",
+    "licenseFile": "../LICENSE",
     "copyright": "FVM - Hedit",
     "homepage": "https://github.com/valtlfelipe/hedit",
     "category": "DeveloperTool",
@@ -40,14 +41,6 @@
     ],
     "macOS": {
       "signingIdentity": "-"
-    },
-    "linux": {
-      "appimage": {
-        "bundleMediaFramework": true
-      },
-      "deb": {
-        "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0"]
-      }
     }
   },
   "plugins": {}
