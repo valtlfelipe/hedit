@@ -48,7 +48,7 @@
                 <Moon class="w-4 h-4" v-else />
                 <span>{{ settingsStore.isDarkTheme ? 'Light Mode' : 'Dark Mode' }}</span>
               </li>
-              <li @click="showLicenseModal = true" class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out">
+              <li @click="$emit('showLicenseModal')" class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out">
                 <KeyRound class="w-4 h-4" />
                 <span>Activate License</span>
               </li>
@@ -61,17 +61,14 @@
           </div>
         </transition>
       </div>
-      <LicenseModal :show="showLicenseModal" @close="showLicenseModal = false" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { listen } from '@tauri-apps/api/event'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { KeyRound, MessageSquare, Moon, Play, Plus, Save, Settings, Sun } from 'lucide-vue-next'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { settingsStore } from '../stores/settings'
-import LicenseModal from './LicenseModal.vue'
 
 defineProps<{
   allowActivate: boolean
@@ -81,15 +78,11 @@ defineEmits<{
   createFile: []
   saveFile: []
   activateFile: []
+  showLicenseModal: []
 }>()
 
 const showSettings = ref(false)
-const showLicenseModal = ref(false)
 const settingsContainer = ref<HTMLElement | null>(null)
-
-listen('activate_license', async () => {
-  showLicenseModal.value = true
-})
 
 const handleClickOutside = (event: MouseEvent) => {
   if (settingsContainer.value && !settingsContainer.value.contains(event.target as Node)) {
@@ -100,7 +93,6 @@ const handleClickOutside = (event: MouseEvent) => {
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape') {
     showSettings.value = false
-    showLicenseModal.value = false
   }
 }
 

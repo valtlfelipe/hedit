@@ -6,6 +6,7 @@
         @create-file="handleCreateFile"
         @save-file="() => handleSaveFile()"
         @activate-file="handleActivateFile"
+        @show-license-modal="showLicenseModal = true"
       />
 
       <div class="flex flex-1 min-h-0">
@@ -23,29 +24,31 @@
         />
       </div>
     </div>
+    <LicenseModal :show="showLicenseModal" @close="showLicenseModal = false" />
   </AppWindow>
 </template>
 
 <script setup lang="ts">
 /** biome-ignore-all lint/correctness/noUnusedImports: biomejs is bugged */
 import { listen } from '@tauri-apps/api/event'
-import { onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import AppWindow from './components/AppWindow.vue'
 // biome-ignore lint/style/useImportType: biomejs is bugged
 import CodeEditor from './components/CodeEditor.vue'
+import LicenseModal from './components/LicenseModal.vue'
 import Sidebar from './components/Sidebar.vue'
 import Toolbar from './components/Toolbar.vue'
 import { useFileOperations } from './composables/useFileOperations'
-import { useFileWatcher } from './composables/useFileWatcher'
 import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts'
 import { useTheme } from './composables/useTheme'
 import { hostsStore } from './stores/files'
 import { settingsStore } from './stores/settings'
 
+const showLicenseModal = ref(false)
+
 // Initialize composables
 const fileOperations = useFileOperations()
 const { initializeTheme } = useTheme()
-const fileWatcher = useFileWatcher()
 
 const { selectedFile } = fileOperations
 
@@ -91,12 +94,15 @@ const keyboardShortcuts = useKeyboardShortcuts(
 
 keyboardShortcuts.initializeEventListeners()
 initializeTheme()
-fileWatcher.initializeFileWatcher(fileOperations.fileSelectedChanged)
 
 // Handle license invalid event
 listen('license-invalid', async () => {
   // TODO:
   console.warn('License is invalid, do something')
+})
+
+listen('activate_license', async () => {
+  showLicenseModal.value = true
 })
 
 // Watch for file content changes
@@ -139,14 +145,29 @@ watch(
   },
 )
 
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') {
+    showLicenseModal.value = false
+  }
+}
+
 // Initialize on mount
 onMounted(() => {
-  settingsStore.load()
+  settingsStore.load().then(() => {
+    if (!settingsStore.personalUseOnly && !settingsStore.activationId) {
+      showLicenseModal.value = true
+    }
+  })
   fileOperations.loadFiles().then(() => {
     // After loading files, mark the initial content load as programmatic
     if (selectedFile.value) {
       markProgrammaticChange()
     }
   })
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleKeydown)
 })
 </script>

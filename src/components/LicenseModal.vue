@@ -43,36 +43,39 @@
             />
               <div v-if="error" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ errorText }}</div>
           </div>
-          <div class="mt-6 flex justify-end space-x-3">
-            <button
-              @click="$emit('close')"
-              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-zinc-700 dark:border-zinc-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-            >
-              {{ settingsStore.isActivated || personalUseOnly ? 'Close' : 'Cancel' }}
-            </button>
-            <template v-if="!personalUseOnly">
+          <div class="mt-6 flex justify-between">
+            <a href="#" @click.prevent="openPurchasePage()" class="text-sm text-purple-600 hover:underline">Purchase License</a>
+            <div class="flex justify-end space-x-3">
               <button
-                v-if="!settingsStore.isActivated"
-                @click="activate"
-                :disabled="isLoading"
-                class="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 flex items-center justify-center"
+                @click="$emit('close')"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-zinc-700 dark:border-zinc-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
               >
-                <span v-if="isLoading" class="mr-2">
-                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                </svg>
-                </span>
-                <span>{{ isLoading ? 'Activating...' : 'Activate' }}</span>
+                {{ settingsStore.isActivated || personalUseOnly ? 'Close' : 'Cancel' }}
               </button>
-              <button
-                v-else
-                disabled
-                 class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 flex items-center justify-center"
-              >
-                Activated!
-              </button>
-            </template>
+              <template v-if="!personalUseOnly">
+                <button
+                  v-if="!settingsStore.isActivated"
+                  @click="activate"
+                  :disabled="isLoading"
+                  class="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 flex items-center justify-center"
+                >
+                  <span v-if="isLoading" class="mr-2">
+                  <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                  </svg>
+                  </span>
+                  <span>{{ isLoading ? 'Activating...' : 'Activate' }}</span>
+                </button>
+                <button
+                  v-else
+                  disabled
+                  class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 flex items-center justify-center"
+                >
+                  Activated!
+                </button>
+              </template>
+            </div>
           </div>
         </div>
       </transition>
@@ -82,6 +85,7 @@
 
 <script setup lang="ts">
 import { invoke } from '@tauri-apps/api/core'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { ref, watch } from 'vue'
 import { settingsStore } from '../stores/settings'
 
@@ -130,6 +134,10 @@ async function activate() {
   }
 
   isLoading.value = false
+}
+
+function openPurchasePage() {
+  openUrl('https://hedit.app/pricing?ref=license_modal')
 }
 </script>
 
