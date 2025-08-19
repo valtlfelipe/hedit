@@ -15,12 +15,15 @@ const MIN_WINDOW_SIZE: (f64, f64) = (1000.0, 650.0);
 
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .setup(|app| {
             // Ensure app data directory exists
-            let app_data_dir = app.path().app_data_dir()
+            let app_data_dir = app
+                .path()
+                .app_data_dir()
                 .map_err(|e| format!("Failed to get app data directory: {}", e))?;
             create_dir_all(&app_data_dir)
                 .map_err(|e| format!("Failed to create app directory: {}", e))?;
@@ -67,9 +70,11 @@ pub fn run() {
                 use cocoa::appkit::{NSColor, NSWindow};
                 use cocoa::base::{id as cocoa_id, nil};
 
-                let ns_window = window.ns_window()
-                    .map_err(|e| format!("Failed to get NSWindow: {}", e))? as cocoa_id;
-                
+                let ns_window = window
+                    .ns_window()
+                    .map_err(|e| format!("Failed to get NSWindow: {}", e))?
+                    as cocoa_id;
+
                 unsafe {
                     let bg_color = NSColor::colorWithRed_green_blue_alpha_(
                         nil,

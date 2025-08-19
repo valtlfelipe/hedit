@@ -168,37 +168,37 @@ pub fn handle_menu_event(app_handle: &tauri::AppHandle, event: &MenuEvent) {
             if let Err(e) = app_handle.emit("new_file", true) {
                 eprintln!("Failed to emit new_file event: {}", e);
             }
-        },
+        }
         "activate_file" => {
             if let Err(e) = app_handle.emit("activate_file", true) {
                 eprintln!("Failed to emit activate_file event: {}", e);
             }
-        },
+        }
         "save_file" => {
             if let Err(e) = app_handle.emit("save_file", true) {
                 eprintln!("Failed to emit save_file event: {}", e);
             }
-        },
+        }
         "activate_license" => {
             if let Err(e) = app_handle.emit("activate_license", true) {
                 eprintln!("Failed to emit activate_license event: {}", e);
             }
-        },
+        }
         "zoom_reset" => {
             if let Err(e) = app_handle.emit("zoom_reset", true) {
                 eprintln!("Failed to emit zoom_reset event: {}", e);
             }
-        },
+        }
         "zoom_in" => {
             if let Err(e) = app_handle.emit("zoom_in", true) {
                 eprintln!("Failed to emit zoom_in event: {}", e);
             }
-        },
+        }
         "zoom_out" => {
             if let Err(e) = app_handle.emit("zoom_out", true) {
                 eprintln!("Failed to emit zoom_out event: {}", e);
             }
-        },
+        }
         "open_feedback" => {
             if let Err(e) = app_handle.opener().open_url(FEEDBACK_URL, None::<&str>) {
                 eprintln!("Failed to open feedback URL: {}", e);
@@ -213,7 +213,7 @@ pub fn handle_menu_event(app_handle: &tauri::AppHandle, event: &MenuEvent) {
             } else {
                 eprintln!("Failed to get main window for refresh");
             }
-        },
+        }
         #[cfg(dev)]
         "dev_toggle_devtools" => {
             if let Some(window) = app_handle.get_webview_window("main") {

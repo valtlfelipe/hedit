@@ -12,9 +12,9 @@ A sleek and intuitive hosts file editor built with Tauri, Vue.js, and Rust. Simp
 
 ---
 
-## 🍎 macOS Only (for now!)
+## 🍎💻 Cross-Platform Support
 
-Currently, this application is only available and tested on macOS. Support for Windows and Linux is planned for future releases.
+This application is available and tested on macOS and Linux. Windows support is planned for future releases.
 
 ---
 
@@ -26,10 +26,11 @@ Currently, this application is only available and tested on macOS. Support for W
 
 ---
 
-## ⬇️ Installation & Usage (macOS)
+## ⬇️ Installation & Usage (macOS & Linux)
 
-Since this application is not yet signed, you'll need to follow these steps to open it on macOS:
+Since this application is not yet signed, you'll need to follow these steps to open it:
 
+### macOS:
 1.  **Download the latest `.dmg` or `.app` file** from the [Releases page](https://github.com/valtlfelipe/hedit/releases) (link will be updated once releases are available).
 2.  **Drag the application** to your Applications folder.
 3.  **Right-click** on the `Hedit.app` icon in your Applications folder.
@@ -41,3 +42,15 @@ Since this application is not yet signed, you'll need to follow these steps to o
 9.  You will be prompted to confirm. Click **"Open"**.
 
 The application should now launch successfully.
+
+### Linux:
+1. **Download the latest `.deb` or `.AppImage` file** from the [Releases page](https://github.com/valtlfelipe/hedit/releases).
+2. **For .deb files:**
+   - Double-click the file to open it with your package manager, or
+   - Install via terminal: `sudo dpkg -i hedit_x.x.x_amd64.deb`
+3. **For .AppImage files:**
+   - Make the file executable: `chmod +x hedit_x.x.x.AppImage`
+   - Run the application: `./hedit_x.x.x.AppImage`
+   
+**Note:** On some Linux distributions, you may need to install additional dependencies:
+- For Debian/Ubuntu-based systems: `sudo apt install libwebkit2gtk-4.1-0 libgtk-3-0`

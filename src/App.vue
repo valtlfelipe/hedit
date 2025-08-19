@@ -1,5 +1,5 @@
 <template>
-  <MacOSWindow title="Hedit">
+  <AppWindow title="Hedit">
     <div class="flex flex-col h-full flex-1 min-h-0">
       <Toolbar
         :allow-activate="!selectedFile?.isActive"
@@ -23,16 +23,17 @@
         />
       </div>
     </div>
-  </MacOSWindow>
+  </AppWindow>
 </template>
 
 <script setup lang="ts">
 /** biome-ignore-all lint/correctness/noUnusedImports: biomejs is bugged */
 import { listen } from '@tauri-apps/api/event'
 import { onMounted, ref, watch } from 'vue'
+import AppWindow from './components/AppWindow.vue'
 // biome-ignore lint/style/useImportType: biomejs is bugged
 import CodeEditor from './components/CodeEditor.vue'
-import MacOSWindow from './components/MacOSWindow.vue'
+// import MacOSWindow from './components/MacOSWindow.vue'
 import Sidebar from './components/Sidebar.vue'
 import Toolbar from './components/Toolbar.vue'
 import { useFileOperations } from './composables/useFileOperations'
@@ -82,7 +83,12 @@ const handleToggleComment = () => {
 }
 
 // Initialize event listeners and watchers
-const keyboardShortcuts = useKeyboardShortcuts(handleCreateFile, handleSaveFile, handleActivateFile, handleToggleComment)
+const keyboardShortcuts = useKeyboardShortcuts(
+  handleCreateFile,
+  handleSaveFile,
+  handleActivateFile,
+  handleToggleComment,
+)
 
 keyboardShortcuts.initializeEventListeners()
 initializeTheme()

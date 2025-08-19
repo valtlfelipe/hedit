@@ -68,11 +68,11 @@ pub async fn send_telemetry(handle: AppHandle) {
     if let Err(e) = event.insert_prop("os", env::consts::OS) {
         eprintln!("Failed to insert 'os' property: {}", e);
     }
-    
+
     if let Err(e) = event.insert_prop("arch", env::consts::ARCH) {
         eprintln!("Failed to insert 'arch' property: {}", e);
     }
-    
+
     if let Err(e) = event.insert_prop("version", handle.package_info().version.to_string()) {
         eprintln!("Failed to insert 'version' property: {}", e);
     }

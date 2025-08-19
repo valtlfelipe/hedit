@@ -12,7 +12,9 @@ const PRODUCT_NAME: &str = "hedit";
 #[command]
 pub async fn activate(app_handle: AppHandle, license_key: String) -> Result<(), String> {
     println!("Activating license {}", license_key);
-    activate_license(app_handle, &license_key).await.map_err(|e| e.to_string())
+    activate_license(app_handle, &license_key)
+        .await
+        .map_err(|e| e.to_string())
 }
 
 /// Check if the current license is valid
@@ -61,12 +63,7 @@ pub async fn check_license(app_handle: AppHandle) {
 
     // Send check request
     let client = reqwest::Client::new();
-    let res = match client
-        .post(CHECK_ENDPOINT)
-        .json(&payload)
-        .send()
-        .await
-    {
+    let res = match client.post(CHECK_ENDPOINT).json(&payload).send().await {
         Ok(response) => response,
         Err(e) => {
             eprintln!("Error sending license check request: {}", e);
@@ -110,21 +107,20 @@ pub async fn check_license(app_handle: AppHandle) {
 }
 
 /// Activate a license key
-async fn activate_license(app_handle: AppHandle, license_key: &str) -> Result<(), Box<dyn std::error::Error>> {
+async fn activate_license(
+    app_handle: AppHandle,
+    license_key: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
     // Prepare activation payload
     let payload = serde_json::json!({
         "licenseKey": license_key,
         "product": PRODUCT_NAME,
         "isTest": tauri::is_dev(),
     });
-    
+
     // Send activation request
     let client = reqwest::Client::new();
-    let res = client
-        .post(ACTIVATE_ENDPOINT)
-        .json(&payload)
-        .send()
-        .await?;
+    let res = client.post(ACTIVATE_ENDPOINT).json(&payload).send().await?;
 
     // Handle server/client errors
     if res.status().is_client_error() {
@@ -154,19 +150,21 @@ async fn activate_license(app_handle: AppHandle, license_key: &str) -> Result<()
         .disable_auto_save()
         .build()
         .map_err(|e| format!("Store error: {}", e))?;
-        
+
     store.set("license", license_key.to_string());
     store.set(
         "activationId",
         body["activationId"].as_str().unwrap_or("<unknown>"),
     );
     store.set("isActivated", true);
-    
-    store.save()
+
+    store
+        .save()
         .map_err(|e| format!("Failed to save store: {}", e))?;
 
     // Notify frontend to reload settings
-    app_handle.emit("reload-settings", true)
+    app_handle
+        .emit("reload-settings", true)
         .map_err(|e| format!("Failed to emit reload-settings event: {}", e))?;
 
     Ok(())
