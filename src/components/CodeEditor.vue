@@ -344,6 +344,14 @@ const toggleComment = (): void => {
   el.setSelectionRange(lineStart, lineEnd)
   document.execCommand('insertText', false, newSelectedText)
 
+  const newValue =
+    value.substring(0, lineStart) +
+    newSelectedText +
+    value.substring(lineEnd)
+
+  // Update the model and textarea value
+  modelValue.value = newValue
+
   // Restore selection and focus
   nextTick(() => {
     el.focus()
