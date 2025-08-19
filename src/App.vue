@@ -33,7 +33,6 @@ import { onMounted, ref, watch } from 'vue'
 import AppWindow from './components/AppWindow.vue'
 // biome-ignore lint/style/useImportType: biomejs is bugged
 import CodeEditor from './components/CodeEditor.vue'
-// import MacOSWindow from './components/MacOSWindow.vue'
 import Sidebar from './components/Sidebar.vue'
 import Toolbar from './components/Toolbar.vue'
 import { useFileOperations } from './composables/useFileOperations'

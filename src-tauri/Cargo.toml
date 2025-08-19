@@ -1,6 +1,6 @@
 [package]
 name = "hedit"
-version = "0.1.0"
+version = "0.0.0"
 authors = ["Felipe Valtl de Mello"]
 edition = "2021"
 publish = false
