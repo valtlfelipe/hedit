@@ -35,6 +35,8 @@ pub fn run() {
             // Setup menu
             let menu = menu::get_menu(app.handle())
                 .map_err(|e| format!("Failed to create menu: {}", e))?;
+
+            #[cfg(not(target_os = "linux"))]
             app.set_menu(menu)?;
 
             // Handle menu events
