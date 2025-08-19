@@ -337,13 +337,12 @@ const toggleComment = (): void => {
   const newSelectionEnd = selectionEnd + getOffset(selectionEnd)
 
   const newSelectedText = newLines.join('\n')
-  const newValue =
-    value.substring(0, lineStart) +
-    newSelectedText +
-    value.substring(lineEnd)
 
-  // Update the model and textarea value
-  modelValue.value = newValue
+  // Use execCommand('insertText') to support the undo stack.
+  // This is a more reliable method for programmatic changes than direct value manipulation.
+  el.focus()
+  el.setSelectionRange(lineStart, lineEnd)
+  document.execCommand('insertText', false, newSelectedText)
 
   // Restore selection and focus
   nextTick(() => {
