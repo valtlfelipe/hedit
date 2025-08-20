@@ -27,24 +27,5 @@ export default tseslint.config(
       'vue/multi-word-component-names': 'off',
     },
   },
-  {
-    files: ['vite.config.ts'],
-    extends: [...tseslint.configs.recommended],
-    languageOptions: {
-      parserOptions: {
-        project: './tsconfig.node.json',
-      },
-    },
-  },
-  {
-    files: ['scripts/**/*.js'],
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      globals: {
-        ...globals.node,
-      },
-    },
-  },
   eslintConfigPrettier,
 );

@@ -3,8 +3,22 @@
 </template>
 
 <script setup lang="ts">
-import * as monaco from 'monaco-editor'
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
+import 'monaco-editor/esm/vs/editor/contrib/comment/browser/comment.js'
+import 'monaco-editor/esm/vs/editor/contrib/find/browser/findController.js'
+import 'monaco-editor/esm/vs/editor/contrib/find/browser/findWidget.css'
+import 'monaco-editor/esm/vs/editor/contrib/hover/browser/hoverContribution.js'
+import 'monaco-editor/esm/vs/base/browser/ui/codicons/codicon/codicon.css'
+
 import { onMounted, onUnmounted, ref, watch } from 'vue'
+
+// Configure Monaco environment for minimal bundle size
+self.MonacoEnvironment = {
+  getWorker() {
+    // Return a minimal worker for basic functionality
+    return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker?worker', import.meta.url))
+  }
+}
 
 // --- Constants ---
 const IPV4_REGEX = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/
