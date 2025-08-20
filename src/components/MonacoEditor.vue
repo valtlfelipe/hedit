@@ -16,7 +16,7 @@ import { onMounted, onUnmounted, ref, watch } from 'vue'
 self.MonacoEnvironment = {
   getWorker() {
     // Return a minimal worker for basic functionality
-    return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker?worker', import.meta.url))
+    return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url))
   }
 }
 
