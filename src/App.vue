@@ -12,15 +12,15 @@
       <div class="flex flex-1 min-h-0 h-full">
         <Sidebar
           :files="hostsStore.files"
-          @file-select="handleFileSelect"
           :status="selectedFile?.status || ''"
+          @file-select="handleFileSelect"
         />
 
         <MonacoEditor
           v-if="selectedFile?.content || selectedFile?.content === ''"
+          ref="codeEditor"
           v-model="selectedFile.content"
           class="flex-1 min-w-0"
-          ref="codeEditor"
           :is-dark-theme="settingsStore.isDarkTheme"
           @validation-status="handleValidationStatus"
         />
@@ -31,12 +31,10 @@
 </template>
 
 <script setup lang="ts">
-/** biome-ignore-all lint/correctness/noUnusedImports: biomejs is bugged */
 import { listen } from '@tauri-apps/api/event'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import AppWindow from './components/AppWindow.vue'
 import LicenseModal from './components/LicenseModal.vue'
-// biome-ignore lint/style/useImportType: biomejs is bugged
 import MonacoEditor from './components/MonacoEditor.vue'
 import Sidebar from './components/Sidebar.vue'
 import Toolbar from './components/Toolbar.vue'

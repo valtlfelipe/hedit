@@ -13,14 +13,14 @@
         <button
           v-for="file in files"
           :key="file.id"
-          @click="$emit('fileSelect', file.id)"
-          @contextmenu.prevent="showContextMenu($event, file)"
           :class="[
             'w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 transition-colors',
             file.isSelected
               ? 'bg-purple-500/10 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300'
               : 'text-gray-700 hover:bg-gray-200/80 dark:text-gray-300 dark:hover:bg-zinc-800/80',
           ]"
+          @click="$emit('fileSelect', file.id)"
+          @contextmenu.prevent="showContextMenu($event, file)"
         >
           <File class="w-4 h-4 text-gray-500 dark:text-gray-400" />
           <span class="text-sm font-medium flex-1 select-none">{{ file.name }}</span>

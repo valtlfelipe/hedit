@@ -3,8 +3,8 @@
     <div
       v-if="show"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
-      @click.self="$emit('close')"
       data-tauri-drag-region
+      @click.self="$emit('close')"
     >
       <transition name="slide-up">
         <div v-if="show" class="w-full max-w-md p-6 bg-white rounded-lg shadow-xl dark:bg-zinc-800">
@@ -12,23 +12,23 @@
           <div class="mt-4">
             <label for="filename" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Filename</label>
             <input
-              type="text"
               ref="filenameInput"
               v-model="newName"
+              type="text"
               class="block w-full px-3 py-2 mt-1 text-gray-900 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-zinc-700 dark:border-zinc-600 dark:text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
               @keyup.enter="save"
             />
           </div>
           <div class="mt-6 flex justify-end space-x-3">
             <button
-              @click="$emit('close')"
               class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-zinc-700 dark:border-zinc-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              @click="$emit('close')"
             >
               Cancel
             </button>
             <button
-              @click="save"
               class="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              @click="save"
             >
               Save
             </button>
