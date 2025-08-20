@@ -7,7 +7,6 @@ export function useKeyboardShortcuts(
   handleCreateFile: () => Promise<void>,
   handleSaveFile: () => void,
   handleActivateFile: () => void,
-  handleToggleComment: () => void,
 ) {
   const { handleZoomIn, handleZoomOut } = useZoom()
 
@@ -30,9 +29,6 @@ export function useKeyboardShortcuts(
     } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === '0') {
       e.preventDefault()
       zoomUtils.handleZoomReset()
-    } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === '/') {
-      e.preventDefault()
-      handleToggleComment()
     }
   }
 

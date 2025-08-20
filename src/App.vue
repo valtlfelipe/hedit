@@ -9,18 +9,20 @@
         @show-license-modal="showLicenseModal = true"
       />
 
-      <div class="flex flex-1 min-h-0">
+      <div class="flex flex-1 min-h-0 h-full">
         <Sidebar
           :files="hostsStore.files"
           @file-select="handleFileSelect"
           :status="selectedFile?.status || ''"
         />
 
-        <CodeEditor
+        <MonacoEditor
           v-if="selectedFile?.content || selectedFile?.content === ''"
           v-model="selectedFile.content"
           class="flex-1 min-w-0"
           ref="codeEditor"
+          :is-dark-theme="settingsStore.isDarkTheme"
+          @validation-status="handleValidationStatus"
         />
       </div>
     </div>
@@ -33,9 +35,9 @@
 import { listen } from '@tauri-apps/api/event'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import AppWindow from './components/AppWindow.vue'
-// biome-ignore lint/style/useImportType: biomejs is bugged
-import CodeEditor from './components/CodeEditor.vue'
 import LicenseModal from './components/LicenseModal.vue'
+// biome-ignore lint/style/useImportType: biomejs is bugged
+import MonacoEditor from './components/MonacoEditor.vue'
 import Sidebar from './components/Sidebar.vue'
 import Toolbar from './components/Toolbar.vue'
 import { useFileOperations } from './composables/useFileOperations'
@@ -45,6 +47,7 @@ import { hostsStore } from './stores/files'
 import { settingsStore } from './stores/settings'
 
 const showLicenseModal = ref(false)
+const isContentValid = ref(true)
 
 // Initialize composables
 const fileOperations = useFileOperations()
@@ -52,14 +55,15 @@ const { initializeTheme } = useTheme()
 
 const { selectedFile } = fileOperations
 
-const codeEditor = ref<InstanceType<typeof CodeEditor> | null>(null)
+const codeEditor = ref<InstanceType<typeof MonacoEditor> | null>(null)
+
+const handleValidationStatus = (isValid: boolean) => {
+  isContentValid.value = isValid
+}
 
 // Enhanced handlers with additional logic
 const handleFileSelect = (fileId: string) => {
   fileOperations.handleFileSelect(fileId)
-  if (codeEditor.value) {
-    codeEditor.value.focus()
-  }
 }
 
 const handleCreateFile = async () => {
@@ -70,18 +74,11 @@ const handleCreateFile = async () => {
 }
 
 const handleSaveFile = () => {
-  const hasErrors = selectedFile.value && codeEditor.value?.hasErrors
-  fileOperations.handleSaveFile(!!hasErrors)
+  fileOperations.handleSaveFile(!isContentValid.value)
 }
 
 const handleActivateFile = () => {
   fileOperations.handleActivateFile()
-}
-
-const handleToggleComment = () => {
-  if (codeEditor.value) {
-    codeEditor.value.toggleComment()
-  }
 }
 
 // Initialize event listeners and watchers
@@ -89,7 +86,6 @@ const keyboardShortcuts = useKeyboardShortcuts(
   handleCreateFile,
   handleSaveFile,
   handleActivateFile,
-  handleToggleComment,
 )
 
 keyboardShortcuts.initializeEventListeners()
@@ -142,6 +138,7 @@ watch(
   () => {
     // When file changes, mark the next content update as programmatic
     markProgrammaticChange()
+    codeEditor.value?.focus()
   },
 )
 
@@ -163,6 +160,7 @@ onMounted(() => {
     if (selectedFile.value) {
       markProgrammaticChange()
     }
+    codeEditor.value?.focus()
   })
   window.addEventListener('keydown', handleKeydown)
 })
