@@ -32,10 +32,9 @@
 
 <script setup lang="ts">
 import { listen } from '@tauri-apps/api/event'
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import AppWindow from './components/AppWindow.vue'
 import LicenseModal from './components/LicenseModal.vue'
-import MonacoEditor from './components/MonacoEditor.vue'
 import Sidebar from './components/Sidebar.vue'
 import Toolbar from './components/Toolbar.vue'
 import { useFileOperations } from './composables/useFileOperations'
@@ -43,6 +42,11 @@ import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts'
 import { useTheme } from './composables/useTheme'
 import { hostsStore } from './stores/files'
 import { settingsStore } from './stores/settings'
+
+const MonacoEditor = defineAsyncComponent({
+  loader: () => import('./components/MonacoEditor.vue'),
+  loadingComponent: () => import('./components/LoadingSpinner.vue'),
+})
 
 const showLicenseModal = ref(false)
 const isContentValid = ref(true)
@@ -158,7 +162,6 @@ onMounted(() => {
     if (selectedFile.value) {
       markProgrammaticChange()
     }
-    codeEditor.value?.focus()
   })
   window.addEventListener('keydown', handleKeydown)
 })

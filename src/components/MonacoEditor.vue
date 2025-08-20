@@ -10,7 +10,7 @@ import 'monaco-editor/esm/vs/editor/contrib/find/browser/findWidget.css'
 import 'monaco-editor/esm/vs/editor/contrib/hover/browser/hoverContribution.js'
 import 'monaco-editor/esm/vs/base/browser/ui/codicons/codicon/codicon.css'
 
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 // Configure Monaco environment for minimal bundle size
 self.MonacoEnvironment = {
@@ -62,7 +62,7 @@ function setupMonaco() {
     rules: [
       { token: 'number', foreground: 'db70b8' },
       { token: 'string', foreground: '000000' },
-  ],
+    ],
     colors: { 'editor.background': '#ffffff', 'editorLineNumber.foreground': '#888888', 'editorLineNumber.activeForeground': '#000000' },
   })
   monaco.editor.defineTheme('HeditDark', {
@@ -185,6 +185,10 @@ onMounted(() => {
   })
 
   validate(editor) // Initial validation
+
+  nextTick(() => {
+    editor?.focus()
+  })
 })
 
 onUnmounted(() => {
