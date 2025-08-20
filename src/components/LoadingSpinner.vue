@@ -6,19 +6,4 @@
 
 <script setup lang="ts">
 import { LoaderCircle } from 'lucide-vue-next';
-
-// No script needed for static spinner
 </script>
-
-<style scoped>
-.lucide-spin {
-    animation: lucide-spin 1s linear infinite;
-    color: #9ca3af; /* Tailwind gray-400 */
-}
-
-@keyframes lucide-spin {
-    100% {
-        transform: rotate(360deg);
-    }
-}
-</style>
