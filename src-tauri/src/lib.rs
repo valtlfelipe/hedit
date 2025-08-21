@@ -1,4 +1,5 @@
 use std::env;
+mod files;
 mod license;
 mod menu;
 mod telemetry;
@@ -93,7 +94,10 @@ pub fn run() {
             Ok(())
         })
         .plugin(tauri_plugin_fs::init())
-        .invoke_handler(tauri::generate_handler![license::activate])
+        .invoke_handler(tauri::generate_handler![
+            license::activate,
+            files::write_system_hosts
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

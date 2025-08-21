@@ -1,3 +1,4 @@
+import { invoke } from '@tauri-apps/api/core'
 import {
   BaseDirectory,
   exists,
@@ -83,6 +84,7 @@ export const hostsStore = reactive({
     if (this.files.find((file) => file.id === id)?.isActive) {
       return
     }
+
     this.files = this.files.filter((file) => file.id !== id)
     await remove(`files/${id}.hosts`, { baseDir: BaseDirectory.AppData })
     this.saveMetadata()
@@ -94,8 +96,9 @@ export const hostsStore = reactive({
     await writeTextFile(`files/${file.id}.hosts`, file.content, {
       baseDir: BaseDirectory.AppData,
     })
+
     if (file.isActive) {
-      await writeTextFile('/etc/hosts', file.content)
+      await invoke('write_system_hosts', { content: file.content })
     }
   },
   saveMetadata() {
