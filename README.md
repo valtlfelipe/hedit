@@ -4,13 +4,9 @@ Fast and intuitive hosts file management. Edit, manage, and organize your hosts 
 
 ![](https://github.com/user-attachments/assets/c4d97520-51ba-4980-b2cd-a10a388eadf2)
 
----
-
 ## 🚧 Work in Progress
 
 **Please Note:** This project is currently under active development. Features may be incomplete, and bugs are expected. Your feedback and contributions are highly welcome!
-
----
 
 ## ✨ Features
 
@@ -20,8 +16,6 @@ This application is available on macOS and Linux. Windows support is planned for
 *   **Fast & Secure:** Built with modern tech for performance and system-level access.
 *   **Multiple Files:** Manage multiple files and activate the one you need.
 *   **Syntax highlighting:** Edit your hosts file with syntax highlighting and validation.
-
----
 
 ## ⬇️ Installation & Usage (macOS)
 
