@@ -1,5 +1,7 @@
 <template>
-  <div ref="editorContainer" class="w-full h-full"></div>
+  <div class="mt-2">
+    <div ref="editorContainer" class="w-full h-full"></div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -63,7 +65,7 @@ function setupMonaco() {
       { token: 'number', foreground: 'db70b8' },
       { token: 'string', foreground: '000000' },
     ],
-    colors: { 'editor.background': '#ffffff', 'editorLineNumber.foreground': '#888888', 'editorLineNumber.activeForeground': '#000000' },
+    colors: { 'editor.background': '#f9fafb', 'editorLineNumber.foreground': '#888888', 'editorLineNumber.activeForeground': '#000000' },
   })
   monaco.editor.defineTheme('HeditDark', {
     base: 'vs-dark',
@@ -72,7 +74,7 @@ function setupMonaco() {
       { token: 'number', foreground: 'db70b8' },
       { token: 'string', foreground: 'ffffff' },
     ],
-    colors: { 'editor.background': '#27272a' },
+    colors: { 'editor.background': '#18181b' },
   })
 
   isMonacoSetup = true
@@ -172,6 +174,7 @@ onMounted(() => {
     letterSpacing: 0.2,
     minimap: { enabled: false },
     scrollBeyondLastLine: false,
+    renderLineHighlight: 'none',
   })
 
   resizeObserver = new ResizeObserver(() => editor?.layout())

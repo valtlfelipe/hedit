@@ -3,9 +3,9 @@
     class="w-64 bg-gray-100 dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between"
   >
     <!-- Sidebar Header -->
-    <div class="px-4 py-3 border-b border-gray-200 dark:border-zinc-800">
+    <!-- <div class="px-4 py-3 border-b border-gray-200 dark:border-zinc-800">
       <h2 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Local</h2>
-    </div>
+    </div> -->
 
     <!-- File List -->
     <div class="overflow-y-auto flex-grow">
