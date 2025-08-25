@@ -10,11 +10,18 @@ import {
 import { load } from '@tauri-apps/plugin-store'
 import { reactive } from 'vue'
 
+export enum HostsFileType {
+  LOCAL = 'local',
+  REMOTE = 'remote',
+}
+
 export interface HostsFile {
   id: string
   name: string
   isActive: boolean
   isSelected: boolean
+  type: HostsFileType
+  remoteUrl?: string | null
   content: string
   status: string
 }
@@ -42,6 +49,7 @@ export const hostsStore = reactive({
       name,
       isActive: !!isFirst,
       isSelected: !!isFirst,
+      type: HostsFileType.LOCAL,
       content,
       status: '',
     }
@@ -104,7 +112,7 @@ export const hostsStore = reactive({
   saveMetadata() {
     return metadataStore.set(
       'files',
-      this.files.map(({ id, name, isActive, isSelected }) => ({ id, name, isActive, isSelected })),
+      this.files.map(({ id, name, type, remoteUrl, isActive, isSelected }) => ({ id, name, type, remoteUrl, isActive, isSelected })),
     )
   },
 })

@@ -1,31 +1,36 @@
 <template>
   <div class="bg-gray-50/80 dark:bg-zinc-900/80 border-b border-gray-200 dark:border-zinc-800 px-3 py-2 flex items-center">
     <div class="flex items-center space-x-2 flex-grow select-none">
-      <button
-        class="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
-        @click="$emit('createFile')"
-      >
-        <Plus class="w-4 h-4" />
-        <span>Create</span>
-      </button>
+      <Tooltip text="New File" :shortcut="`${modifier}+N`">
+        <button
+          class="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
+          @click="$emit('createFile')"
+        >
+          <Plus class="w-4 h-4" />
+          <span>Create</span>
+        </button>
+      </Tooltip>
 
-      <button
-        class="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
-        @click="$emit('saveFile')"
-      >
-        <Save class="w-4 h-4 text-gray-600 dark:text-gray-300" />
-        <span class="text-gray-800 dark:text-gray-200 font-medium">Save</span>
-      </button>
+      <Tooltip text="Save File" :shortcut="`${modifier}+S`">
+        <button
+          class="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
+          @click="$emit('saveFile')"
+        >
+          <Save class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+          <span>Save</span>
+        </button>
+      </Tooltip>
 
-      <button
-        class="flex items-center space-x-1 px-3 py-1.5 text-sm text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors"
-        :disabled="!allowActivate"
-        :class="{ 'opacity-50 cursor-not-allowed': !allowActivate }"
-        @click="$emit('activateFile')"
-      >
-        <Play class="w-4 h-4" />
-        <span>Activate</span>
-      </button>
+      <Tooltip text="Activate File" :shortcut="`${modifier}+⇧+A`">
+        <button
+          class="flex items-center space-x-2 px-3 py-1.5 text-sm text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors"
+          :disabled="!allowActivate"
+          :class="{ 'opacity-50 cursor-not-allowed': !allowActivate }"
+          @click="$emit('activateFile')"
+        >
+          <Play class="w-4 h-4" />
+        </button>
+      </Tooltip>
 
       <div class="flex-1"></div>
 
@@ -36,12 +41,14 @@
       </button> -->
     </div>
     <div ref="settingsContainer" class="relative select-none">
-        <button class="p-1.5 hover:bg-gray-300/80 dark:hover:bg-zinc-700/80 rounded-md transition-colors" @click="showSettings = !showSettings">
-          <Settings class="w-4 h-4 text-gray-600 dark:text-gray-200" />
-        </button>
+        <Tooltip text="Settings" position="right">
+          <button class="p-1.5 hover:bg-gray-300/80 dark:hover:bg-zinc-700/80 rounded-md transition-colors" @click="showSettings = !showSettings">
+            <Settings class="w-4 h-4 text-gray-600 dark:text-gray-200" />
+          </button>
+        </Tooltip>
 
         <transition name="fade-scale">
-          <div v-if="showSettings" class="absolute right-0 top-8 z-10 bg-gray-50/95 dark:bg-zinc-800/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg w-50">
+          <div v-if="showSettings" class="absolute right-0 top-8 z-60 bg-gray-50/95 dark:bg-zinc-800/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg w-50">
             <ul class="p-1 text-sm text-gray-800 dark:text-gray-200">
               <li class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out" @click="toggleDarkMode">
                 <Sun v-if="settingsStore.isDarkTheme" class="w-4 h-4" />
@@ -65,10 +72,14 @@
 </template>
 
 <script setup lang="ts">
+import Tooltip from './Tooltip.vue'
+import { usePlatform } from '../composables/usePlatform'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { KeyRound, MessageSquare, Moon, Play, Plus, Save, Settings, Sun } from 'lucide-vue-next'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { settingsStore } from '../stores/settings'
+
+const { modifier } = usePlatform()
 
 defineProps<{
   allowActivate: boolean

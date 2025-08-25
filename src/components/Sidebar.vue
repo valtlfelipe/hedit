@@ -22,7 +22,7 @@
           @click="$emit('fileSelect', file.id)"
           @contextmenu.prevent="showContextMenu($event, file)"
         >
-          <File class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          <File v-if="!file.type || file.type === HostsFileType.LOCAL" class="w-4 h-4 text-gray-500 dark:text-gray-400" />
           <span class="text-sm font-medium flex-1 select-none">{{ file.name }}</span>
           <Play v-if="file.isActive" class="w-4 h-4 text-purple-700 dark:text-purple-300" />
         </button>
@@ -41,7 +41,8 @@
         v-if="contextMenu.show"
         :x="contextMenu.x"
         :y="contextMenu.y"
-        :allow-delete="!contextMenu.file?.isActive"
+        :is-file-active="contextMenu.file?.isActive ?? false"
+        @activate="activateFile"
         @edit="editFile"
         @delete="showConfirmModal"
         @click.stop
@@ -67,7 +68,7 @@
 import { File, Folder, Play } from 'lucide-vue-next'
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import type { HostsFile } from '../stores/files'
-import { hostsStore } from '../stores/files'
+import { HostsFileType, hostsStore } from '../stores/files'
 import ConfirmModal from './ConfirmModal.vue'
 import ContextMenu from './ContextMenu.vue'
 import EditFileModal from './EditFileModal.vue'
@@ -79,8 +80,9 @@ interface Props {
 
 const props = defineProps<Props>()
 
-defineEmits<{
+const emit = defineEmits<{
   fileSelect: [fileId: string]
+  activateFile: [fileId: string]
 }>()
 
 const contextMenuContainer = ref<HTMLElement | null>(null)
@@ -104,6 +106,12 @@ const confirmModal = reactive({
   message: '',
   fileId: '',
 })
+
+function activateFile() {
+  if(!contextMenu.file) return
+  emit('activateFile', contextMenu.file.id)
+  hideContextMenu()
+}
 
 function showContextMenu(event: MouseEvent, file: HostsFile) {
   contextMenu.file = file

@@ -14,6 +14,7 @@
           :files="hostsStore.files"
           :status="selectedFile?.status || ''"
           @file-select="handleFileSelect"
+          @activate-file="handleActivateFile"
         />
 
         <MonacoEditor
@@ -79,8 +80,8 @@ const handleSaveFile = () => {
   fileOperations.handleSaveFile(!isContentValid.value)
 }
 
-const handleActivateFile = () => {
-  fileOperations.handleActivateFile()
+const handleActivateFile = (id?: string) => {
+  fileOperations.handleActivateFile(id)
 }
 
 // Initialize event listeners and watchers

@@ -8,6 +8,14 @@
       <ul class="p-1 text-sm text-gray-800 dark:text-gray-200">
         <li
           class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
+          :class="{ 'cursor-not-allowed opacity-50': isFileActive }"
+          @click.prevent="isFileActive ? null : $emit('activate')"
+        >
+          <Play class="w-4 h-4 " />
+          <span>Activate File</span>
+        </li>
+        <li
+          class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
           @click.prevent="$emit('edit')"
         >
           <Pencil class="w-4 h-4" />
@@ -16,8 +24,8 @@
         <div class="border-t border-gray-200 dark:border-zinc-700 my-1"></div>
         <li
           class="rounded-lg flex items-center gap-2 px-2 py-1 text-red-600 dark:text-red-400 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
-          :class="{ 'cursor-not-allowed opacity-50': !allowDelete }"
-          @click.prevent="allowDelete ? $emit('delete') : null"
+          :class="{ 'cursor-not-allowed opacity-50': isFileActive }"
+          @click.prevent="isFileActive ? null : $emit('delete')"
         >
           <Trash2 class="w-4 h-4" />
           <span>Delete File</span>
@@ -28,15 +36,16 @@
 </template>
 
 <script setup lang="ts">
-import { Pencil, Trash2 } from 'lucide-vue-next'
+import { Pencil, Play, Trash2 } from 'lucide-vue-next'
 
 defineProps<{
   x: number
   y: number
-  allowDelete: boolean
+  isFileActive: boolean
 }>()
 
 defineEmits<{
+  activate: []
   edit: []
   delete: []
 }>()

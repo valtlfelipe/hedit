@@ -60,9 +60,18 @@ export function useFileOperations() {
     await writeHostsFile()
   }
 
-  const handleActivateFile = async () => {
-    if (!selectedFile.value?.id || selectedFile.value.isActive) return
-    hostsStore.setActive(selectedFile.value.id)
+  const handleActivateFile = async (id?: string) => {
+    if (!id) {
+      id = selectedFile.value?.id
+    }
+
+    if (!id) return
+
+    const file = hostsStore.files.find((f) => f.id === id)
+
+    if (!file || file.isActive) return
+
+    hostsStore.setActive(id)
     await writeHostsFile(true)
   }
 
