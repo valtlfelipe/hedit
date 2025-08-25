@@ -2,7 +2,7 @@
 
 Fast and intuitive hosts file management. Edit, manage, and organize your hosts entries with a beautiful and modern interface.
 
-![](https://github.com/user-attachments/assets/c4d97520-51ba-4980-b2cd-a10a388eadf2)
+![](https://github.com/user-attachments/assets/d121e976-db32-4ed7-b6f2-320d65911472)
 
 ## 🚧 Work in Progress
 
