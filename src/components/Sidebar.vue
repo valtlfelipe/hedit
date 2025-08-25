@@ -8,7 +8,7 @@
     </div> -->
 
     <!-- File List -->
-    <div class="overflow-y-auto flex-grow">
+    <div class="overflow-y-auto flex-grow" @contextmenu.prevent="null">
       <div class="p-2 space-y-1">
         <button
           v-for="file in files"

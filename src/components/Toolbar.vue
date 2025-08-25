@@ -1,5 +1,8 @@
 <template>
-  <div class="bg-gray-50/80 dark:bg-zinc-900/80 border-b border-gray-200 dark:border-zinc-800 px-3 py-2 flex items-center">
+  <div
+    class="bg-gray-50/80 dark:bg-zinc-900/80 border-b border-gray-200 dark:border-zinc-800 px-3 py-2 flex items-center"
+    @contextmenu.prevent="null"
+  >
     <div class="flex items-center space-x-2 flex-grow select-none">
       <Tooltip text="New File" :shortcut="`${modifier}+N`">
         <button
