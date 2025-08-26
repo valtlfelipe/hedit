@@ -30,6 +30,7 @@
             :is-dark-theme="settingsStore.isDarkTheme"
             @validation-status="handleValidationStatus"
           />
+          <LoadingSpinner v-else class="m-auto" />
         </Suspense>
       </div>
     </div>

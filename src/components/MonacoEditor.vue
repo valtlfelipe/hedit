@@ -187,6 +187,9 @@ onMounted(() => {
     minimap: { enabled: false },
     scrollBeyondLastLine: false,
     renderLineHighlight: 'none',
+    glyphMargin: false,
+    showUnused: false,
+    showDeprecated: false,
   })
 
   resizeObserver = new ResizeObserver(() => editor?.layout())

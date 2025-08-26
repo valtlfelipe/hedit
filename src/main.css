@@ -12,3 +12,11 @@ body,
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+.monaco-editor .lines-content {
+  will-change: transform;
+}
+
+.monaco-editor .scroll-decoration {
+  transform: translateZ(0);
+}
