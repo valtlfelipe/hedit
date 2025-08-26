@@ -2,6 +2,7 @@ use std::env;
 mod files;
 mod license;
 mod menu;
+mod remote_hosts;
 mod telemetry;
 use std::fs::create_dir_all;
 
@@ -96,7 +97,8 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![
             license::activate,
-            files::write_system_hosts
+            files::write_system_hosts,
+            remote_hosts::fetch_remote_hosts_file,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

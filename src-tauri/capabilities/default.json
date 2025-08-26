@@ -40,6 +40,9 @@
       "allow": [
         {
           "url": "https://activate.felipevm.dev"
+        },
+        {
+          "url": "https://*"
         }
       ]
     },
