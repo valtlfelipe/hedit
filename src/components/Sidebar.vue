@@ -8,7 +8,7 @@
     </div> -->
 
     <!-- File List -->
-    <div class="overflow-y-auto flex-grow" @contextmenu.prevent="null">
+    <div class="flex-grow" @contextmenu.prevent="null">
       <div class="p-2 space-y-1">
         <button
           v-for="file in files"
@@ -22,9 +22,16 @@
           @click="$emit('fileSelect', file.id)"
           @contextmenu.prevent="showContextMenu($event, file)"
         >
-          <File v-if="!file.type || file.type === HostsFileType.LOCAL" class="w-4 h-4 text-gray-500 dark:text-gray-400" />
-          <span class="text-sm font-medium flex-1 select-none">{{ file.name }}</span>
-          <Play v-if="file.isActive" class="w-4 h-4 text-purple-700 dark:text-purple-300" />
+          <Tooltip v-if="!file.type || file.type === HostsFileType.LOCAL" text="Local File">
+            <File class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          </Tooltip>
+          <Tooltip v-else-if="file.type === HostsFileType.REMOTE" text="Remote File">
+            <Globe class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          </Tooltip>
+          <span class="text-sm font-medium flex-1 select-none truncate">{{ file.name }}</span>
+          <Tooltip v-if="file.isActive" text="Current Active">
+            <Play v-if="file.isActive" class="w-4 h-4 text-purple-700 dark:text-purple-300" />
+          </Tooltip>
         </button>
       </div>
     </div>
@@ -65,13 +72,14 @@
 </template>
 
 <script setup lang="ts">
-import { File, Folder, Play } from 'lucide-vue-next'
+import { File, Folder, Globe, Play } from 'lucide-vue-next'
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import type { HostsFile } from '../stores/files'
 import { HostsFileType, hostsStore } from '../stores/files'
 import ConfirmModal from './ConfirmModal.vue'
 import ContextMenu from './ContextMenu.vue'
 import EditFileModal from './EditFileModal.vue'
+import Tooltip from './Tooltip.vue'
 
 interface Props {
   files: HostsFile[]
