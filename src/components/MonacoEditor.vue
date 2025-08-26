@@ -1,6 +1,7 @@
 <template>
   <div class="mt-2">
-    <div ref="editorContainer" class="w-full h-full"></div>
+    <div v-show="isReady" ref="editorContainer" class="w-full h-full"></div>
+    <LoadingSpinner v-if="!isReady" class="m-auto" />
   </div>
 </template>
 
@@ -12,7 +13,10 @@ import 'monaco-editor/esm/vs/editor/contrib/find/browser/findWidget.css'
 import 'monaco-editor/esm/vs/editor/contrib/hover/browser/hoverContribution.js'
 import 'monaco-editor/esm/vs/base/browser/ui/codicons/codicon/codicon.css'
 
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue'
+import LoadingSpinner from './LoadingSpinner.vue'
+
+const isReady = ref(false)
 
 // Configure Monaco environment for minimal bundle size
 self.MonacoEnvironment = {
@@ -45,7 +49,7 @@ function setupMonaco() {
   monaco.languages.setMonarchTokensProvider('hosts', {
     tokenizer: {
       root: [
-        [/^#.*$/, 'comment'],
+        [/#.*$/, 'comment'],
         [/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/, 'number'], // IPv4
         [/([a-fA-F0-9:]+:+)+[a-fA-F0-9]+/, 'number'], // IPv6
         [/[a-zA-Z0-9\-. Advance]/, 'string'], // Hostnames
@@ -126,7 +130,13 @@ function getHostsValidationMarkers(content: string): monaco.editor.IMarkerData[]
         endColumn: lineContent.length + 1,
       })
     } else {
+      let initiatedComments = false
       hostnames.forEach((hostname) => {
+        if (hostname.startsWith('#') || initiatedComments) {
+          initiatedComments = true
+          return
+        }
+
         if (!isValidHostname(hostname)) {
           const startColumn = lineContent.indexOf(hostname) + 1
           markers.push({
@@ -160,10 +170,12 @@ const editorContainer = ref<HTMLElement | null>(null)
 let editor: monaco.editor.IStandaloneCodeEditor | null = null
 let resizeObserver: ResizeObserver | null = null
 
+onBeforeMount(() => {
+  setupMonaco()
+})
+
 onMounted(() => {
   if (!editorContainer.value) return
-
-  setupMonaco()
 
   editor = monaco.editor.create(editorContainer.value, {
     value: props.modelValue,
@@ -189,6 +201,8 @@ onMounted(() => {
 
   validate(editor) // Initial validation
 
+  isReady.value = true
+
   nextTick(() => {
     editor?.focus()
   })
@@ -205,6 +219,7 @@ watch(
   (newValue) => {
     if (editor && editor.getValue() !== newValue) {
       editor.setValue(newValue)
+      editor.focus()
     }
   },
 )
