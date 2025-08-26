@@ -8,7 +8,7 @@
     </div> -->
 
     <!-- File List -->
-    <div class="flex-grow" @contextmenu.prevent="null">
+    <div class="flex-grow" @contextmenu.prevent="showContextMenu($event)">
       <div class="p-2 space-y-1">
         <button
           v-for="file in files"
@@ -20,7 +20,7 @@
               : 'text-gray-700 hover:bg-gray-200/80 dark:text-gray-300 dark:hover:bg-zinc-800/80',
           ]"
           @click="$emit('fileSelect', file.id)"
-          @contextmenu.prevent="showContextMenu($event, file)"
+          @contextmenu.prevent="showFileContextMenu($event, file)"
         >
           <Tooltip v-if="!file.type || file.type === HostsFileType.LOCAL" text="Local File">
             <File class="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -43,16 +43,24 @@
         <span class="text-xs text-gray-600 dark:text-gray-400 font-medium">{{ statusText }}</span>
       </div>
     </div>
-    <div ref="contextMenuContainer">
-      <ContextMenu
-        v-if="contextMenu.show"
-        :x="contextMenu.x"
-        :y="contextMenu.y"
-        :is-file-active="contextMenu.file?.isActive ?? false"
+    <div ref="fileContextMenuContainer">
+      <FileContextMenu
+        v-if="fileContextMenu.show"
+        :x="fileContextMenu.x"
+        :y="fileContextMenu.y"
+        :is-file-active="fileContextMenu.file?.isActive ?? false"
         @activate="activateFile"
         @edit="editFile"
         @delete="showConfirmModal"
         @click.stop
+      />
+    </div>
+    <div ref="contextMenuContainer">
+      <SidebarContextMenu
+        v-if="contextMenu.show"
+        :x="contextMenu.x"
+        :y="contextMenu.y"
+        @create="createFile"
       />
     </div>
     <EditFileModal
@@ -77,9 +85,10 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import type { HostsFile } from '../stores/files'
 import { HostsFileType, hostsStore } from '../stores/files'
 import ConfirmModal from './ConfirmModal.vue'
-import ContextMenu from './ContextMenu.vue'
+import FileContextMenu from './FileContextMenu.vue'
 import EditFileModal from './EditFileModal.vue'
 import Tooltip from './Tooltip.vue'
+import SidebarContextMenu from './SidebarContextMenu.vue'
 
 interface Props {
   files: HostsFile[]
@@ -91,15 +100,23 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   fileSelect: [fileId: string]
   activateFile: [fileId: string]
+  createFile: []
 }>()
 
 const contextMenuContainer = ref<HTMLElement | null>(null)
+const fileContextMenuContainer = ref<HTMLElement | null>(null)
+
+const fileContextMenu = reactive({
+  show: false,
+  x: 0,
+  y: 0,
+  file: null as HostsFile | null,
+})
 
 const contextMenu = reactive({
   show: false,
   x: 0,
   y: 0,
-  file: null as HostsFile | null,
 })
 
 const editModal = reactive({
@@ -116,36 +133,49 @@ const confirmModal = reactive({
 })
 
 function activateFile() {
-  if(!contextMenu.file) return
-  emit('activateFile', contextMenu.file.id)
+  if(!fileContextMenu.file) return
+  emit('activateFile', fileContextMenu.file.id)
   hideContextMenu()
 }
 
-function showContextMenu(event: MouseEvent, file: HostsFile) {
-  contextMenu.file = file
+function createFile() {
+  emit('createFile')
+  hideContextMenu()
+}
+
+function showFileContextMenu(event: MouseEvent, file: HostsFile) {
+  fileContextMenu.file = file
+  fileContextMenu.x = event.clientX
+  fileContextMenu.y = event.clientY
+  fileContextMenu.show = true
+}
+
+function showContextMenu(event: MouseEvent) {
+  if(fileContextMenu.show) return
   contextMenu.x = event.clientX
   contextMenu.y = event.clientY
   contextMenu.show = true
 }
 
 function hideContextMenu() {
+  fileContextMenu.show = false
   contextMenu.show = false
 }
 
 function editFile() {
-  if (contextMenu.file) {
-    editModal.fileId = contextMenu.file.id
-    editModal.fileName = contextMenu.file.name
+  if (fileContextMenu.file) {
+    editModal.fileId = fileContextMenu.file.id
+    editModal.fileName = fileContextMenu.file.name
     editModal.show = true
     hideContextMenu()
   }
 }
 
 function showConfirmModal() {
-  if (contextMenu.file) {
-    confirmModal.title = `Delete '${contextMenu.file.name}'`
-    confirmModal.message = `Are you sure you want to delete '${contextMenu.file.name}'? This action cannot be undone.`
-    confirmModal.fileId = contextMenu.file.id
+  if (fileContextMenu.file) {
+    confirmModal.title = `Delete '${fileContextMenu.file.name}'`
+    confirmModal.message = `Are you sure you want to delete '${fileContextMenu.file.name}'? This action cannot be undone.`
+    confirmModal.fileId = fileContextMenu.file.id
     confirmModal.show = true
     hideContextMenu()
   }
@@ -194,7 +224,10 @@ const statusText = computed(() => {
 })
 
 const handleClickOutside = (event: MouseEvent) => {
-  if (contextMenuContainer.value && !contextMenuContainer.value.contains(event.target as Node)) {
+  if (
+    (fileContextMenuContainer.value && !fileContextMenuContainer.value.contains(event.target as Node)) ||
+    (contextMenuContainer.value && !contextMenuContainer.value.contains(event.target as Node))
+  ) {
     hideContextMenu()
   }
 }

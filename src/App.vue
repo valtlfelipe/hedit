@@ -15,6 +15,7 @@
           :status="selectedFile?.status || ''"
           @file-select="handleFileSelect"
           @activate-file="handleActivateFile"
+          @create-file="handleCreateFile"
         />
 
         <Suspense>
