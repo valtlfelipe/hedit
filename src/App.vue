@@ -17,14 +17,20 @@
           @activate-file="handleActivateFile"
         />
 
-        <MonacoEditor
-          v-if="selectedFile?.content || selectedFile?.content === ''"
-          ref="codeEditor"
-          v-model="selectedFile.content"
-          class="flex-1 min-w-0"
-          :is-dark-theme="settingsStore.isDarkTheme"
-          @validation-status="handleValidationStatus"
-        />
+        <Suspense>
+          <template #fallback>
+            <LoadingSpinner class="m-auto" />
+          </template>
+
+          <MonacoEditor
+            v-if="selectedFile?.content || selectedFile?.content === ''"
+            ref="codeEditor"
+            v-model="selectedFile.content"
+            class="flex-1 min-w-0"
+            :is-dark-theme="settingsStore.isDarkTheme"
+            @validation-status="handleValidationStatus"
+          />
+        </Suspense>
       </div>
     </div>
     <LicenseModal :show="showLicenseModal" @close="showLicenseModal = false" />
@@ -43,11 +49,9 @@ import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts'
 import { useTheme } from './composables/useTheme'
 import { hostsStore } from './stores/files'
 import { settingsStore } from './stores/settings'
+import LoadingSpinner from './components/LoadingSpinner.vue'
 
-const MonacoEditor = defineAsyncComponent({
-  loader: () => import('./components/MonacoEditor.vue'),
-  loadingComponent: () => import('./components/LoadingSpinner.vue'),
-})
+const MonacoEditor = defineAsyncComponent(() => import('./components/MonacoEditor.vue'))
 
 const showLicenseModal = ref(false)
 const isContentValid = ref(true)
