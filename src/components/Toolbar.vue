@@ -4,15 +4,31 @@
     @contextmenu.prevent="null"
   >
     <div class="flex items-center space-x-2 flex-grow select-none">
-      <Tooltip text="New File" :shortcut="`${modifier}+N`">
+      <div ref="createContainer" class="relative">
         <button
           class="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
-          @click="$emit('createFile')"
+          @click="showCreateDropdown = !showCreateDropdown"
         >
           <Plus class="w-4 h-4" />
           <span>Create</span>
+          <ChevronDown class="w-4 h-4" />
         </button>
-      </Tooltip>
+
+        <transition name="fade-scale">
+          <div v-if="showCreateDropdown" class="absolute left-0 top-8 z-60 bg-gray-50/95 dark:bg-zinc-800/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg w-48">
+            <ul class="p-1 text-sm text-gray-800 dark:text-gray-200">
+              <li class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out" @click="$emit('createLocalFile'); showCreateDropdown = false">
+                <File class="w-4 h-4" />
+                <span>New Local File</span>
+              </li>
+              <li class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out" @click="$emit('createRemoteFile'); showCreateDropdown = false">
+                <Globe class="w-4 h-4" />
+                <span>New Remote File</span>
+              </li>
+            </ul>
+          </div>
+        </transition>
+      </div>
 
       <Tooltip text="Save File" :shortcut="`${modifier}+S`">
         <button
@@ -78,7 +94,7 @@
 import Tooltip from './Tooltip.vue'
 import { usePlatform } from '../composables/usePlatform'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { KeyRound, MessageSquare, Moon, Play, Plus, Save, Settings, Sun } from 'lucide-vue-next'
+import { ChevronDown, KeyRound, MessageSquare, Moon, Play, Plus, Save, Settings, Sun, File, Globe } from 'lucide-vue-next'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { settingsStore } from '../stores/settings'
 
@@ -89,7 +105,8 @@ defineProps<{
 }>()
 
 defineEmits<{
-  createFile: []
+  createLocalFile: []
+  createRemoteFile: []
   saveFile: []
   activateFile: []
   showLicenseModal: []
@@ -97,16 +114,22 @@ defineEmits<{
 
 const showSettings = ref(false)
 const settingsContainer = ref<HTMLElement | null>(null)
+const showCreateDropdown = ref(false)
+const createContainer = ref<HTMLElement | null>(null)
 
 const handleClickOutside = (event: MouseEvent) => {
   if (settingsContainer.value && !settingsContainer.value.contains(event.target as Node)) {
     showSettings.value = false
+  }
+  if (createContainer.value && !createContainer.value.contains(event.target as Node)) {
+    showCreateDropdown.value = false
   }
 }
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape') {
     showSettings.value = false
+    showCreateDropdown.value = false
   }
 }
 

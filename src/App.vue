@@ -3,7 +3,8 @@
     <div class="flex flex-col h-full flex-1 min-h-0">
       <Toolbar
         :allow-activate="!selectedFile?.isActive"
-        @create-file="handleCreateFile"
+        @create-local-file="() => handleCreateFile()"
+        @create-remote-file="() => handleCreateFile({ remote: true })"
         @save-file="() => handleSaveFile()"
         @activate-file="handleActivateFile"
         @show-license-modal="showLicenseModal = true"
