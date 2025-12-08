@@ -49,9 +49,12 @@
         :x="fileContextMenu.x"
         :y="fileContextMenu.y"
         :is-file-active="fileContextMenu.file?.isActive ?? false"
+        :is-remote="fileContextMenu.file?.type === HostsFileType.REMOTE"
+        :is-refreshing="refreshingFiles.has(fileContextMenu.file?.id ?? '')"
         @activate="activateFile"
         @edit="editFile"
         @delete="showConfirmModal"
+        @refresh="refreshFile"
         @click.stop
       />
     </div>
@@ -143,6 +146,8 @@ const remoteFileModal = reactive({
   show: false,
 })
 
+const refreshingFiles = reactive(new Set<string>())
+
 function activateFile() {
   if(!fileContextMenu.file) return
   emit('activateFile', fileContextMenu.file.id)
@@ -227,6 +232,21 @@ function hideRemoteFileModal() {
 function handleRemoteFileCreated(fileId: string) {
   emit('fileSelect', fileId)
   hideRemoteFileModal()
+}
+
+async function refreshFile() {
+  if (!fileContextMenu.file) return
+  const fileId = fileContextMenu.file.id
+  refreshingFiles.add(fileId)
+  try {
+    await hostsStore.refreshFile(fileId)
+  } catch (error) {
+    // Error is already handled in the store by setting status to 'fetch_error'
+    console.error('Failed to refresh remote file:', error)
+  } finally {
+    refreshingFiles.delete(fileId)
+  }
+  hideContextMenu()
 }
 
 const statusText = computed(() => {

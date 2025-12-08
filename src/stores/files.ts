@@ -118,6 +118,23 @@ export const hostsStore = reactive({
     await remove(`files/${id}.hosts`, { baseDir: BaseDirectory.AppData })
     this.saveMetadata()
   },
+  async refreshFile(id: string) {
+    const file = this.files.find((file) => file.id === id)
+    if (!file || file.type !== HostsFileType.REMOTE || !file.remoteUrl) return
+
+    try {
+      file.status = 'fetching'
+      await invoke('fetch_remote_hosts_file', { url: file.remoteUrl, fileName: `${id}.hosts` })
+      // Reload the content after fetching
+      file.content = await readTextFile(`files/${id}.hosts`, {
+        baseDir: BaseDirectory.AppData,
+      })
+      file.status = 'loaded'
+    } catch (error) {
+      file.status = 'fetch_error'
+      throw error
+    }
+  },
   async saveContent(id: string) {
     const file = this.files.find((file) => file.id === id)
     if (!file) return

@@ -21,6 +21,14 @@
           <Pencil class="w-4 h-4" />
           <span>Rename File</span>
         </li>
+        <li
+          v-if="isRemote"
+          class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
+          @click.prevent="$emit('refresh')"
+        >
+          <RefreshCw :class="['w-4 h-4', { 'animate-spin': isRefreshing }]" />
+          <span>Refresh</span>
+        </li>
         <div class="border-t border-gray-200 dark:border-zinc-700 my-1"></div>
         <li
           class="rounded-lg flex items-center gap-2 px-2 py-1 text-red-600 dark:text-red-400 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
@@ -36,18 +44,21 @@
 </template>
 
 <script setup lang="ts">
-import { Pencil, Play, Trash2 } from 'lucide-vue-next'
+import { Pencil, Play, RefreshCw, Trash2 } from 'lucide-vue-next'
 
 defineProps<{
   x: number
   y: number
   isFileActive: boolean
+  isRemote: boolean
+  isRefreshing: boolean
 }>()
 
 defineEmits<{
   activate: []
   edit: []
   delete: []
+  refresh: []
 }>()
 </script>
 
