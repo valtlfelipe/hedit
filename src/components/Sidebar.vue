@@ -216,6 +216,10 @@ function showRemoteFileModal() {
   hideContextMenu()
 }
 
+defineExpose({
+  showRemoteFileModal,
+})
+
 function hideRemoteFileModal() {
   remoteFileModal.show = false
 }

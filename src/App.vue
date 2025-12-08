@@ -11,6 +11,7 @@
 
       <div class="flex flex-1 min-h-0 h-full">
         <Sidebar
+          ref="sidebarRef"
           :files="hostsStore.files"
           :status="selectedFile?.status || ''"
           @file-select="handleFileSelect"
@@ -57,6 +58,7 @@ const MonacoEditor = defineAsyncComponent(() => import('./components/MonacoEdito
 
 const showLicenseModal = ref(false)
 const isContentValid = ref(true)
+const sidebarRef = ref()
 
 // Initialize composables
 const fileOperations = useFileOperations()
@@ -76,6 +78,12 @@ const handleFileSelect = (fileId: string) => {
 }
 
 const handleCreateFile = async ({ remote = false, fileName = '', remoteUrl = '' } = {}) => {
+  if (remote && !fileName && !remoteUrl) {
+    // Open remote file modal instead of creating directly
+    sidebarRef.value?.showRemoteFileModal()
+    return
+  }
+
   const id = await fileOperations.handleCreateFile({ remote, fileName, remoteUrl })
   if (id) {
     handleFileSelect(id)
