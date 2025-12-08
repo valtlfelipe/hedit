@@ -15,6 +15,7 @@ This application is available on macOS and Linux. Windows support is planned for
 *   **Intuitive UI:** Clean and user-friendly interface for easy hosts file management with Light & Dark mode.
 *   **Fast & Secure:** Built with modern tech for performance and system-level access.
 *   **Multiple Files:** Manage multiple files and activate the one you need.
+*   **Remote Files:** Add and Sync remote hosts files locally (like StevenBlack/hosts, etc.).
 *   **Syntax highlighting:** Edit your hosts file with syntax highlighting and validation.
 
 ## ⬇️ Installation & Usage (macOS)

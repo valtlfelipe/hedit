@@ -26,7 +26,7 @@ pub async fn fetch_remote_hosts_file(
         .get(fetch_url)
         .header(
             reqwest::header::USER_AGENT,
-            format!("Hedit/{}", app_version),
+            format!("hedit.app/{}", app_version),
         )
         .header(reqwest::header::ACCEPT, "text/plain")
         .send()
