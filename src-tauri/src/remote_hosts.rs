@@ -55,6 +55,10 @@ pub async fn fetch_remote_hosts_file(
         .await
         .map_err(|e| format!("Error creating file: {}", e))?;
 
+    file.write_all(format!("# Fetched from: {}\n# --------------\n", url).as_bytes())
+        .await
+        .map_err(|e| format!("Error writing URL to file: {}", e))?;
+
     while let Some(chunk) = response
         .chunk()
         .await

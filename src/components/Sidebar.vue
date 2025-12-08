@@ -80,7 +80,7 @@
     <RemoteFileModal
       :show="remoteFileModal.show"
       @close="hideRemoteFileModal"
-      @create="createRemoteFile"
+      @created="handleRemoteFileCreated"
     />
   </div>
 </template>
@@ -224,13 +224,9 @@ function hideRemoteFileModal() {
   remoteFileModal.show = false
 }
 
-async function createRemoteFile(fileName: string, remoteUrl: string) {
-  try {
-    emit('createFile', { remote: true, fileName, remoteUrl })
-    hideRemoteFileModal()
-  } catch (error) {
-    console.error('Error creating remote file:', error)
-  }
+function handleRemoteFileCreated(fileId: string) {
+  emit('fileSelect', fileId)
+  hideRemoteFileModal()
 }
 
 const statusText = computed(() => {

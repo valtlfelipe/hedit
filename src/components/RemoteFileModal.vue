@@ -34,9 +34,13 @@
               Enter a URL to a remote hosts file. The file will be downloaded and stored locally.
             </p>
           </div>
+          <div v-if="error" class="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+            <p class="text-sm text-red-700 dark:text-red-400 break-words">{{ error }}</p>
+          </div>
           <div class="mt-6 flex justify-end space-x-3">
             <button
               class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-zinc-700 dark:border-zinc-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              :disabled="isLoading"
               @click="$emit('close')"
             >
               Cancel
@@ -63,7 +67,10 @@
 </template>
 
 <script setup lang="ts">
+import { invoke } from '@tauri-apps/api/core'
+import { BaseDirectory, exists, mkdir, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
 import { computed, nextTick, ref, watch } from 'vue'
+import { HostsFileType, hostsStore } from '../stores/files'
 
 const props = defineProps<{
   show: boolean
@@ -71,7 +78,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: []
-  create: [fileName: string, remoteUrl: string]
+  created: [fileId: string]
 }>()
 
 const filenameInput = ref<HTMLInputElement | null>(null)
@@ -79,6 +86,7 @@ const filenameInput = ref<HTMLInputElement | null>(null)
 const fileName = ref('')
 const remoteUrl = ref('')
 const isLoading = ref(false)
+const error = ref('')
 
 const isValidUrl = computed(() => {
   if (!remoteUrl.value.trim()) return false
@@ -95,7 +103,9 @@ watch(
   (show) => {
     if (show) {
       fileName.value = 'New Remote File'
+      remoteUrl.value = ''
       isLoading.value = false
+      error.value = ''
       nextTick(() => {
         filenameInput.value?.focus()
       })
@@ -109,7 +119,72 @@ async function create() {
   }
 
   isLoading.value = true
-  emit('create', fileName.value.trim(), remoteUrl.value.trim())
+  error.value = ''
+
+  try {
+    const id = crypto.randomUUID()
+    const fileNameTrimmed = fileName.value.trim()
+    const remoteUrlTrimmed = remoteUrl.value.trim()
+
+    // Ensure files directory exists
+    const dirExists = await exists('files', {
+      baseDir: BaseDirectory.AppData,
+    })
+
+    if (!dirExists) {
+      await mkdir('files', { baseDir: BaseDirectory.AppData })
+    }
+
+    // Create empty file first
+    await writeTextFile(`files/${id}.hosts`, '', {
+      baseDir: BaseDirectory.AppData,
+    })
+
+    // Fetch remote content
+    await invoke('fetch_remote_hosts_file', { url: remoteUrlTrimmed, fileName: `${id}.hosts` })
+
+    // Read the fetched content
+    const content = await readTextFile(`files/${id}.hosts`, {
+      baseDir: BaseDirectory.AppData,
+    })
+
+    // Create file object and add to store
+    const file = {
+      id,
+      name: fileNameTrimmed,
+      isActive: false,
+      isSelected: false,
+      type: HostsFileType.REMOTE,
+      remoteUrl: remoteUrlTrimmed,
+      content,
+      status: 'loaded',
+    }
+
+    hostsStore.files = [...hostsStore.files, file]
+    hostsStore.saveMetadata()
+
+    emit('created', id)
+    emit('close')
+  } catch (err) {
+    console.error('Error creating remote file:', err)
+
+    // Provide more user-friendly error messages
+    if (err instanceof Error) {
+      if (err.message.includes('fetch') || err.message.includes('network')) {
+        error.value = 'Failed to fetch the remote file. Please check the URL and try again.'
+      } else if (err.message.includes('permission') || err.message.includes('access')) {
+        error.value = 'Permission denied. Unable to save the file locally.'
+      } else if (err.message.includes('timeout')) {
+        error.value = 'Request timed out. The remote server may be slow or unreachable.'
+      } else {
+        error.value = `Error: ${err.message}`
+      }
+    } else {
+      error.value = String(err) || 'An unknown error occurred.'
+    }
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
