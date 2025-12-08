@@ -42,14 +42,15 @@ export const hostsStore = reactive({
     )
     this.saveMetadata()
   },
-  async create(name: string, content: string, isFirst?: boolean): Promise<string> {
+  async create(name: string, content: string, isFirst?: boolean, remote?: boolean): Promise<string> {
     const id = crypto.randomUUID()
     const file: HostsFile = {
       id,
       name,
       isActive: !!isFirst,
       isSelected: !!isFirst,
-      type: HostsFileType.LOCAL,
+      type: remote ? HostsFileType.REMOTE : HostsFileType.LOCAL,
+      remoteUrl: remote ? 'https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts' : null,
       content,
       status: '',
     }
@@ -68,6 +69,10 @@ export const hostsStore = reactive({
 
     this.files = [...this.files, file]
     this.saveMetadata()
+
+    if (remote) {
+      await invoke('fetch_remote_hosts_file', { url: file.remoteUrl, fileName: `${id}.hosts` })
+    }
 
     return id
   },

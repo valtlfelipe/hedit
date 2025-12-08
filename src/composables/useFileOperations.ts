@@ -45,9 +45,16 @@ export function useFileOperations() {
     hostsStore.setSelected(fileId)
   }
 
-  const handleCreateFile = async () => {
-    const id = await hostsStore.create(`New File ${hostsStore.files.length}`, '')
-    return id
+  const handleCreateFile = async ({ remote = false } = {}) => {
+    try {
+      const id = await hostsStore.create(`New ${remote ? 'Remote' : 'Local'} File ${hostsStore.files.length}`, '', false, remote)
+      return id
+    } catch (error) {
+      if (selectedFile.value) {
+        selectedFile.value.status = 'save_error'
+      }
+      console.error('Error creating file:', error)
+    }
   }
 
   const handleSaveFile = async (hasErrors: boolean) => {

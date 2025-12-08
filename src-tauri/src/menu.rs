@@ -53,6 +53,9 @@ pub fn get_menu<R: Runtime>(app_handle: &AppHandle<R>) -> tauri::Result<Menu<R>>
             &MenuItemBuilder::with_id("new_file".to_string(), "New File")
                 .accelerator("CmdOrCtrl+n")
                 .build(app_handle)?,
+            &MenuItemBuilder::with_id("new_remote_file".to_string(), "New Remote File")
+                .accelerator("CmdOrCtrl+Shift+n")
+                .build(app_handle)?,
             &MenuItemBuilder::with_id("activate_file".to_string(), "Activate File")
                 .accelerator("CmdOrCtrl+Shift+a")
                 .build(app_handle)?,
@@ -167,6 +170,11 @@ pub fn handle_menu_event(app_handle: &tauri::AppHandle, event: &MenuEvent) {
         "new_file" => {
             if let Err(e) = app_handle.emit("new_file", true) {
                 eprintln!("Failed to emit new_file event: {}", e);
+            }
+        }
+        "new_remote_file" => {
+            if let Err(e) = app_handle.emit("new_remote_file", true) {
+                eprintln!("Failed to emit new_remote_file event: {}", e);
             }
         }
         "activate_file" => {

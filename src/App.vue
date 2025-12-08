@@ -75,8 +75,8 @@ const handleFileSelect = (fileId: string) => {
   fileOperations.handleFileSelect(fileId)
 }
 
-const handleCreateFile = async () => {
-  const id = await fileOperations.handleCreateFile()
+const handleCreateFile = async ({ remote = false } = {}) => {
+  const id = await fileOperations.handleCreateFile({ remote })
   if (id) {
     handleFileSelect(id)
   }

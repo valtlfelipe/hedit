@@ -60,7 +60,8 @@
         v-if="contextMenu.show"
         :x="contextMenu.x"
         :y="contextMenu.y"
-        @create="createFile"
+        @create-local="createFile"
+        @create-remote="createFile({ remote: true })"
       />
     </div>
     <EditFileModal
@@ -100,7 +101,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   fileSelect: [fileId: string]
   activateFile: [fileId: string]
-  createFile: []
+  createFile: [{ remote?: boolean }]
 }>()
 
 const contextMenuContainer = ref<HTMLElement | null>(null)
@@ -138,8 +139,8 @@ function activateFile() {
   hideContextMenu()
 }
 
-function createFile() {
-  emit('createFile')
+function createFile({ remote = false } = {}) {
+  emit('createFile', { remote })
   hideContextMenu()
 }
 
@@ -212,6 +213,10 @@ const statusText = computed(() => {
       return 'Saved successfully'
     case 'save_error':
       return 'Error occurred while saving'
+    case 'fetching':
+      return 'Fetching remote file...'
+    case 'fetch_error':
+      return 'Error fetching remote file'
     case 'syntax_error':
       return 'Not saved. Syntax error detected.'
     case 'loaded':
