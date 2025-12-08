@@ -61,7 +61,7 @@
         :x="contextMenu.x"
         :y="contextMenu.y"
         @create-local="createFile"
-        @create-remote="createFile({ remote: true })"
+        @create-remote="showRemoteFileModal"
       />
     </div>
     <EditFileModal
@@ -77,6 +77,11 @@
       @close="hideConfirmModal"
       @confirm="confirmDelete"
     />
+    <RemoteFileModal
+      :show="remoteFileModal.show"
+      @close="hideRemoteFileModal"
+      @create="createRemoteFile"
+    />
   </div>
 </template>
 
@@ -88,6 +93,7 @@ import { HostsFileType, hostsStore } from '../stores/files'
 import ConfirmModal from './ConfirmModal.vue'
 import FileContextMenu from './FileContextMenu.vue'
 import EditFileModal from './EditFileModal.vue'
+import RemoteFileModal from './RemoteFileModal.vue'
 import Tooltip from './Tooltip.vue'
 import SidebarContextMenu from './SidebarContextMenu.vue'
 
@@ -101,7 +107,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   fileSelect: [fileId: string]
   activateFile: [fileId: string]
-  createFile: [{ remote?: boolean }]
+  createFile: [{ remote?: boolean; fileName?: string; remoteUrl?: string }]
 }>()
 
 const contextMenuContainer = ref<HTMLElement | null>(null)
@@ -131,6 +137,10 @@ const confirmModal = reactive({
   title: '',
   message: '',
   fileId: '',
+})
+
+const remoteFileModal = reactive({
+  show: false,
 })
 
 function activateFile() {
@@ -201,6 +211,24 @@ function saveNewName(newName: string) {
   hideEditModal()
 }
 
+function showRemoteFileModal() {
+  remoteFileModal.show = true
+  hideContextMenu()
+}
+
+function hideRemoteFileModal() {
+  remoteFileModal.show = false
+}
+
+async function createRemoteFile(fileName: string, remoteUrl: string) {
+  try {
+    emit('createFile', { remote: true, fileName, remoteUrl })
+    hideRemoteFileModal()
+  } catch (error) {
+    console.error('Error creating remote file:', error)
+  }
+}
+
 const statusText = computed(() => {
   switch (props.status) {
     case 'saving':
@@ -242,6 +270,7 @@ const handleKeydown = (event: KeyboardEvent) => {
     hideContextMenu()
     hideEditModal()
     hideConfirmModal()
+    hideRemoteFileModal()
   }
 }
 

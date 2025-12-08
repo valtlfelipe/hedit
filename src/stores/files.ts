@@ -26,7 +26,7 @@ export interface HostsFile {
   status: string
 }
 
-const metadataStore = await load('files-metadata.json', { autoSave: 100 })
+const metadataStore = await load('files-metadata.json', { autoSave: 100, defaults: { files: [] } })
 
 export const hostsStore = reactive({
   files: [] as HostsFile[],
@@ -42,7 +42,12 @@ export const hostsStore = reactive({
     )
     this.saveMetadata()
   },
-  async create(name: string, content: string, isFirst?: boolean, remote?: boolean): Promise<string> {
+  async create(name: string, content: string, isFirst?: boolean, remote?: boolean, remoteUrl?: string): Promise<string> {
+
+    if (remote && !remoteUrl) {
+      throw new Error('Remote URL is required for remote hosts file')
+    }
+
     const id = crypto.randomUUID()
     const file: HostsFile = {
       id,
@@ -50,7 +55,7 @@ export const hostsStore = reactive({
       isActive: !!isFirst,
       isSelected: !!isFirst,
       type: remote ? HostsFileType.REMOTE : HostsFileType.LOCAL,
-      remoteUrl: remote ? 'https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts' : null,
+      remoteUrl: remote ? remoteUrl : null,
       content,
       status: '',
     }
@@ -70,8 +75,19 @@ export const hostsStore = reactive({
     this.files = [...this.files, file]
     this.saveMetadata()
 
-    if (remote) {
-      await invoke('fetch_remote_hosts_file', { url: file.remoteUrl, fileName: `${id}.hosts` })
+    if (remote && file.remoteUrl) {
+      try {
+        file.status = 'fetching'
+        await invoke('fetch_remote_hosts_file', { url: file.remoteUrl, fileName: `${id}.hosts` })
+        // Reload the content after fetching
+        file.content = await readTextFile(`files/${id}.hosts`, {
+          baseDir: BaseDirectory.AppData,
+        })
+        file.status = 'loaded'
+      } catch (error) {
+        file.status = 'fetch_error'
+        throw error
+      }
     }
 
     return id

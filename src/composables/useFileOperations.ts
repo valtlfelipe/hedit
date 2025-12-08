@@ -45,9 +45,10 @@ export function useFileOperations() {
     hostsStore.setSelected(fileId)
   }
 
-  const handleCreateFile = async ({ remote = false } = {}) => {
+  const handleCreateFile = async ({ remote = false, fileName = '', remoteUrl = '' } = {}) => {
     try {
-      const id = await hostsStore.create(`New ${remote ? 'Remote' : 'Local'} File ${hostsStore.files.length}`, '', false, remote)
+      const name = fileName || `New ${remote ? 'Remote' : 'Local'} File ${hostsStore.files.length}`
+      const id = await hostsStore.create(name, '', false, remote, remoteUrl)
       return id
     } catch (error) {
       if (selectedFile.value) {
