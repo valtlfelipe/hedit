@@ -2,7 +2,14 @@
 
 Fast and intuitive hosts file management. Edit, manage, and organize your hosts entries with a beautiful and modern interface.
 
-![](https://github.com/user-attachments/assets/0eef8114-1369-448a-8f20-932304acc7fc)
+![image](https://github.com/user-attachments/assets/0eef8114-1369-448a-8f20-932304acc7fc)
+
+<div align="center">
+  <a href="https://hedit.app/download">
+    <img src="https://img.shields.io/badge/Download-Hedit-purple?style=for-the-badge" alt="Download Hedit" />
+  </a>
+</div>
+
 
 ## 🚧 Work in Progress
 
@@ -13,7 +20,7 @@ Fast and intuitive hosts file management. Edit, manage, and organize your hosts 
 This application is available on macOS and Linux. Windows support is planned for future releases.
 
 *   **Intuitive UI:** Clean and user-friendly interface for easy hosts file management with Light & Dark mode.
-*   **Fast & Secure:** Built with modern tech for performance and system-level access.
+*   **Fast & Secure:** Built with modern tech for performance and system-level access and Open-source codebase.
 *   **Multiple Files:** Manage multiple files and activate the one you need.
 *   **Remote Files:** Add and Sync remote hosts files locally (like StevenBlack/hosts, etc.).
 *   **Syntax highlighting:** Edit your hosts file with syntax highlighting and validation.
