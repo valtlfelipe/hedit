@@ -10,14 +10,14 @@
           class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
           @click.prevent="$emit('createLocal')"
         >
-          <File class="w-4 h-4 " />
+          <File class="w-4 h-4 "/>
           <span>New Local File...</span>
         </li>
         <li
           class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
           @click.prevent="$emit('createRemote')"
         >
-          <Globe class="w-4 h-4 " />
+          <Globe class="w-4 h-4 "/>
           <span>New Remote File...</span>
         </li>
       </ul>
@@ -26,29 +26,30 @@
 </template>
 
 <script setup lang="ts">
-import { File, Globe } from 'lucide-vue-next'
+  import { File, Globe } from 'lucide-vue-next'
 
-defineProps<{
-  x: number
-  y: number
-}>()
+  defineProps<{
+    x: number
+    y: number
+  }>()
 
-
-defineEmits<{
-  createLocal: []
-  createRemote: []
-}>()
+  defineEmits<{
+    createLocal: []
+    createRemote: []
+  }>()
 </script>
 
 <style scoped>
-.fade-scale-enter-active,
-.fade-scale-leave-active {
-  transition: transform 0.1s ease, opacity 0.1s ease;
-}
+  .fade-scale-enter-active,
+  .fade-scale-leave-active {
+    transition:
+      transform 0.1s ease,
+      opacity 0.1s ease;
+  }
 
-.fade-scale-enter-from,
-.fade-scale-leave-to {
-  opacity: 0;
-  transform: scale(0.95) translateY(-10px);
-}
+  .fade-scale-enter-from,
+  .fade-scale-leave-to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
 </style>

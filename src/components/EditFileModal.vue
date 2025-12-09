@@ -10,14 +10,19 @@
         <div v-if="show" class="w-full max-w-md p-6 bg-white rounded-lg shadow-xl dark:bg-zinc-800">
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Rename File</h2>
           <div class="mt-4">
-            <label for="filename" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Filename</label>
+            <label
+              for="filename"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Filename
+            </label>
             <input
               ref="filenameInput"
               v-model="newName"
               type="text"
               class="block w-full px-3 py-2 mt-1 text-gray-900 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-zinc-700 dark:border-zinc-600 dark:text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
               @keyup.enter="save"
-            />
+            >
           </div>
           <div class="mt-6 flex justify-end space-x-3">
             <button
@@ -40,59 +45,59 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
+  import { nextTick, ref, watch } from 'vue'
 
-const props = defineProps<{
-  show: boolean
-  currentName: string
-}>()
+  const props = defineProps<{
+    show: boolean
+    currentName: string
+  }>()
 
-const emit = defineEmits<{
-  close: []
-  save: [newName: string]
-}>()
+  const emit = defineEmits<{
+    close: []
+    save: [newName: string]
+  }>()
 
-const filenameInput = ref<HTMLInputElement | null>(null)
+  const filenameInput = ref<HTMLInputElement | null>(null)
 
-const newName = ref(props.currentName)
+  const newName = ref(props.currentName)
 
-watch(
-  () => props.show,
-  (show) => {
-    if (show) {
-      newName.value = props.currentName
-      nextTick(() => {
-        filenameInput.value?.focus()
-      })
+  watch(
+    () => props.show,
+    (show) => {
+      if (show) {
+        newName.value = props.currentName
+        nextTick(() => {
+          filenameInput.value?.focus()
+        })
+      }
+    },
+  )
+
+  function save() {
+    if (newName.value.trim()) {
+      emit('save', newName.value.trim())
     }
-  },
-)
-
-function save() {
-  if (newName.value.trim()) {
-    emit('save', newName.value.trim())
   }
-}
 </script>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.2s ease;
+  }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: transform 0.2s ease-out;
-}
+  .slide-up-enter-active,
+  .slide-up-leave-active {
+    transition: transform 0.2s ease-out;
+  }
 
-.slide-up-enter-from,
-.slide-up-leave-to {
-  transform: translateY(20px);
-}
+  .slide-up-enter-from,
+  .slide-up-leave-to {
+    transform: translateY(20px);
+  }
 </style>

@@ -42,8 +42,13 @@ export const hostsStore = reactive({
     )
     this.saveMetadata()
   },
-  async create(name: string, content: string, isFirst?: boolean, remote?: boolean, remoteUrl?: string): Promise<string> {
-
+  async create(
+    name: string,
+    content: string,
+    isFirst?: boolean,
+    remote?: boolean,
+    remoteUrl?: string,
+  ): Promise<string> {
     if (remote && !remoteUrl) {
       throw new Error('Remote URL is required for remote hosts file')
     }
@@ -150,7 +155,14 @@ export const hostsStore = reactive({
   saveMetadata() {
     return metadataStore.set(
       'files',
-      this.files.map(({ id, name, type, remoteUrl, isActive, isSelected }) => ({ id, name, type, remoteUrl, isActive, isSelected })),
+      this.files.map(({ id, name, type, remoteUrl, isActive, isSelected }) => ({
+        id,
+        name,
+        type,
+        remoteUrl,
+        isActive,
+        isSelected,
+      })),
     )
   },
 })

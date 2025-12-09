@@ -12,7 +12,9 @@
     >
       <!-- Window Title -->
       <div class="flex-1 text-center select-none cursor-default">
-        <h1 class="text-sm font-semibold text-gray-800 dark:text-gray-100" data-tauri-drag-region>{{ title }}</h1>
+        <h1 class="text-sm font-semibold text-gray-800 dark:text-gray-100" data-tauri-drag-region>
+          {{ title }}
+        </h1>
       </div>
     </div>
 
@@ -24,7 +26,9 @@
     >
       <!-- Window Title -->
       <div class="flex-1 text-center select-none cursor-default">
-        <h1 class="text-sm font-semibold text-gray-800 dark:text-gray-100" data-tauri-drag-region>{{ title }}</h1>
+        <h1 class="text-sm font-semibold text-gray-800 dark:text-gray-100" data-tauri-drag-region>
+          {{ title }}
+        </h1>
       </div>
 
       <!-- Window Controls (Windows/Linux) -->
@@ -33,38 +37,38 @@
           class="w-8 h-8 bg-transparent hover:bg-gray-300 dark:hover:bg-zinc-700 rounded flex items-center justify-center group"
           @click="appWindow.minimize()"
         >
-          <Minus class="w-4 h-4 text-gray-800 dark:text-gray-200" />
+          <Minus class="w-4 h-4 text-gray-800 dark:text-gray-200"/>
         </button>
         <button
           class="w-8 h-8 bg-transparent hover:bg-gray-300 dark:hover:bg-zinc-700 rounded flex items-center justify-center group"
           @click="appWindow.toggleMaximize()"
         >
-          <Square class="w-4 h-4 text-gray-800 dark:text-gray-200" />
+          <Square class="w-4 h-4 text-gray-800 dark:text-gray-200"/>
         </button>
         <button
           class="w-8 h-8 bg-transparent hover:bg-red-500 rounded flex items-center justify-center group"
           @click="appWindow.close()"
         >
-          <X class="w-4 h-4 text-gray-800 dark:text-gray-200 group-hover:text-white" />
+          <X class="w-4 h-4 text-gray-800 dark:text-gray-200 group-hover:text-white"/>
         </button>
       </div>
     </div>
 
-    <slot />
+    <slot/>
   </div>
 </template>
 
 <script setup lang="ts">
-import { getCurrentWindow } from '@tauri-apps/api/window'
-import { platform } from '@tauri-apps/plugin-os';
-import { Minus, Square, X } from 'lucide-vue-next'
+  import { getCurrentWindow } from '@tauri-apps/api/window'
+  import { platform } from '@tauri-apps/plugin-os'
+  import { Minus, Square, X } from 'lucide-vue-next'
 
-interface Props {
-  title: string
-}
+  interface Props {
+    title: string
+  }
 
-defineProps<Props>()
+  defineProps<Props>()
 
-const appWindow = getCurrentWindow()
-const isMacOS = platform() === 'macos'
+  const appWindow = getCurrentWindow()
+  const isMacOS = platform() === 'macos'
 </script>

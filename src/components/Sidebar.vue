@@ -23,23 +23,25 @@
           @contextmenu.prevent="showFileContextMenu($event, file)"
         >
           <Tooltip v-if="!file.type || file.type === HostsFileType.LOCAL" text="Local File">
-            <File class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            <File class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
           </Tooltip>
           <Tooltip v-else-if="file.type === HostsFileType.REMOTE" text="Remote File">
-            <Globe class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            <Globe class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
           </Tooltip>
           <span class="text-sm font-medium flex-1 select-none truncate">{{ file.name }}</span>
           <Tooltip v-if="file.isActive" text="Current Active">
-            <Play v-if="file.isActive" class="w-4 h-4 text-purple-700 dark:text-purple-300" />
+            <Play v-if="file.isActive" class="w-4 h-4 text-purple-700 dark:text-purple-300"/>
           </Tooltip>
         </button>
       </div>
     </div>
 
     <!-- Sidebar Footer -->
-    <div class="px-3 py-2 border-t border-gray-200 dark:border-zinc-800 bg-gray-100 dark:bg-zinc-900">
+    <div
+      class="px-3 py-2 border-t border-gray-200 dark:border-zinc-800 bg-gray-100 dark:bg-zinc-900"
+    >
       <div class="flex items-center space-x-2">
-        <SquareDot class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+        <SquareDot class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
         <span class="text-xs text-gray-600 dark:text-gray-400 font-medium">{{ statusText }}</span>
       </div>
     </div>
@@ -89,218 +91,219 @@
 </template>
 
 <script setup lang="ts">
-import { File, Globe, Play, SquareDot } from 'lucide-vue-next'
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import type { HostsFile } from '../stores/files'
-import { HostsFileType, hostsStore } from '../stores/files'
-import ConfirmModal from './ConfirmModal.vue'
-import FileContextMenu from './FileContextMenu.vue'
-import EditFileModal from './EditFileModal.vue'
-import RemoteFileModal from './RemoteFileModal.vue'
-import Tooltip from './Tooltip.vue'
-import SidebarContextMenu from './SidebarContextMenu.vue'
+  import { File, Globe, Play, SquareDot } from 'lucide-vue-next'
+  import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+  import type { HostsFile } from '../stores/files'
+  import { HostsFileType, hostsStore } from '../stores/files'
+  import ConfirmModal from './ConfirmModal.vue'
+  import FileContextMenu from './FileContextMenu.vue'
+  import EditFileModal from './EditFileModal.vue'
+  import RemoteFileModal from './RemoteFileModal.vue'
+  import Tooltip from './Tooltip.vue'
+  import SidebarContextMenu from './SidebarContextMenu.vue'
 
-interface Props {
-  files: HostsFile[]
-  status: string
-}
+  interface Props {
+    files: HostsFile[]
+    status: string
+  }
 
-const props = defineProps<Props>()
+  const props = defineProps<Props>()
 
-const emit = defineEmits<{
-  fileSelect: [fileId: string]
-  activateFile: [fileId: string]
-  createFile: [{ remote?: boolean; fileName?: string; remoteUrl?: string }]
-}>()
+  const emit = defineEmits<{
+    fileSelect: [fileId: string]
+    activateFile: [fileId: string]
+    createFile: [{ remote?: boolean; fileName?: string; remoteUrl?: string }]
+  }>()
 
-const contextMenuContainer = ref<HTMLElement | null>(null)
-const fileContextMenuContainer = ref<HTMLElement | null>(null)
+  const contextMenuContainer = ref<HTMLElement | null>(null)
+  const fileContextMenuContainer = ref<HTMLElement | null>(null)
 
-const fileContextMenu = reactive({
-  show: false,
-  x: 0,
-  y: 0,
-  file: null as HostsFile | null,
-})
+  const fileContextMenu = reactive({
+    show: false,
+    x: 0,
+    y: 0,
+    file: null as HostsFile | null,
+  })
 
-const contextMenu = reactive({
-  show: false,
-  x: 0,
-  y: 0,
-})
+  const contextMenu = reactive({
+    show: false,
+    x: 0,
+    y: 0,
+  })
 
-const editModal = reactive({
-  show: false,
-  fileId: '',
-  fileName: '',
-})
+  const editModal = reactive({
+    show: false,
+    fileId: '',
+    fileName: '',
+  })
 
-const confirmModal = reactive({
-  show: false,
-  title: '',
-  message: '',
-  fileId: '',
-})
+  const confirmModal = reactive({
+    show: false,
+    title: '',
+    message: '',
+    fileId: '',
+  })
 
-const remoteFileModal = reactive({
-  show: false,
-})
+  const remoteFileModal = reactive({
+    show: false,
+  })
 
-const refreshingFiles = reactive(new Set<string>())
+  const refreshingFiles = reactive(new Set<string>())
 
-function activateFile() {
-  if(!fileContextMenu.file) return
-  emit('activateFile', fileContextMenu.file.id)
-  hideContextMenu()
-}
-
-function createFile({ remote = false } = {}) {
-  emit('createFile', { remote })
-  hideContextMenu()
-}
-
-function showFileContextMenu(event: MouseEvent, file: HostsFile) {
-  fileContextMenu.file = file
-  fileContextMenu.x = event.clientX
-  fileContextMenu.y = event.clientY
-  fileContextMenu.show = true
-}
-
-function showContextMenu(event: MouseEvent) {
-  if(fileContextMenu.show) return
-  contextMenu.x = event.clientX
-  contextMenu.y = event.clientY
-  contextMenu.show = true
-}
-
-function hideContextMenu() {
-  fileContextMenu.show = false
-  contextMenu.show = false
-}
-
-function editFile() {
-  if (fileContextMenu.file) {
-    editModal.fileId = fileContextMenu.file.id
-    editModal.fileName = fileContextMenu.file.name
-    editModal.show = true
+  function activateFile() {
+    if (!fileContextMenu.file) return
+    emit('activateFile', fileContextMenu.file.id)
     hideContextMenu()
   }
-}
 
-function showConfirmModal() {
-  if (fileContextMenu.file) {
-    confirmModal.title = `Delete '${fileContextMenu.file.name}'`
-    confirmModal.message = `Are you sure you want to delete '${fileContextMenu.file.name}'? This action cannot be undone.`
-    confirmModal.fileId = fileContextMenu.file.id
-    confirmModal.show = true
+  function createFile({ remote = false } = {}) {
+    emit('createFile', { remote })
     hideContextMenu()
   }
-}
 
-function hideConfirmModal() {
-  confirmModal.show = false
-}
-
-function confirmDelete() {
-  hostsStore.deleteFile(confirmModal.fileId)
-  hostsStore.setSelected(hostsStore.files[0]?.id)
-  hideConfirmModal()
-}
-
-function hideEditModal() {
-  editModal.show = false
-}
-
-function saveNewName(newName: string) {
-  hostsStore.renameFile(editModal.fileId, newName)
-  hideEditModal()
-}
-
-function showRemoteFileModal() {
-  remoteFileModal.show = true
-  hideContextMenu()
-}
-
-defineExpose({
-  showRemoteFileModal,
-})
-
-function hideRemoteFileModal() {
-  remoteFileModal.show = false
-}
-
-function handleRemoteFileCreated(fileId: string) {
-  emit('fileSelect', fileId)
-  hideRemoteFileModal()
-}
-
-async function refreshFile() {
-  if (!fileContextMenu.file) return
-  const fileId = fileContextMenu.file.id
-  refreshingFiles.add(fileId)
-  try {
-    await hostsStore.refreshFile(fileId)
-  } catch (error) {
-    // Error is already handled in the store by setting status to 'fetch_error'
-    console.error('Failed to refresh remote file:', error)
-  } finally {
-    refreshingFiles.delete(fileId)
+  function showFileContextMenu(event: MouseEvent, file: HostsFile) {
+    fileContextMenu.file = file
+    fileContextMenu.x = event.clientX
+    fileContextMenu.y = event.clientY
+    fileContextMenu.show = true
   }
-  hideContextMenu()
-}
 
-const statusText = computed(() => {
-  switch (props.status) {
-    case 'saving':
-      return 'Saving...'
-    case 'activating':
-      return 'Activating...'
-    case 'activated':
-      return 'Activated successfully'
-    case 'saved':
-      return 'Saved successfully'
-    case 'save_error':
-      return 'Error occurred while saving'
-    case 'fetching':
-      return 'Fetching remote file...'
-    case 'fetch_error':
-      return 'Error fetching remote file'
-    case 'syntax_error':
-      return 'Not saved. Syntax error detected.'
-    case 'loaded':
-      return 'File loaded successfully'
-    case 'modified':
-      return 'File has been modified'
-    default:
-      return ''
+  function showContextMenu(event: MouseEvent) {
+    if (fileContextMenu.show) return
+    contextMenu.x = event.clientX
+    contextMenu.y = event.clientY
+    contextMenu.show = true
   }
-})
 
-const handleClickOutside = (event: MouseEvent) => {
-  if (
-    (fileContextMenuContainer.value && !fileContextMenuContainer.value.contains(event.target as Node)) ||
-    (contextMenuContainer.value && !contextMenuContainer.value.contains(event.target as Node))
-  ) {
-    hideContextMenu()
+  function hideContextMenu() {
+    fileContextMenu.show = false
+    contextMenu.show = false
   }
-}
 
-const handleKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape') {
-    hideContextMenu()
-    hideEditModal()
+  function editFile() {
+    if (fileContextMenu.file) {
+      editModal.fileId = fileContextMenu.file.id
+      editModal.fileName = fileContextMenu.file.name
+      editModal.show = true
+      hideContextMenu()
+    }
+  }
+
+  function showConfirmModal() {
+    if (fileContextMenu.file) {
+      confirmModal.title = `Delete '${fileContextMenu.file.name}'`
+      confirmModal.message = `Are you sure you want to delete '${fileContextMenu.file.name}'? This action cannot be undone.`
+      confirmModal.fileId = fileContextMenu.file.id
+      confirmModal.show = true
+      hideContextMenu()
+    }
+  }
+
+  function hideConfirmModal() {
+    confirmModal.show = false
+  }
+
+  function confirmDelete() {
+    hostsStore.deleteFile(confirmModal.fileId)
+    hostsStore.setSelected(hostsStore.files[0]?.id)
     hideConfirmModal()
+  }
+
+  function hideEditModal() {
+    editModal.show = false
+  }
+
+  function saveNewName(newName: string) {
+    hostsStore.renameFile(editModal.fileId, newName)
+    hideEditModal()
+  }
+
+  function showRemoteFileModal() {
+    remoteFileModal.show = true
+    hideContextMenu()
+  }
+
+  defineExpose({
+    showRemoteFileModal,
+  })
+
+  function hideRemoteFileModal() {
+    remoteFileModal.show = false
+  }
+
+  function handleRemoteFileCreated(fileId: string) {
+    emit('fileSelect', fileId)
     hideRemoteFileModal()
   }
-}
 
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-  window.addEventListener('keydown', handleKeydown)
-})
+  async function refreshFile() {
+    if (!fileContextMenu.file) return
+    const fileId = fileContextMenu.file.id
+    refreshingFiles.add(fileId)
+    try {
+      await hostsStore.refreshFile(fileId)
+    } catch (error) {
+      // Error is already handled in the store by setting status to 'fetch_error'
+      console.error('Failed to refresh remote file:', error)
+    } finally {
+      refreshingFiles.delete(fileId)
+    }
+    hideContextMenu()
+  }
 
-onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside)
-  window.removeEventListener('keydown', handleKeydown)
-})
+  const statusText = computed(() => {
+    switch (props.status) {
+      case 'saving':
+        return 'Saving...'
+      case 'activating':
+        return 'Activating...'
+      case 'activated':
+        return 'Activated successfully'
+      case 'saved':
+        return 'Saved successfully'
+      case 'save_error':
+        return 'Error occurred while saving'
+      case 'fetching':
+        return 'Fetching remote file...'
+      case 'fetch_error':
+        return 'Error fetching remote file'
+      case 'syntax_error':
+        return 'Not saved. Syntax error detected.'
+      case 'loaded':
+        return 'File loaded successfully'
+      case 'modified':
+        return 'File has been modified'
+      default:
+        return ''
+    }
+  })
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      (fileContextMenuContainer.value &&
+        !fileContextMenuContainer.value.contains(event.target as Node)) ||
+      (contextMenuContainer.value && !contextMenuContainer.value.contains(event.target as Node))
+    ) {
+      hideContextMenu()
+    }
+  }
+
+  const handleKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      hideContextMenu()
+      hideEditModal()
+      hideConfirmModal()
+      hideRemoteFileModal()
+    }
+  }
+
+  onMounted(() => {
+    document.addEventListener('click', handleClickOutside)
+    window.addEventListener('keydown', handleKeydown)
+  })
+
+  onBeforeUnmount(() => {
+    document.removeEventListener('click', handleClickOutside)
+    window.removeEventListener('keydown', handleKeydown)
+  })
 </script>

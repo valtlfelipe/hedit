@@ -31,36 +31,36 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  show: boolean
-  title: string
-  message: string
-}>()
+  defineProps<{
+    show: boolean
+    title: string
+    message: string
+  }>()
 
-defineEmits<{
-  close: []
-  confirm: []
-}>()
+  defineEmits<{
+    close: []
+    confirm: []
+  }>()
 </script>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.2s ease;
+  }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: transform 0.2s ease-out;
-}
+  .slide-up-enter-active,
+  .slide-up-leave-active {
+    transition: transform 0.2s ease-out;
+  }
 
-.slide-up-enter-from,
-.slide-up-leave-to {
-  transform: translateY(20px);
-}
+  .slide-up-enter-from,
+  .slide-up-leave-to {
+    transform: translateY(20px);
+  }
 </style>

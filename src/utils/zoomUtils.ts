@@ -1,6 +1,6 @@
 export const zoomUtils = {
   getCurrentZoom: () => {
-    return parseInt(document.body.style.zoom.replace('%', '')) || 100
+    return parseInt(document.body.style.zoom.replace('%', ''), 10) || 100
   },
 
   setZoom: (zoom: number) => {
@@ -19,5 +19,5 @@ export const zoomUtils = {
 
   handleZoomReset: () => {
     zoomUtils.setZoom(100)
-  }
+  },
 }
