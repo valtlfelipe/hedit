@@ -3,7 +3,7 @@
     class="bg-gray-50/80 dark:bg-zinc-900/80 border-b border-gray-200 dark:border-zinc-800 px-3 py-2 flex items-center"
     @contextmenu.prevent="null"
   >
-    <div class="flex items-center space-x-2 flex-grow select-none">
+    <div class="flex items-center space-x-2 grow select-none">
       <div ref="createContainer" class="relative">
         <button
           class="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
@@ -59,7 +59,19 @@
         <ChevronDown class="w-4 h-4" />
       </button> -->
     </div>
-    <div ref="settingsContainer" class="relative select-none">
+    <div class="flex items-center gap-2 select-none">
+      <!-- Update Available Icon -->
+      <Tooltip v-if="updateAvailable" text="Update Available" position="right">
+        <button
+          class="p-1.5 hover:bg-gray-300/80 dark:hover:bg-zinc-700/80 rounded-md transition-colors relative"
+          @click="openUpdatePage"
+        >
+          <Download class="w-4 h-4 text-gray-600 dark:text-gray-200" />
+          <span class="absolute -top-1 -right-1 w-2 h-2 bg-purple-600 rounded-full"></span>
+        </button>
+      </Tooltip>
+
+      <div ref="settingsContainer" class="relative">
         <Tooltip text="Settings" position="right">
           <button class="p-1.5 hover:bg-gray-300/80 dark:hover:bg-zinc-700/80 rounded-md transition-colors" @click="showSettings = !showSettings">
             <Settings class="w-4 h-4 text-gray-600 dark:text-gray-200" />
@@ -87,6 +99,7 @@
           </div>
         </transition>
       </div>
+    </div>
   </div>
 </template>
 
@@ -94,9 +107,17 @@
 import Tooltip from './Tooltip.vue'
 import { usePlatform } from '../composables/usePlatform'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { ChevronDown, KeyRound, MessageSquare, Moon, Play, Plus, Save, Settings, Sun, File, Globe } from 'lucide-vue-next'
+import { ChevronDown, Download, KeyRound, MessageSquare, Moon, Play, Plus, Save, Settings, Sun, File, Globe } from 'lucide-vue-next'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { settingsStore } from '../stores/settings'
+import { listen } from '@tauri-apps/api/event'
+
+interface UpdateInfo {
+  available: boolean
+  latest_version: string
+  download_url: string
+  current_version: string
+}
 
 const { modifier } = usePlatform()
 
@@ -116,6 +137,8 @@ const showSettings = ref(false)
 const settingsContainer = ref<HTMLElement | null>(null)
 const showCreateDropdown = ref(false)
 const createContainer = ref<HTMLElement | null>(null)
+const updateAvailable = ref(false)
+const updateInfo = ref<UpdateInfo | null>(null)
 
 const handleClickOutside = (event: MouseEvent) => {
   if (settingsContainer.value && !settingsContainer.value.contains(event.target as Node)) {
@@ -132,6 +155,11 @@ const handleKeydown = (event: KeyboardEvent) => {
     showCreateDropdown.value = false
   }
 }
+
+listen<UpdateInfo>('update-available', (event) => {
+  updateInfo.value = event.payload
+  updateAvailable.value = true
+})
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
@@ -151,6 +179,12 @@ const toggleDarkMode = async () => {
 const openFeedbackLink = () => {
   openUrl('https://github.com/valtlfelipe/hedit/issues/new/choose')
   showSettings.value = false
+}
+
+const openUpdatePage = () => {
+  if (updateInfo.value?.download_url) {
+    openUrl(updateInfo.value.download_url)
+  }
 }
 </script>
 

@@ -4,6 +4,7 @@ mod license;
 mod menu;
 mod remote_hosts;
 mod telemetry;
+mod update_checker;
 use std::fs::create_dir_all;
 
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
@@ -33,6 +34,9 @@ pub fn run() {
             // Spawn background tasks
             tauri::async_runtime::spawn(telemetry::send_telemetry(app.handle().clone()));
             tauri::async_runtime::spawn(license::check_license(app.handle().clone()));
+            tauri::async_runtime::spawn(update_checker::check_updates_periodically(
+                app.handle().clone(),
+            ));
 
             // Setup menu
             let menu = menu::get_menu(app.handle())
