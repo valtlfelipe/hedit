@@ -3,6 +3,8 @@ use std::env;
 use tauri::{AppHandle, Manager};
 use tauri_plugin_store::StoreBuilder;
 
+// TODO: consider replacing with https://docs.umami.is/docs/api/sending-stats
+
 /// PostHog API key for telemetry
 const POSTHOG_API_KEY: &str = "phc_l1HKfDOk4sJYAC7R2e4z3xW4qk90wWXzEJWN9GE4Ykb";
 /// Event name for app opening

@@ -1,5 +1,5 @@
 <template>
-  <AppWindow title="Hedit">
+  <AppWindow :title="title">
     <div class="flex flex-col h-full flex-1 min-h-0">
       <Toolbar
         :allow-activate="!selectedFile?.isActive"
@@ -37,7 +37,7 @@
         </Suspense>
       </div>
     </div>
-    <LicenseModal :show="showLicenseModal" @close="showLicenseModal = false" />
+    <LicenseModal :show="showLicenseModal" @close="handleLicenseModalClose" />
   </AppWindow>
 </template>
 
@@ -57,6 +57,7 @@ import LoadingSpinner from './components/LoadingSpinner.vue'
 
 const MonacoEditor = defineAsyncComponent(() => import('./components/MonacoEditor.vue'))
 
+const title = ref('Hedit')
 const showLicenseModal = ref(false)
 const isContentValid = ref(true)
 const sidebarRef = ref()
@@ -109,10 +110,23 @@ const keyboardShortcuts = useKeyboardShortcuts(
 keyboardShortcuts.initializeEventListeners()
 initializeTheme()
 
+const handleLicenseModalClose = () => {
+  showLicenseModal.value = false
+  if (
+    !settingsStore.personalUseOnly &&
+    !settingsStore.activationId
+  ) {
+    title.value = 'Hedit (Unlicensed)'
+  } else if (settingsStore.personalUseOnly) {
+    title.value = 'Hedit (Personal Use Only)'
+  }
+}
+
 // Handle license invalid event
 listen('license-invalid', async () => {
-  // TODO:
   console.warn('License is invalid, do something')
+  title.value = 'Hedit (License Invalid)'
+  showLicenseModal.value = true
 })
 
 listen('activate_license', async () => {
@@ -171,6 +185,9 @@ onMounted(() => {
   settingsStore.load().then(() => {
     if (!settingsStore.personalUseOnly && !settingsStore.activationId) {
       showLicenseModal.value = true
+      title.value = 'Hedit (Unlicensed)'
+    } else if (settingsStore.personalUseOnly) {
+      title.value = 'Hedit (Personal Use Only)'
     }
   })
   fileOperations.loadFiles().then(() => {
