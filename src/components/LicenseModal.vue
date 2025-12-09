@@ -20,7 +20,7 @@
               If you are using this app for commercial use, you need to activate a license.
             </p>
             <div class="flex items-start p-3 bg-purple-50 rounded-lg dark:bg-purple-900/20">
-              <Heart class="flex-shrink-0 w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" />
+              <Heart class="shrink-0 w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" />
               <p class="ml-3">
                 Hedit is a fully indie project, and every license helps keep it that way. Thank you for your support!
               </p>
