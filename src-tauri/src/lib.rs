@@ -32,7 +32,7 @@ pub fn run() {
                 .map_err(|e| format!("Failed to create app directory: {}", e))?;
 
             // Spawn background tasks
-            tauri::async_runtime::spawn(telemetry::send_telemetry(app.handle().clone()));
+            tauri::async_runtime::spawn(telemetry::send_telemetry(app.handle().clone(), "app_opened"));
             tauri::async_runtime::spawn(license::check_license(app.handle().clone()));
             tauri::async_runtime::spawn(update_checker::check_updates_periodically(
                 app.handle().clone(),
@@ -104,6 +104,7 @@ pub fn run() {
             license::activate,
             files::write_system_hosts,
             remote_hosts::fetch_remote_hosts_file,
+            telemetry::send_telemetry_event,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

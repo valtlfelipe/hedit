@@ -1,8 +1,12 @@
-use tauri::{AppHandle, Manager};
+use tauri::{command, AppHandle, Manager};
 use tauri_plugin_store::StoreBuilder;
 use reqwest::Client;
 use serde_json::json;
 use std::env;
+
+// Disclosure: I just want bare minimum telemetry to understand usage patterns
+// No personal data is collected or stored
+// Telemetry can be disabled by the user
 
 const UMAMI_SITE_ID: &str = "16b261e5-f0c5-4b24-b33d-10b7369332c5";
 const UMAMI_HOST: &str = "https://sun.felipevm.dev";
@@ -49,7 +53,7 @@ fn is_telemetry_disabled(app_handle: &AppHandle) -> bool {
 }
 
 /// Send telemetry data to Umami
-pub async fn send_telemetry(handle: AppHandle) {
+pub async fn send_telemetry(handle: AppHandle, event_name: &str) {
     // Check if telemetry is disabled
     if is_telemetry_disabled(&handle) {
         return;
@@ -67,7 +71,7 @@ pub async fn send_telemetry(handle: AppHandle) {
             "title": "Hedit App",
             "url": "/",
             "website": UMAMI_SITE_ID,
-            "name": "app_opened",
+            "name": event_name,
             "data": {
                 "os": env::consts::OS,
                 "arch": env::consts::ARCH,
@@ -98,4 +102,14 @@ pub async fn send_telemetry(handle: AppHandle) {
             eprintln!("Failed to send telemetry event: {}", e);
         }
     }
+}
+
+
+#[command]
+pub async fn send_telemetry_event(
+    app_handle: tauri::AppHandle,
+    event_name: String,
+) -> Result<(), String> {
+    send_telemetry(app_handle, &event_name).await;
+    Ok(())
 }

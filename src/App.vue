@@ -51,11 +51,14 @@
   import Toolbar from './components/Toolbar.vue'
   import { useFileOperations } from './composables/useFileOperations'
   import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts'
+  import { useTelemetry } from './composables/useTelemetry'
   import { useTheme } from './composables/useTheme'
   import { hostsStore } from './stores/files'
   import { settingsStore } from './stores/settings'
 
   const MonacoEditor = defineAsyncComponent(() => import('./components/MonacoEditor.vue'))
+
+  const { trackEvent } = useTelemetry()
 
   const title = ref('Hedit')
   const showLicenseModal = ref(false)
@@ -85,6 +88,8 @@
       sidebarRef.value?.showRemoteFileModal()
       return
     }
+
+    trackEvent(`create_${remote ? 'remote' : 'local'}_file`)
 
     const id = await fileOperations.handleCreateFile({ remote, fileName, remoteUrl })
     if (id) {
