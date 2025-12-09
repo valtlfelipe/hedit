@@ -7,7 +7,7 @@ import { invoke } from "@tauri-apps/api/core"
 
 export function useTelemetry() {
     const trackEvent = (eventName: string) => {
-        return invoke('send_telemetry_event', { event_name: eventName })
+        return invoke('send_telemetry_event', { event: eventName })
     }
 
     return {

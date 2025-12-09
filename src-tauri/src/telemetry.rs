@@ -3,6 +3,8 @@ use tauri_plugin_store::StoreBuilder;
 use reqwest::Client;
 use serde_json::json;
 use std::env;
+use uuid::Uuid;
+use once_cell::sync::Lazy;
 
 // Disclosure: I just want bare minimum telemetry to understand usage patterns
 // No personal data is collected or stored
@@ -10,6 +12,12 @@ use std::env;
 
 const UMAMI_SITE_ID: &str = "16b261e5-f0c5-4b24-b33d-10b7369332c5";
 const UMAMI_HOST: &str = "https://sun.felipevm.dev";
+
+/// Session ID that is generated once and reused for all telemetry events
+/// This ensures the same session ID is used throughout the app's lifetime
+static SESSION_ID: Lazy<String> = Lazy::new(|| {
+    Uuid::new_v4().to_string()
+});
 
 /// Check if telemetry is disabled by user settings
 fn is_telemetry_disabled(app_handle: &AppHandle) -> bool {
@@ -70,6 +78,7 @@ pub async fn send_telemetry(handle: AppHandle, event_name: &str) {
             "screen": "1920x1080",
             "title": "Hedit App",
             "url": "/",
+            "id": &*SESSION_ID,
             "website": UMAMI_SITE_ID,
             "name": event_name,
             "data": {
@@ -104,12 +113,11 @@ pub async fn send_telemetry(handle: AppHandle, event_name: &str) {
     }
 }
 
-
 #[command]
 pub async fn send_telemetry_event(
     app_handle: tauri::AppHandle,
-    event_name: String,
+    event: String,
 ) -> Result<(), String> {
-    send_telemetry(app_handle, &event_name).await;
+    send_telemetry(app_handle, &event).await;
     Ok(())
 }

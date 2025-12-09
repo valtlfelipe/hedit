@@ -33,6 +33,8 @@ tauri-plugin-http = "2"
 reqwest = { version = "0.12", features = ["json"] }
 tauri-plugin-os = "2"
 url = "2.5.7"
+uuid = { version = "1.19.0", features = ["v4"] }
+once_cell = "1.21.3"
 
 [target."cfg(target_os = \"macos\")".dependencies]
 cocoa = "0.26"

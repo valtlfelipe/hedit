@@ -1524,6 +1524,7 @@ name = "hedit"
 version = "0.0.0"
 dependencies = [
  "cocoa",
+ "once_cell",
  "reqwest",
  "serde",
  "serde_json",
@@ -1536,6 +1537,7 @@ dependencies = [
  "tauri-plugin-store",
  "tokio",
  "url",
+ "uuid",
 ]
 
 [[package]]
