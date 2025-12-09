@@ -1,16 +1,11 @@
-use posthog_rs::Event;
-use std::env;
 use tauri::{AppHandle, Manager};
 use tauri_plugin_store::StoreBuilder;
+use reqwest::Client;
+use serde_json::json;
+use std::env;
 
-// TODO: consider replacing with https://docs.umami.is/docs/api/sending-stats
-
-/// PostHog API key for telemetry
-const POSTHOG_API_KEY: &str = "phc_l1HKfDOk4sJYAC7R2e4z3xW4qk90wWXzEJWN9GE4Ykb";
-/// Event name for app opening
-const APP_OPENED_EVENT: &str = "app_opened";
-/// Event distinct ID for system events
-const SYSTEM_DISTINCT_ID: &str = "system";
+const UMAMI_SITE_ID: &str = "16b261e5-f0c5-4b24-b33d-10b7369332c5";
+const UMAMI_HOST: &str = "https://sun.felipevm.dev";
 
 /// Check if telemetry is disabled by user settings
 fn is_telemetry_disabled(app_handle: &AppHandle) -> bool {
@@ -53,34 +48,54 @@ fn is_telemetry_disabled(app_handle: &AppHandle) -> bool {
     is_disabled
 }
 
-/// Send telemetry data to PostHog
+/// Send telemetry data to Umami
 pub async fn send_telemetry(handle: AppHandle) {
     // Check if telemetry is disabled
     if is_telemetry_disabled(&handle) {
         return;
     }
 
-    // Initialize PostHog client
-    let client = posthog_rs::client(POSTHOG_API_KEY).await;
+    // Create HTTP client
+    let client = Client::new();
 
-    // Create event
-    let mut event = Event::new(APP_OPENED_EVENT, SYSTEM_DISTINCT_ID);
+    // Prepare event data for Umami according to their API specification
+    let event_data = json!({
+        "payload": {
+            "hostname": "app.hedit.app",
+            "language": "en-US",
+            "screen": "1920x1080",
+            "title": "Hedit App",
+            "url": "/",
+            "website": UMAMI_SITE_ID,
+            "name": "app_opened",
+            "data": {
+                "os": env::consts::OS,
+                "arch": env::consts::ARCH,
+                "version": handle.package_info().version.to_string()
+            }
+        },
+        "type": "event"
+    });
 
-    // Add properties to event
-    if let Err(e) = event.insert_prop("os", env::consts::OS) {
-        eprintln!("Failed to insert 'os' property: {}", e);
-    }
+    // Build the tracking URL
+    let tracking_url = format!("{}/api/send", UMAMI_HOST);
 
-    if let Err(e) = event.insert_prop("arch", env::consts::ARCH) {
-        eprintln!("Failed to insert 'arch' property: {}", e);
-    }
+    // Send event to Umami
+    let response = client
+        .post(&tracking_url)
+        .header("Content-Type", "application/json")
+        .json(&event_data)
+        .send()
+        .await;
 
-    if let Err(e) = event.insert_prop("version", handle.package_info().version.to_string()) {
-        eprintln!("Failed to insert 'version' property: {}", e);
-    }
-
-    // Send event
-    if let Err(e) = client.capture(event).await {
-        eprintln!("Failed to send telemetry event: {}", e);
+    match response {
+        Ok(resp) => {
+            if !resp.status().is_success() {
+                eprintln!("Failed to send telemetry event: HTTP {}", resp.status());
+            }
+        }
+        Err(e) => {
+            eprintln!("Failed to send telemetry event: {}", e);
+        }
     }
 }
