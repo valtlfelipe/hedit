@@ -53,7 +53,7 @@ async fn check_for_updates(app: AppHandle) -> Result<(), Box<dyn std::error::Err
 
     // Create HTTP client with User-Agent header (required by GitHub API)
     let client = reqwest::Client::builder()
-        .user_agent("hedit-app")
+        .user_agent(format!("hedit.app/{}", current_version))
         .timeout(Duration::from_secs(10))
         .build()?;
 

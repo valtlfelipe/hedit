@@ -1,3 +1,4 @@
+use std::time::Duration;
 use tauri::{command, Manager};
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
@@ -21,13 +22,14 @@ pub async fn fetch_remote_hosts_file(
 
     let app_version = app_handle.package_info().version.to_string();
 
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .user_agent(format!("hedit.app/{}", app_version))
+        .timeout(Duration::from_secs(10))
+        .build()
+        .map_err(|e| format!("Error building HTTP client: {}", e))?;
+
     let mut response = client
         .get(fetch_url)
-        .header(
-            reqwest::header::USER_AGENT,
-            format!("hedit.app/{}", app_version),
-        )
         .header(reqwest::header::ACCEPT, "text/plain")
         .send()
         .await
