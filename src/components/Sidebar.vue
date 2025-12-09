@@ -39,7 +39,7 @@
     <!-- Sidebar Footer -->
     <div class="px-3 py-2 border-t border-gray-200 dark:border-zinc-800 bg-gray-100 dark:bg-zinc-900">
       <div class="flex items-center space-x-2">
-        <Folder class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+        <SquareDot class="w-4 h-4 text-gray-500 dark:text-gray-400" />
         <span class="text-xs text-gray-600 dark:text-gray-400 font-medium">{{ statusText }}</span>
       </div>
     </div>
@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { File, Folder, Globe, Play } from 'lucide-vue-next'
+import { File, Globe, Play, SquareDot } from 'lucide-vue-next'
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import type { HostsFile } from '../stores/files'
 import { HostsFileType, hostsStore } from '../stores/files'
