@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-2">
+  <div class="h-full">
     <div v-show="isReady" ref="editorContainer" class="w-full h-full"></div>
     <LoadingSpinner v-if="!isReady" class="m-auto" />
   </div>
