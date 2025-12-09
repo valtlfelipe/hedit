@@ -7,7 +7,7 @@ mod telemetry;
 mod update_checker;
 use std::fs::create_dir_all;
 
-use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::{LogicalPosition, Manager, WebviewUrl, WebviewWindowBuilder};
 
 /// Background color for macOS window (RGB values)
 #[cfg(target_os = "macos")]
@@ -61,6 +61,7 @@ pub fn run() {
                 use tauri::TitleBarStyle;
                 win_builder = win_builder
                     .hidden_title(true)
+                    .traffic_light_position(LogicalPosition::new(12.0, 21.0))
                     .title_bar_style(TitleBarStyle::Overlay);
             }
 

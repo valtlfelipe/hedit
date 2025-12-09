@@ -8,8 +8,8 @@
     </div> -->
 
     <!-- File List -->
-    <div class="flex-grow" @contextmenu.prevent="showContextMenu($event)">
-      <div class="p-2 space-y-1">
+    <div class="grow" @contextmenu.prevent="showContextMenu($event)">
+      <div class="p-3 space-y-1">
         <button
           v-for="file in files"
           :key="file.id"
@@ -37,7 +37,7 @@
     </div>
 
     <!-- Sidebar Footer -->
-    <div class="px-4 py-2 border-t border-gray-200 dark:border-zinc-800 bg-gray-100 dark:bg-zinc-900">
+    <div class="px-3 py-2 border-t border-gray-200 dark:border-zinc-800 bg-gray-100 dark:bg-zinc-900">
       <div class="flex items-center space-x-2">
         <Folder class="w-4 h-4 text-gray-500 dark:text-gray-400" />
         <span class="text-xs text-gray-600 dark:text-gray-400 font-medium">{{ statusText }}</span>
