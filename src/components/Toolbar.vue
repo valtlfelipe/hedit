@@ -86,7 +86,7 @@
                 <Moon v-else class="w-4 h-4" />
                 <span>{{ settingsStore.isDarkTheme ? 'Light Mode' : 'Dark Mode' }}</span>
               </li>
-              <li class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out" @click="$emit('showLicenseModal')">
+              <li class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out" @click="openLicenseModal">
                 <KeyRound class="w-4 h-4" />
                 <span>Activate License</span>
               </li>
@@ -125,7 +125,7 @@ defineProps<{
   allowActivate: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   createLocalFile: []
   createRemoteFile: []
   saveFile: []
@@ -174,6 +174,11 @@ onBeforeUnmount(() => {
 const toggleDarkMode = async () => {
   settingsStore.setTheme(!settingsStore.isDarkTheme)
   showSettings.value = false
+}
+
+const openLicenseModal = () => {
+  showSettings.value = false
+  emit('showLicenseModal')
 }
 
 const openFeedbackLink = () => {
