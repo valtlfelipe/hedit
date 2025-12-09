@@ -108,7 +108,7 @@ import Tooltip from './Tooltip.vue'
 import { usePlatform } from '../composables/usePlatform'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ChevronDown, Download, KeyRound, MessageSquare, Moon, Play, Plus, Save, Settings, Sun, File, Globe } from 'lucide-vue-next'
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { settingsStore } from '../stores/settings'
 import { listen } from '@tauri-apps/api/event'
 
@@ -157,8 +157,10 @@ const handleKeydown = (event: KeyboardEvent) => {
 }
 
 listen<UpdateInfo>('update-available', (event) => {
-  updateInfo.value = event.payload
-  updateAvailable.value = true
+  nextTick(() => {
+    updateInfo.value = event.payload
+    updateAvailable.value = true
+  })
 })
 
 onMounted(() => {

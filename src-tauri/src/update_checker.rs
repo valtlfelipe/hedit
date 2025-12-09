@@ -91,6 +91,8 @@ async fn check_for_updates(app: AppHandle) -> Result<(), Box<dyn std::error::Err
 
 /// Background task that checks for updates on launch and every 24 hours
 pub async fn check_updates_periodically(app: AppHandle) {
+    sleep(Duration::from_secs(5)).await; // slight delay to ensure frontend is ready
+
     // Initial check on app launch
     if let Err(e) = check_for_updates(app.clone()).await {
         eprintln!("Failed to check for updates: {}", e);
