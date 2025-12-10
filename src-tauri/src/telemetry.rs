@@ -1,10 +1,10 @@
-use tauri::{command, AppHandle, Manager};
-use tauri_plugin_store::StoreBuilder;
+use once_cell::sync::Lazy;
 use reqwest::Client;
 use serde_json::json;
 use std::env;
+use tauri::{command, AppHandle, Manager};
+use tauri_plugin_store::StoreBuilder;
 use uuid::Uuid;
-use once_cell::sync::Lazy;
 
 // Disclosure: I just want bare minimum telemetry to understand usage patterns
 // No personal data is collected or stored
@@ -15,9 +15,7 @@ const UMAMI_HOST: &str = "https://sun.felipevm.dev";
 
 /// Session ID that is generated once and reused for all telemetry events
 /// This ensures the same session ID is used throughout the app's lifetime
-static SESSION_ID: Lazy<String> = Lazy::new(|| {
-    Uuid::new_v4().to_string()
-});
+static SESSION_ID: Lazy<String> = Lazy::new(|| Uuid::new_v4().to_string());
 
 /// Check if telemetry is disabled by user settings
 fn is_telemetry_disabled(app_handle: &AppHandle) -> bool {
