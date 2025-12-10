@@ -6,7 +6,7 @@ mod remote_hosts;
 mod telemetry;
 mod update_checker;
 use std::fs::create_dir_all;
-use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+use tauri::tray::TrayIconBuilder;
 use tauri::{ActivationPolicy, LogicalPosition, Manager, WebviewUrl, WebviewWindowBuilder};
 
 /// Background color for macOS window (RGB values)
@@ -42,10 +42,7 @@ fn hide_app(api: &tauri::CloseRequestApi, window: &tauri::Window) {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            let _ = app
-                .get_webview_window("main")
-                .expect("no main window")
-                .set_focus();
+            show_app(app);
         }))
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_http::init())
@@ -72,17 +69,6 @@ pub fn run() {
             ));
 
             let _tray = TrayIconBuilder::new()
-                .on_tray_icon_event(|tray, event| match event {
-                    TrayIconEvent::Click {
-                        button: MouseButton::Left,
-                        button_state: MouseButtonState::Up,
-                        ..
-                    } => {
-                        let app = tray.app_handle();
-                        show_app(&app);
-                    }
-                    _ => {}
-                })
                 .icon(app.default_window_icon().unwrap().clone())
                 .menu(&menu::get_tray_menu(app.handle())?)
                 .on_menu_event(|app, event| match event.id.as_ref() {
