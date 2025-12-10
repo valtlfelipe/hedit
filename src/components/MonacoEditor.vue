@@ -6,6 +6,7 @@
 </template>
 
 <script setup lang="ts">
+  // @ts-ignore
   import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
   import 'monaco-editor/esm/vs/editor/contrib/comment/browser/comment.js'
   import 'monaco-editor/esm/vs/editor/contrib/find/browser/findController.js'
@@ -19,6 +20,7 @@
   const isReady = ref(false)
 
   // Configure Monaco environment for minimal bundle size
+  // @ts-ignore
   self.MonacoEnvironment = {
     getWorker() {
       // Return a minimal worker for basic functionality

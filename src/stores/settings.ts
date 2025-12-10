@@ -2,7 +2,7 @@ import { listen } from '@tauri-apps/api/event'
 import { load } from '@tauri-apps/plugin-store'
 import { reactive } from 'vue'
 
-const store = await load('settings.json', { autoSave: false })
+const store = await load('settings.json', { autoSave: false, defaults: {} })
 
 listen('reload-settings', async () => {
   await store.reload()
