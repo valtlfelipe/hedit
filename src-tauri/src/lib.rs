@@ -29,7 +29,7 @@ fn show_app(app: &tauri::AppHandle) {
 }
 
 fn hide_app(api: &tauri::CloseRequestApi, window: &tauri::Window) {
-    window.hide().unwrap();
+    let _ = window.hide();
     api.prevent_close();
     #[cfg(target_os = "macos")]
     {
