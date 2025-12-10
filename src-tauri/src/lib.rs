@@ -78,14 +78,10 @@ pub fn run() {
                         button_state: MouseButtonState::Up,
                         ..
                     } => {
-                        println!("left click pressed and released");
-                        // in this example, let's show and focus the main window when the tray is clicked
                         let app = tray.app_handle();
                         show_app(&app);
                     }
-                    _ => {
-                        println!("unhandled event {event:?}");
-                    }
+                    _ => {}
                 })
                 .icon(app.default_window_icon().unwrap().clone())
                 .menu(&menu::get_tray_menu(app.handle())?)
@@ -94,7 +90,7 @@ pub fn run() {
                         show_app(app);
                     }
                     "quit_app" => {
-                        std::process::exit(0);
+                        app.exit(0);
                     }
                     _ => {}
                 })
