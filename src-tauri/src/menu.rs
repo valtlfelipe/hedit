@@ -164,7 +164,7 @@ pub fn get_menu<R: Runtime>(app_handle: &AppHandle<R>) -> tauri::Result<Menu<R>>
     Ok(menu)
 }
 
-/// Handle menu events
+/// Handle system menu events
 pub fn handle_menu_event(app_handle: &tauri::AppHandle, event: &MenuEvent) {
     match event.id().0.as_str() {
         "new_file" => {
@@ -236,4 +236,17 @@ pub fn handle_menu_event(app_handle: &tauri::AppHandle, event: &MenuEvent) {
         }
         _ => eprintln!("Unexpected menu event: {}", event.id().0),
     }
+}
+
+/// Create the system tray menu
+pub fn get_tray_menu<R: Runtime>(app_handle: &AppHandle<R>) -> tauri::Result<Menu<R>> {
+    let tray_menu = Menu::with_items(
+        app_handle,
+        &[
+            &MenuItemBuilder::with_id("show_app".to_string(), "Show Hedit").build(app_handle)?,
+            &PredefinedMenuItem::separator(app_handle)?,
+            &PredefinedMenuItem::quit(app_handle, None)?,
+        ],
+    )?;
+    Ok(tray_menu)
 }

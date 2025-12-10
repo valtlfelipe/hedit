@@ -6,7 +6,10 @@
 </template>
 
 <script setup lang="ts">
-  // @ts-ignore
+  // import * as monaco from 'monaco-editor'
+  // import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
+
+  // @ts-expect-error
   import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
   import 'monaco-editor/esm/vs/editor/contrib/comment/browser/comment.js'
   import 'monaco-editor/esm/vs/editor/contrib/find/browser/findController.js'
@@ -19,14 +22,11 @@
 
   const isReady = ref(false)
 
-  // Configure Monaco environment for minimal bundle size
-  // @ts-ignore
-  self.MonacoEnvironment = {
-    getWorker() {
-      // Return a minimal worker for basic functionality
-      return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url))
-    },
-  }
+  // self.MonacoEnvironment = {
+  //   getWorker() {
+  //     return new editorWorker()
+  //   },
+  // }
 
   // --- Constants ---
   const IPV4_REGEX =

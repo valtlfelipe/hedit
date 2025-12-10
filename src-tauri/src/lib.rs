@@ -6,8 +6,8 @@ mod remote_hosts;
 mod telemetry;
 mod update_checker;
 use std::fs::create_dir_all;
-
-use tauri::{LogicalPosition, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+use tauri::{ActivationPolicy, LogicalPosition, Manager, WebviewUrl, WebviewWindowBuilder};
 
 /// Background color for macOS window (RGB values)
 #[cfg(target_os = "macos")]
@@ -16,12 +16,42 @@ const WINDOW_BG_COLOR: (f64, f64, f64, f64) = (50.0 / 255.0, 158.0 / 255.0, 163.
 /// Minimum window dimensions
 const MIN_WINDOW_SIZE: (f64, f64) = (1000.0, 650.0);
 
+fn show_app(app: &tauri::AppHandle) {
+    #[cfg(target_os = "macos")]
+    {
+        let _ = app.set_activation_policy(ActivationPolicy::Regular);
+    }
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.unminimize();
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
+
+fn hide_app(api: &tauri::CloseRequestApi, window: &tauri::Window) {
+    window.hide().unwrap();
+    api.prevent_close();
+    #[cfg(target_os = "macos")]
+    {
+        let _ = window
+            .app_handle()
+            .set_activation_policy(ActivationPolicy::Accessory);
+    }
+}
+
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            let _ = app
+                .get_webview_window("main")
+                .expect("no main window")
+                .set_focus();
+        }))
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
+        .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             // Ensure app data directory exists
             let app_data_dir = app
@@ -32,11 +62,43 @@ pub fn run() {
                 .map_err(|e| format!("Failed to create app directory: {}", e))?;
 
             // Spawn background tasks
-            tauri::async_runtime::spawn(telemetry::send_telemetry(app.handle().clone(), "app_opened"));
+            tauri::async_runtime::spawn(telemetry::send_telemetry(
+                app.handle().clone(),
+                "app_opened",
+            ));
             tauri::async_runtime::spawn(license::check_license(app.handle().clone()));
             tauri::async_runtime::spawn(update_checker::check_updates_periodically(
                 app.handle().clone(),
             ));
+
+            let _tray = TrayIconBuilder::new()
+                .on_tray_icon_event(|tray, event| match event {
+                    TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } => {
+                        println!("left click pressed and released");
+                        // in this example, let's show and focus the main window when the tray is clicked
+                        let app = tray.app_handle();
+                        show_app(&app);
+                    }
+                    _ => {
+                        println!("unhandled event {event:?}");
+                    }
+                })
+                .icon(app.default_window_icon().unwrap().clone())
+                .menu(&menu::get_tray_menu(app.handle())?)
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "show_app" => {
+                        show_app(app);
+                    }
+                    "quit_app" => {
+                        std::process::exit(0);
+                    }
+                    _ => {}
+                })
+                .build(app)?;
 
             // Setup menu
             let menu = menu::get_menu(app.handle())
@@ -99,7 +161,12 @@ pub fn run() {
 
             Ok(())
         })
-        .plugin(tauri_plugin_fs::init())
+        .on_window_event(|window, event| match event {
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                hide_app(api, window);
+            }
+            _ => {}
+        })
         .invoke_handler(tauri::generate_handler![
             license::activate,
             files::write_system_hosts,
