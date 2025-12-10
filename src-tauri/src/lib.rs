@@ -89,9 +89,6 @@ pub fn run() {
                     "show_app" => {
                         show_app(app);
                     }
-                    "quit_app" => {
-                        app.exit(0);
-                    }
                     _ => {}
                 })
                 .build(app)?;
