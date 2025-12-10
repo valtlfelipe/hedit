@@ -20,7 +20,6 @@
   "bundle": {
     "publisher": "FVM",
     "license": "MIT",
-    "licenseFile": "../LICENSE",
     "copyright": "FVM - Hedit",
     "homepage": "https://hedit.app",
     "category": "DeveloperTool",
