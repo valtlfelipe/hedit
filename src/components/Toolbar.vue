@@ -93,17 +93,17 @@
         <transition name="fade-scale">
           <div
             v-if="showSettings"
-            class="absolute right-0 top-8 z-60 bg-gray-50/95 dark:bg-zinc-800/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg w-50"
+            class="absolute right-0 top-8 z-60 bg-gray-50/95 dark:bg-zinc-800/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg w-48"
           >
             <ul class="p-1 text-sm text-gray-800 dark:text-gray-200">
               <li
                 class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out"
-                @click="toggleDarkMode"
+                @click="openSettingsModal"
               >
-                <Sun v-if="settingsStore.isDarkTheme" class="w-4 h-4"/>
-                <Moon v-else class="w-4 h-4"/>
-                <span>{{ settingsStore.isDarkTheme ? 'Light Mode' : 'Dark Mode' }}</span>
+                <Settings class="w-4 h-4"/>
+                <span>Settings</span>
               </li>
+              <div class="border-t border-gray-200 dark:border-zinc-700 my-1"></div>
               <li
                 class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out"
                 @click="openLicenseModal"
@@ -125,6 +125,13 @@
       </div>
     </div>
   </div>
+
+  <!-- Settings Modal -->
+  <SettingsModal
+    :show="showSettingsModal"
+    @close="showSettingsModal = false"
+    @showLicenseModal="() => { showSettingsModal = false; emit('showLicenseModal') }"
+  />
 </template>
 
 <script setup lang="ts">
@@ -136,18 +143,16 @@
     Download,
     KeyRound,
     MessageSquare,
-    Moon,
     Play,
     Plus,
     Save,
     Settings,
-    Sun,
     File,
     Globe,
   } from 'lucide-vue-next'
   import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-  import { settingsStore } from '../stores/settings'
   import { listen } from '@tauri-apps/api/event'
+  import SettingsModal from './SettingsModal.vue'
 
   interface UpdateInfo {
     available: boolean
@@ -171,6 +176,7 @@
   }>()
 
   const showSettings = ref(false)
+  const showSettingsModal = ref(false)
   const settingsContainer = ref<HTMLElement | null>(null)
   const showCreateDropdown = ref(false)
   const createContainer = ref<HTMLElement | null>(null)
@@ -210,11 +216,6 @@
     window.removeEventListener('keydown', handleKeydown)
   })
 
-  const toggleDarkMode = async () => {
-    settingsStore.setTheme(!settingsStore.isDarkTheme)
-    showSettings.value = false
-  }
-
   const openLicenseModal = () => {
     showSettings.value = false
     emit('showLicenseModal')
@@ -223,6 +224,11 @@
   const openFeedbackLink = () => {
     openUrl('https://github.com/valtlfelipe/hedit/issues/new/choose')
     showSettings.value = false
+  }
+
+  const openSettingsModal = () => {
+    showSettings.value = false
+    showSettingsModal.value = true
   }
 
   const openUpdatePage = () => {

@@ -4,11 +4,11 @@ use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 use url::Url;
 
-#[command]
-pub async fn fetch_remote_hosts_file(
-    app_handle: tauri::AppHandle,
-    url: String,
-    file_name: String,
+/// Internal function to fetch a remote hosts file
+pub async fn fetch_remote_hosts_file_internal(
+    app_handle: &tauri::AppHandle,
+    url: &str,
+    file_name: &str,
 ) -> Result<(), String> {
     if url.is_empty() || file_name.is_empty() {
         return Err("URL or file name is empty".to_string());
@@ -79,4 +79,13 @@ pub async fn fetch_remote_hosts_file(
     }
 
     Ok(())
+}
+
+#[command]
+pub async fn fetch_remote_hosts_file(
+    app_handle: tauri::AppHandle,
+    url: String,
+    file_name: String,
+) -> Result<(), String> {
+    fetch_remote_hosts_file_internal(&app_handle, &url, &file_name).await
 }

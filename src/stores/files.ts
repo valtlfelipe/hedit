@@ -152,6 +152,14 @@ export const hostsStore = reactive({
       await invoke('write_system_hosts', { content: file.content })
     }
   },
+  async reloadContent(id: string) {
+    const file = this.files.find((file) => file.id === id)
+    if (!file) return
+
+    file.content = await readTextFile(`files/${file.id}.hosts`, {
+      baseDir: BaseDirectory.AppData,
+    })
+  },
   saveMetadata() {
     return metadataStore.set(
       'files',

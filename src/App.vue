@@ -135,6 +135,11 @@
     showLicenseModal.value = true
   })
 
+  listen('remote-hosts-updated', (event) => {
+    const id = event.payload as string
+    return hostsStore.reloadContent(id)
+  })
+
   // Watch for file content changes
   let isProgrammaticChange = false
 

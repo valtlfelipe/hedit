@@ -1,6 +1,11 @@
 use std::process::Command;
 use tauri::command;
 
+pub async fn write_system_hosts_from_file(file_path: &str) -> Result<(), String> {
+    let content = std::fs::read_to_string(file_path).map_err(|e| e.to_string())?;
+    write_system_hosts(content).await
+}
+
 #[command]
 pub async fn write_system_hosts(content: String) -> Result<(), String> {
     let platform = tauri_plugin_os::platform();
