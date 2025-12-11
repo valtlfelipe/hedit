@@ -2,8 +2,11 @@
   <div class="space-y-6">
     <div>
       <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">About Hedit</h3>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 italic">
+        The modern hosts file editor for people who care about their tools.
+      </p>
       <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        Hedit - The modern hosts file editor for people who care about their tools
+       © {{ new Date().getFullYear() }} FVM Tec. All rights reserved.
       </p>
 
       <div class="space-y-2">
@@ -20,7 +23,7 @@
           <span class="text-sm text-gray-600 dark:text-gray-400">Feedback:</span>
           <button
             @click="openFeedbackLink"
-            class="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors"
+            class="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors hover:cursor-pointer"
           >
             Report an issue
           </button>
@@ -30,7 +33,7 @@
           <span class="text-sm text-gray-600 dark:text-gray-400">Open Source:</span>
           <button
             @click="openSourceLink"
-            class="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors"
+            class="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors hover:cursor-pointer"
           >
             GitHub Repository
           </button>
