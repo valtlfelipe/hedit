@@ -130,7 +130,6 @@ export const hostsStore = reactive({
       if (file.isActive) {
         await invoke('write_system_hosts', { content: file.content })
       }
-
     } catch (error) {
       file.status = 'fetch_error'
       throw error

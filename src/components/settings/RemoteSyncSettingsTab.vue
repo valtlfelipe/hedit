@@ -97,7 +97,7 @@
     }
   }
 
-const triggerManualSync = async () => {
+  const triggerManualSync = async () => {
     if (isSyncing.value) {
       return
     }
