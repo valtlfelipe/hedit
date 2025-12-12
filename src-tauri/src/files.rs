@@ -1,8 +1,16 @@
 use std::process::Command;
-use tauri::command;
+use tauri::{command, Manager};
 use tokio::fs;
 
-pub async fn write_system_hosts_from_file(file_path: &str) -> Result<(), String> {
+use tauri::AppHandle;
+
+pub async fn write_system_hosts_from_file(
+    app_handle: &AppHandle,
+    file_name: &str,
+) -> Result<(), String> {
+    let dir = app_handle.path().app_data_dir().unwrap();
+    let file_path = dir.join("files").join(file_name);
+
     let content = fs::read_to_string(file_path)
         .await
         .map_err(|e| e.to_string())?;

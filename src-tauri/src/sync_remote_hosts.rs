@@ -83,7 +83,7 @@ async fn update_remote_hosts_files(app: &AppHandle) -> Result<(), Box<dyn std::e
 
                     // If the file is active, write it to the system hosts
                     if file.is_active {
-                        files::write_system_hosts_from_file(&file_name)
+                        files::write_system_hosts_from_file(app, &file_name)
                             .await
                             .unwrap_or_else(|e| {
                                 eprintln!(
