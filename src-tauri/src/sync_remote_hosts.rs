@@ -5,6 +5,8 @@ use tauri::{command, AppHandle, Emitter};
 use tauri_plugin_store::StoreBuilder;
 use tokio::time::sleep;
 
+const SETTINGS_CHECK_INTERVAL_SECS: u64 = 3600; // 1 hour
+
 #[derive(Debug, Deserialize, Serialize, Clone)]
 struct HostsFileMetadata {
     id: String,
@@ -131,7 +133,7 @@ pub async fn auto_update_hosts_periodically(app: AppHandle) {
             Ok(store) => store,
             Err(e) => {
                 eprintln!("Failed to load settings store: {}", e);
-                sleep(Duration::from_secs(3600)).await; // Wait 1 hour before retrying
+                sleep(Duration::from_secs(SETTINGS_CHECK_INTERVAL_SECS)).await; // Wait 1 hour before retrying
                 continue;
             }
         };
@@ -143,7 +145,7 @@ pub async fn auto_update_hosts_periodically(app: AppHandle) {
 
         if !auto_update_enabled {
             println!("Auto-update for hosts files is disabled");
-            sleep(Duration::from_secs(3600)).await; // Check again in 1 hour
+            sleep(Duration::from_secs(SETTINGS_CHECK_INTERVAL_SECS)).await; // Check again in 1 hour
             continue;
         }
 
