@@ -5,6 +5,7 @@
       <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 italic">
         The modern hosts file editor for people who care about their tools.
       </p>
+      <!-- biome-ignore format: biome is removing necessary spaces -->
       <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
         © {{ new Date().getFullYear() }} FVM Tec. All rights reserved.
       </p>
