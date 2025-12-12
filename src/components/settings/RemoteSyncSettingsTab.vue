@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onUnmounted, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, ref } from 'vue'
   import { settingsStore } from '../../stores/settings'
   import { invoke } from '@tauri-apps/api/core'
   import { listen } from '@tauri-apps/api/event'
@@ -117,13 +117,17 @@
     }
   }
 
-  // Listen for sync status updates
-  const unlisten = listen<{ status: string; message?: string }>('sync-status-update', (event) => {
-    const { status } = event.payload
-    syncStatus.value = status as 'idle' | 'in_progress' | 'success' | 'error'
+  let unlisten: () => void
+
+  onMounted(async () => {
+    // Listen for sync status updates
+    unlisten = await listen<{ status: string; message?: string }>('sync-status-update', (event) => {
+      const { status } = event.payload
+      syncStatus.value = status as 'idle' | 'in_progress' | 'success' | 'error'
+    })
   })
 
   onUnmounted(() => {
-    unlisten.then((fn) => fn())
+    unlisten()
   })
 </script>
