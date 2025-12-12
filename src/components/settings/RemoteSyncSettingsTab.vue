@@ -27,7 +27,7 @@
               v-model.number="autoUpdateInterval"
               type="number"
               min="1"
-              max="168"
+              :max="maxIntervalHours"
               class="w-20 px-3 py-2 text-sm bg-gray-100 border border-gray-300 rounded focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
               :disabled="!autoUpdateEnabled"
               @change="updateAutoUpdateSettings"
@@ -54,12 +54,14 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed, onUnmounted, ref } from 'vue'
   import { settingsStore } from '../../stores/settings'
   import { invoke } from '@tauri-apps/api/core'
   import { listen } from '@tauri-apps/api/event'
   import { RefreshCw } from 'lucide-vue-next'
   import Switch from '../Switch.vue'
+
+  const maxIntervalHours = 168 // 7 days
 
   const autoUpdateEnabled = ref(settingsStore.autoUpdateHostsEnabled)
   const autoUpdateInterval = ref(settingsStore.autoUpdateHostsInterval)
@@ -82,10 +84,10 @@
         return
       }
 
-      if (autoUpdateInterval.value < 1 || autoUpdateInterval.value > 168) {
+      if (autoUpdateInterval.value < 1 || autoUpdateInterval.value > maxIntervalHours) {
         syncStatus.value = 'error'
         // Reset to default if invalid
-        autoUpdateInterval.value = Math.min(Math.max(autoUpdateInterval.value, 1), 168)
+        autoUpdateInterval.value = Math.min(Math.max(autoUpdateInterval.value, 1), maxIntervalHours)
         setTimeout(() => {
           syncStatus.value = 'idle'
         }, 3000)
@@ -135,8 +137,12 @@
   }
 
   // Listen for sync status updates
-  listen<{ status: string; message?: string }>('sync-status-update', (event) => {
+  const unlisten = listen<{ status: string; message?: string }>('sync-status-update', (event) => {
     const { status } = event.payload
     syncStatus.value = status as 'idle' | 'in_progress' | 'success' | 'error'
+  })
+
+  onUnmounted(() => {
+    unlisten.then((fn) => fn())
   })
 </script>
