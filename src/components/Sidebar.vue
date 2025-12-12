@@ -241,7 +241,7 @@
     const fileId = fileContextMenu.file.id
     refreshingFiles.add(fileId)
     try {
-      await hostsStore.refreshFile(fileId)
+      await hostsStore.refreshRemoteFile(fileId)
     } catch (error) {
       // Error is already handled in the store by setting status to 'fetch_error'
       console.error('Failed to refresh remote file:', error)
@@ -270,7 +270,7 @@
       case 'syntax_error':
         return 'Not saved. Syntax error detected.'
       case 'loaded':
-        return 'File loaded successfully'
+        return 'File fetched successfully'
       case 'modified':
         return 'File has been modified'
       default:

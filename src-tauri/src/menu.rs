@@ -128,12 +128,8 @@ pub fn get_menu<R: Runtime>(app_handle: &AppHandle<R>) -> tauri::Result<Menu<R>>
                     &PredefinedMenuItem::about(app_handle, None, Some(about_data))?,
                     &PredefinedMenuItem::separator(app_handle)?,
                     // TODO:
-                    // &MenuItemBuilder::with_id("settings".to_string(), "Settings")
-                    //     .accelerator("CmdOrCtrl+,")
-                    //     .build(app_handle)?,
-                    // &MenuItemBuilder::with_id("update".to_string(), "Check for Updates")
-                    //     .build(app_handle)?,
-                    &MenuItemBuilder::with_id("activate_license".to_string(), "Activate License")
+                    &MenuItemBuilder::with_id("open_settings".to_string(), "Settings")
+                        .accelerator("CmdOrCtrl+,")
                         .build(app_handle)?,
                     &PredefinedMenuItem::separator(app_handle)?,
                     &PredefinedMenuItem::services(app_handle, None)?,
@@ -187,9 +183,9 @@ pub fn handle_menu_event(app_handle: &tauri::AppHandle, event: &MenuEvent) {
                 eprintln!("Failed to emit save_file event: {}", e);
             }
         }
-        "activate_license" => {
-            if let Err(e) = app_handle.emit("activate_license", true) {
-                eprintln!("Failed to emit activate_license event: {}", e);
+        "open_settings" => {
+            if let Err(e) = app_handle.emit("open_settings", true) {
+                eprintln!("Failed to emit open_settings event: {}", e);
             }
         }
         "zoom_reset" => {

@@ -125,13 +125,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Settings Modal -->
-  <SettingsModal
-    :show="showSettingsModal"
-    @close="showSettingsModal = false"
-    @showLicenseModal="() => { showSettingsModal = false; emit('showLicenseModal') }"
-  />
 </template>
 
 <script setup lang="ts">
@@ -152,7 +145,6 @@
   } from 'lucide-vue-next'
   import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
   import { listen } from '@tauri-apps/api/event'
-  import SettingsModal from './SettingsModal.vue'
 
   interface UpdateInfo {
     available: boolean
@@ -173,10 +165,10 @@
     saveFile: []
     activateFile: []
     showLicenseModal: []
+    openSettingsModal: []
   }>()
 
   const showSettings = ref(false)
-  const showSettingsModal = ref(false)
   const settingsContainer = ref<HTMLElement | null>(null)
   const showCreateDropdown = ref(false)
   const createContainer = ref<HTMLElement | null>(null)
@@ -228,7 +220,7 @@
 
   const openSettingsModal = () => {
     showSettings.value = false
-    showSettingsModal.value = true
+    emit('openSettingsModal')
   }
 
   const openUpdatePage = () => {
