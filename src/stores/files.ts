@@ -119,11 +119,18 @@ export const hostsStore = reactive({
     try {
       file.status = 'fetching'
       await invoke('fetch_remote_hosts_file', { url: file.remoteUrl, fileName: `${id}.hosts` })
+
       // Reload the content after fetching
       file.content = await readTextFile(`files/${id}.hosts`, {
         baseDir: BaseDirectory.AppData,
       })
       file.status = 'loaded'
+
+      // If the file is active, update the system hosts as well
+      if (file.isActive) {
+        await invoke('write_system_hosts', { content: file.content })
+      }
+
     } catch (error) {
       file.status = 'fetch_error'
       throw error

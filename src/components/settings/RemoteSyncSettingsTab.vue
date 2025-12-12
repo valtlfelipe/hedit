@@ -68,7 +68,7 @@
   const syncStatus = ref<'idle' | 'in_progress' | 'success' | 'error'>('idle')
   const isSyncing = computed(() => syncStatus.value === 'in_progress')
 
-  const updateAutoUpdateSettings = () => {
+  const updateAutoUpdateSettings = async () => {
     // Validate interval
     if (autoUpdateEnabled.value) {
       if (
@@ -76,21 +76,13 @@
         autoUpdateInterval.value === null ||
         autoUpdateInterval.value === undefined
       ) {
-        syncStatus.value = 'error'
         autoUpdateInterval.value = 24 // Reset to default
-        setTimeout(() => {
-          syncStatus.value = 'idle'
-        }, 3000)
         return
       }
 
       if (autoUpdateInterval.value < 1 || autoUpdateInterval.value > maxIntervalHours) {
-        syncStatus.value = 'error'
         // Reset to default if invalid
         autoUpdateInterval.value = Math.min(Math.max(autoUpdateInterval.value, 1), maxIntervalHours)
-        setTimeout(() => {
-          syncStatus.value = 'idle'
-        }, 3000)
         return
       }
 
@@ -99,26 +91,19 @@
     }
 
     try {
-      settingsStore.setAutoUpdateHosts(autoUpdateEnabled.value, autoUpdateInterval.value)
-      syncStatus.value = 'success'
-
-      setTimeout(() => {
-        syncStatus.value = 'idle'
-      }, 2000)
+      await settingsStore.setAutoUpdateHosts(autoUpdateEnabled.value, autoUpdateInterval.value)
     } catch (error) {
-      syncStatus.value = 'error'
-      setTimeout(() => {
-        syncStatus.value = 'idle'
-      }, 3000)
+      console.error('Error updating auto-update settings:', error)
     }
   }
 
-  const triggerManualSync = async () => {
+const triggerManualSync = async () => {
+    if (isSyncing.value) {
+      return
+    }
+
     if (!autoUpdateEnabled.value) {
-      syncStatus.value = 'error'
-      setTimeout(() => {
-        syncStatus.value = 'idle'
-      }, 2000)
+      syncStatus.value = 'idle'
       return
     }
 
@@ -126,13 +111,9 @@
 
     try {
       await invoke('trigger_manual_sync')
-      // Success is handled by the event listener
     } catch (error) {
       console.error('Manual sync error:', error)
       syncStatus.value = 'error'
-      setTimeout(() => {
-        syncStatus.value = 'idle'
-      }, 5000)
     }
   }
 
