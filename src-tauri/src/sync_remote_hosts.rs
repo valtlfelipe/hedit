@@ -103,7 +103,7 @@ async fn update_remote_hosts_files(app: &AppHandle) -> Result<(), Box<dyn std::e
                             "message": format!("Sync failed: {}", e)
                         }),
                     );
-                    return Ok(());
+                    continue;
                 }
             }
         }

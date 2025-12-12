@@ -1,8 +1,11 @@
 use std::process::Command;
 use tauri::command;
+use tokio::fs;
 
 pub async fn write_system_hosts_from_file(file_path: &str) -> Result<(), String> {
-    let content = std::fs::read_to_string(file_path).map_err(|e| e.to_string())?;
+    let content = fs::read_to_string(file_path)
+        .await
+        .map_err(|e| e.to_string())?;
     write_system_hosts(content).await
 }
 

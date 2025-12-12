@@ -6,7 +6,7 @@
         The modern hosts file editor for people who care about their tools.
       </p>
       <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        © {{ new Date().getFullYear() }}FVM Tec. All rights reserved.
+        © {{ new Date().getFullYear() }} FVM Tec. All rights reserved.
       </p>
 
       <div class="space-y-2">
