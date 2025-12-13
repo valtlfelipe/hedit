@@ -3,6 +3,7 @@ mod files;
 mod license;
 mod menu;
 mod remote_hosts;
+mod sync_remote_hosts;
 mod telemetry;
 mod update_checker;
 use std::fs::create_dir_all;
@@ -65,6 +66,9 @@ pub fn run() {
             ));
             tauri::async_runtime::spawn(license::check_license(app.handle().clone()));
             tauri::async_runtime::spawn(update_checker::check_updates_periodically(
+                app.handle().clone(),
+            ));
+            tauri::async_runtime::spawn(sync_remote_hosts::auto_update_hosts_periodically(
                 app.handle().clone(),
             ));
 
@@ -150,6 +154,7 @@ pub fn run() {
             license::activate,
             files::write_system_hosts,
             remote_hosts::fetch_remote_hosts_file,
+            sync_remote_hosts::trigger_manual_sync,
             telemetry::send_telemetry_event,
         ])
         .run(tauri::generate_context!())

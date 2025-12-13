@@ -81,18 +81,7 @@ export const hostsStore = reactive({
     this.saveMetadata()
 
     if (remote && file.remoteUrl) {
-      try {
-        file.status = 'fetching'
-        await invoke('fetch_remote_hosts_file', { url: file.remoteUrl, fileName: `${id}.hosts` })
-        // Reload the content after fetching
-        file.content = await readTextFile(`files/${id}.hosts`, {
-          baseDir: BaseDirectory.AppData,
-        })
-        file.status = 'loaded'
-      } catch (error) {
-        file.status = 'fetch_error'
-        throw error
-      }
+      await this.refreshRemoteFile(id)
     }
 
     return id
@@ -123,18 +112,24 @@ export const hostsStore = reactive({
     await remove(`files/${id}.hosts`, { baseDir: BaseDirectory.AppData })
     this.saveMetadata()
   },
-  async refreshFile(id: string) {
+  async refreshRemoteFile(id: string) {
     const file = this.files.find((file) => file.id === id)
     if (!file || file.type !== HostsFileType.REMOTE || !file.remoteUrl) return
 
     try {
       file.status = 'fetching'
       await invoke('fetch_remote_hosts_file', { url: file.remoteUrl, fileName: `${id}.hosts` })
+
       // Reload the content after fetching
       file.content = await readTextFile(`files/${id}.hosts`, {
         baseDir: BaseDirectory.AppData,
       })
       file.status = 'loaded'
+
+      // If the file is active, update the system hosts as well
+      if (file.isActive) {
+        await invoke('write_system_hosts', { content: file.content })
+      }
     } catch (error) {
       file.status = 'fetch_error'
       throw error
@@ -151,6 +146,14 @@ export const hostsStore = reactive({
     if (file.isActive) {
       await invoke('write_system_hosts', { content: file.content })
     }
+  },
+  async reloadContent(id: string) {
+    const file = this.files.find((file) => file.id === id)
+    if (!file) return
+
+    file.content = await readTextFile(`files/${file.id}.hosts`, {
+      baseDir: BaseDirectory.AppData,
+    })
   },
   saveMetadata() {
     return metadataStore.set(

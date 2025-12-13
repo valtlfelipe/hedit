@@ -20,6 +20,7 @@ jobs:
       - name: install frontend dependencies
         run: bun install
 
+      - run: bun run check
       - run: bun run lint
       - run: bun run format
 

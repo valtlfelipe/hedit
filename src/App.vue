@@ -8,6 +8,7 @@
         @save-file="() => handleSaveFile()"
         @activate-file="handleActivateFile"
         @show-license-modal="showLicenseModal = true"
+        @open-settings-modal="showSettingsModal = true"
       />
 
       <div class="flex flex-1 min-h-0 h-full">
@@ -38,6 +39,11 @@
       </div>
     </div>
     <LicenseModal :show="showLicenseModal" @close="handleLicenseModalClose"/>
+    <SettingsModal
+      :show="showSettingsModal"
+      @close="showSettingsModal = false"
+      @showLicenseModal="showLicenseModal = true"
+    />
   </AppWindow>
 </template>
 
@@ -46,9 +52,11 @@
   import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
   import AppWindow from './components/AppWindow.vue'
   import LicenseModal from './components/LicenseModal.vue'
+  import SettingsModal from './components/SettingsModal.vue'
   import LoadingSpinner from './components/LoadingSpinner.vue'
   import Sidebar from './components/Sidebar.vue'
   import Toolbar from './components/Toolbar.vue'
+
   import { useFileOperations } from './composables/useFileOperations'
   import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts'
   import { useTelemetry } from './composables/useTelemetry'
@@ -62,6 +70,7 @@
 
   const title = ref('Hedit')
   const showLicenseModal = ref(false)
+  const showSettingsModal = ref(false)
   const isContentValid = ref(true)
   const sidebarRef = ref()
 
@@ -131,8 +140,13 @@
     showLicenseModal.value = true
   })
 
-  listen('activate_license', async () => {
-    showLicenseModal.value = true
+  listen('open_settings', async () => {
+    showSettingsModal.value = true
+  })
+
+  listen('remote-hosts-updated', (event) => {
+    const id = event.payload as string
+    return hostsStore.reloadContent(id)
   })
 
   // Watch for file content changes

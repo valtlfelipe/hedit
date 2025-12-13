@@ -15,6 +15,8 @@ export const settingsStore = reactive({
   activationId: '',
   personalUseOnly: false,
   isActivated: false,
+  autoUpdateHostsEnabled: false,
+  autoUpdateHostsInterval: 24, // hours
   async load() {
     const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
     const savedTheme = await store.get<string>('theme')
@@ -23,6 +25,8 @@ export const settingsStore = reactive({
     this.activationId = (await store.get<string>('activationId')) || ''
     this.personalUseOnly = (await store.get<boolean>('personalUseOnly')) || false
     this.isActivated = (await store.get<boolean>('isActivated')) || false
+    this.autoUpdateHostsEnabled = (await store.get<boolean>('autoUpdateHostsEnabled')) || false
+    this.autoUpdateHostsInterval = (await store.get<number>('autoUpdateHostsInterval')) || 24
   },
   setTheme(isDark: boolean) {
     this.isDarkTheme = isDark
@@ -32,12 +36,19 @@ export const settingsStore = reactive({
     this.personalUseOnly = personalUseOnly
     this.save()
   },
+  setAutoUpdateHosts(enabled: boolean, interval: number) {
+    this.autoUpdateHostsEnabled = enabled
+    this.autoUpdateHostsInterval = interval
+    this.save()
+  },
   async save() {
     await store.set('theme', this.isDarkTheme ? 'dark' : 'light')
     await store.set('license', this.license)
     await store.set('activationId', this.activationId)
     await store.set('personalUseOnly', this.personalUseOnly)
     await store.set('isActivated', this.isActivated)
+    await store.set('autoUpdateHostsEnabled', this.autoUpdateHostsEnabled)
+    await store.set('autoUpdateHostsInterval', this.autoUpdateHostsInterval)
     await store.save()
   },
 })
