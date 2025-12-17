@@ -1,6 +1,7 @@
 # Hedit
+_(pronounced **H-edit**)_
 
-Fast and intuitive hosts file management. Edit, manage, and organize your hosts entries with a beautiful and modern interface.
+Fast and intuitive hosts file management. The modern hosts file editor for people who care about their tools.
 
 ![image](https://github.com/user-attachments/assets/0eef8114-1369-448a-8f20-932304acc7fc)
 
@@ -10,11 +11,6 @@ Fast and intuitive hosts file management. Edit, manage, and organize your hosts 
   </a>
 </div>
 
-
-## 🚧 Work in Progress
-
-**Please Note:** This project is currently under active development. Features may be incomplete, and bugs are expected. Your feedback and contributions are highly welcome!
-
 ## ✨ Features
 
 This application is available on macOS and Linux. Windows support is planned for future releases.
@@ -23,6 +19,8 @@ This application is available on macOS and Linux. Windows support is planned for
 *   **Fast & Secure:** Built with modern tech for performance and system-level access and Open-source codebase.
 *   **Multiple Files:** Manage multiple files and activate the one you need.
 *   **Remote Files:** Add and Sync remote hosts files locally (like StevenBlack/hosts, etc.).
+*   **Auto Sync:** Enable automatic remote file synchronization so remote files are always up to date.
+*   **Run in background:** Allow Hedit to run in the background (system tray) so Auto Sync can operate continuously.
 *   **Syntax highlighting:** Edit your hosts file with syntax highlighting and validation.
 
 ## ⬇️ Installation & Usage (macOS)
