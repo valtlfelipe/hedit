@@ -42,6 +42,9 @@
         "formatter": {
             "quoteStyle": "single"
         },
+        "linter": {
+            "enabled": false
+        },
         "parser": {
             "tailwindDirectives": true
         }
@@ -49,8 +52,6 @@
     "overrides": [
         {
             "includes": [
-                "**/*.svelte",
-                "**/*.astro",
                 "**/*.vue"
             ],
             "linter": {
