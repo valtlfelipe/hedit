@@ -9,6 +9,21 @@
         @change="toggleDarkMode"
       />
     </div>
+    <div>
+      <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
+        Quit when closing window
+      </h3>
+      <Switch
+        id="quitOnCloseToggle"
+        v-model="isQuitOnClose"
+        :label="isQuitOnClose ? 'Quit on Close Enabled' : 'Quit on Close Disabled'"
+        @change="toggleQuitOnClose"
+      />
+      <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+        When disabled, allows the application to continue running in the background after closing
+        the main window.
+      </p>
+    </div>
   </div>
 </template>
 
@@ -18,9 +33,14 @@
   import Switch from '../Switch.vue'
 
   const isDarkTheme = ref(settingsStore.isDarkTheme)
+  const isQuitOnClose = ref(settingsStore.quitOnClose)
 
-  const toggleDarkMode = async () => {
+  const toggleDarkMode = () => {
     settingsStore.setTheme(isDarkTheme.value)
+  }
+
+  const toggleQuitOnClose = () => {
+    settingsStore.setQuitOnClose(isQuitOnClose.value)
   }
 
   // Watch for theme changes from the store
