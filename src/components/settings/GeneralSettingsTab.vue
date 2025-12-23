@@ -10,7 +10,9 @@
       />
     </div>
     <div>
-      <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Quit when closing window</h3>
+      <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
+        Quit when closing window
+      </h3>
       <Switch
         id="quitOnCloseToggle"
         v-model="isQuitOnClose"
@@ -18,7 +20,8 @@
         @change="toggleQuitOnClose"
       />
       <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-        When disabled, allows the application to continue running in the background after closing the main window.
+        When disabled, allows the application to continue running in the background after closing
+        the main window.
       </p>
     </div>
   </div>
