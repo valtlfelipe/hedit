@@ -3,6 +3,7 @@ mod files;
 mod license;
 mod menu;
 mod remote_hosts;
+mod settings_store;
 mod sync_remote_hosts;
 mod telemetry;
 mod update_checker;
@@ -146,6 +147,15 @@ pub fn run() {
         })
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::CloseRequested { api, .. } => {
+                let quit_on_close = settings_store::get_settings_store_config(
+                    &window.app_handle(),
+                    "quitOnClose".to_string(),
+                )
+                .unwrap_or(false);
+                if quit_on_close {
+                    return;
+                }
+
                 hide_app(api, window);
             }
             _ => {}
