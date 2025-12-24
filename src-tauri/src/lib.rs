@@ -157,7 +157,8 @@ pub fn run() {
                     settings_store::ConfigKey::QuitOnClose,
                     false,
                 )
-                .unwrap_or(false);
+                .unwrap();
+
                 if quit_on_close {
                     return;
                 }
