@@ -152,9 +152,10 @@ pub fn run() {
         })
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::CloseRequested { api, .. } => {
-                let quit_on_close = settings_store::get_settings_store_config(
+                let quit_on_close = settings_store::get_settings_store_config_bool(
                     &window.app_handle(),
-                    "quitOnClose".to_string(),
+                    settings_store::ConfigKey::QuitOnClose,
+                    false,
                 )
                 .unwrap_or(false);
                 if quit_on_close {

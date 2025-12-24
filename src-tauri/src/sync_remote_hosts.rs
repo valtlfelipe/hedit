@@ -1,4 +1,4 @@
-use crate::{files, remote_hosts::fetch_remote_hosts_file_internal};
+use crate::{files, remote_hosts::fetch_remote_hosts_file_internal, settings_store};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use tauri::{command, AppHandle, Emitter};
@@ -129,19 +129,12 @@ pub async fn auto_update_hosts_periodically(app: AppHandle) {
 
     loop {
         // Load settings to check if auto-update is enabled
-        let settings_store = match StoreBuilder::new(&app, "settings.json").build() {
-            Ok(store) => store,
-            Err(e) => {
-                eprintln!("Failed to load settings store: {}", e);
-                sleep(Duration::from_secs(SETTINGS_CHECK_INTERVAL_SECS)).await; // Wait 1 hour before retrying
-                continue;
-            }
-        };
-
-        let auto_update_enabled = settings_store
-            .get("autoUpdateHostsEnabled")
-            .and_then(|v| v.as_bool())
-            .unwrap_or(false);
+        let auto_update_enabled = settings_store::get_settings_store_config_bool(
+            &app,
+            settings_store::ConfigKey::AutoUpdateHostsEnabled,
+            false,
+        )
+        .unwrap_or(false);
 
         if !auto_update_enabled {
             println!("Auto-update for hosts files is disabled");
@@ -149,10 +142,12 @@ pub async fn auto_update_hosts_periodically(app: AppHandle) {
             continue;
         }
 
-        let interval_hours = settings_store
-            .get("autoUpdateHostsInterval")
-            .and_then(|v| v.as_u64())
-            .unwrap_or(24);
+        let interval_hours = settings_store::get_settings_store_config_u64(
+            &app,
+            settings_store::ConfigKey::AutoUpdateHostsInterval,
+            24,
+        )
+        .unwrap_or(24);
 
         let interval_duration = Duration::from_secs(interval_hours * 3600);
 
