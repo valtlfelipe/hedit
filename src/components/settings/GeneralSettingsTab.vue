@@ -10,6 +10,15 @@
       />
     </div>
     <div>
+      <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Application Startup</h3>
+      <Switch
+        id="autoStartToggle"
+        v-model="isAutoStart"
+        :label="isAutoStart ? 'Start at Login Enabled' : 'Start at Login Disabled'"
+        @change="toggleAutoStart"
+      />
+    </div>
+    <div>
       <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
         Quit when closing window
       </h3>
@@ -28,12 +37,14 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
   import { settingsStore } from '../../stores/settings'
   import Switch from '../Switch.vue'
+  import { enable, disable, isEnabled } from '@tauri-apps/plugin-autostart'
 
   const isDarkTheme = ref(settingsStore.isDarkTheme)
   const isQuitOnClose = ref(settingsStore.quitOnClose)
+  const isAutoStart = ref(settingsStore.autoStart)
 
   const toggleDarkMode = () => {
     settingsStore.setTheme(isDarkTheme.value)
@@ -42,6 +53,30 @@
   const toggleQuitOnClose = () => {
     settingsStore.setQuitOnClose(isQuitOnClose.value)
   }
+
+  const toggleAutoStart = async () => {
+    if (isAutoStart.value) {
+      await enable().catch((e) => {
+        console.error('Failed to enable auto start:', e)
+        isAutoStart.value = false // Revert the toggle on failure
+      })
+    } else {
+      await disable().catch((e) => {
+        console.error('Failed to disable auto start:', e)
+        isAutoStart.value = true // Revert the toggle on failure
+      })
+    }
+    settingsStore.setAutoStart(isAutoStart.value)
+  }
+
+  // On component mount, check the actual OS auto-start status
+  onMounted(async () => {
+    const isAutoStartEnabledOnOS = await isEnabled()
+    if (isAutoStartEnabledOnOS !== isAutoStart.value) {
+      isAutoStart.value = isAutoStartEnabledOnOS
+      settingsStore.setAutoStart(isAutoStartEnabledOnOS)
+    }
+  })
 
   // Watch for theme changes from the store
   watch(

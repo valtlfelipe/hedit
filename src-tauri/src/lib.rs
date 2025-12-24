@@ -30,19 +30,14 @@ fn show_app(app: &tauri::AppHandle) {
     }
 }
 
-fn hide_app(api: &tauri::CloseRequestApi, window: &tauri::Window) {
-    let _ = window.hide();
-    api.prevent_close();
-    #[cfg(target_os = "macos")]
-    {
-        let _ = window
-            .app_handle()
-            .set_activation_policy(ActivationPolicy::Accessory);
-    }
-}
-
 pub fn run() {
     tauri::Builder::default()
+        .plugin(
+            tauri_plugin_autostart::Builder::new()
+                .args(["--from-autostart"])
+                .app_name("Hedit")
+                .build(),
+        )
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             show_app(app);
         }))
@@ -143,6 +138,16 @@ pub fn run() {
                 }
             }
 
+            if env::args().any(|arg| arg == "--from-autostart") {
+                let _ = window.hide();
+                #[cfg(target_os = "macos")]
+                {
+                    let _ = window
+                        .app_handle()
+                        .set_activation_policy(ActivationPolicy::Accessory);
+                }
+            }
+
             Ok(())
         })
         .on_window_event(|window, event| match event {
@@ -156,7 +161,14 @@ pub fn run() {
                     return;
                 }
 
-                hide_app(api, window);
+                let _ = window.hide();
+                api.prevent_close();
+                #[cfg(target_os = "macos")]
+                {
+                    let _ = window
+                        .app_handle()
+                        .set_activation_policy(ActivationPolicy::Accessory);
+                }
             }
             _ => {}
         })
