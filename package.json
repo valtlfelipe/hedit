@@ -19,29 +19,29 @@
     "bun": ">=1.2.0"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.17",
+    "@tailwindcss/vite": "^4.1.18",
     "@tauri-apps/api": "^2.9.1",
-    "@tauri-apps/plugin-autostart": "~2",
+    "@tauri-apps/plugin-autostart": "~2.5.1",
     "@tauri-apps/plugin-fs": "~2.4.4",
     "@tauri-apps/plugin-http": "~2.5.4",
     "@tauri-apps/plugin-opener": "~2.5.2",
     "@tauri-apps/plugin-os": "~2.3.2",
     "@tauri-apps/plugin-store": "~2.4.1",
     "@vueuse/core": "^14.1.0",
-    "lucide-vue-next": "^0.556.0",
+    "lucide-vue-next": "^0.562.0",
     "monaco-editor": "^0.55.1",
-    "tailwindcss": "^4.1.17",
-    "vue": "^3.5.25"
+    "tailwindcss": "^4.1.18",
+    "vue": "^3.5.26"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.8",
+    "@biomejs/biome": "^2.3.10",
     "@tauri-apps/cli": "^2.9.6",
-    "@vitejs/plugin-vue": "^6.0.2",
-    "autoprefixer": "^10.4.22",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "autoprefixer": "^10.4.23",
     "typescript": "~5.9.3",
-    "vite": "^7.2.7",
+    "vite": "^7.3.0",
     "vite-plugin-top-level-await": "^1.6.0",
-    "vue-tsc": "^3.1.8"
+    "vue-tsc": "^3.2.1"
   },
   "trustedDependencies": [
     "@tailwindcss/oxide"

@@ -27,6 +27,8 @@ jobs:
       - run: bun run check
       - run: bun run lint
       - run: bun run format
+      - run: cargo check --all
+        working-directory: src-tauri
 
       # - name: Run frontend Tests
       #   run: bun test
