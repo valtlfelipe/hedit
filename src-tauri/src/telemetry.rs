@@ -27,8 +27,7 @@ fn is_telemetry_disabled(app_handle: &AppHandle) -> bool {
 
     // Check if telemetry is disabled in settings
     let is_disabled =
-        get_settings_store_config_bool(app_handle, ConfigKey::DisableTelemetry, false)
-            .unwrap_or(false);
+        get_settings_store_config_bool(app_handle, ConfigKey::DisableTelemetry, false).unwrap();
 
     if is_disabled {
         println!("Telemetry is disabled by user settings.");

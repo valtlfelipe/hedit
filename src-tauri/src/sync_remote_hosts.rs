@@ -134,7 +134,7 @@ pub async fn auto_update_hosts_periodically(app: AppHandle) {
             settings_store::ConfigKey::AutoUpdateHostsEnabled,
             false,
         )
-        .unwrap_or(false);
+        .unwrap();
 
         if !auto_update_enabled {
             println!("Auto-update for hosts files is disabled");
@@ -147,7 +147,7 @@ pub async fn auto_update_hosts_periodically(app: AppHandle) {
             settings_store::ConfigKey::AutoUpdateHostsInterval,
             24,
         )
-        .unwrap_or(24);
+        .unwrap();
 
         let interval_duration = Duration::from_secs(interval_hours * 3600);
 

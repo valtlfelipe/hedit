@@ -26,6 +26,7 @@ fn get_store(app_handle: &AppHandle) -> Result<Arc<Store<Wry>>, String> {
         .path()
         .app_data_dir()
         .map_err(|e| e.to_string())?;
+
     StoreBuilder::new(app_handle, app_dir.join("settings.json"))
         .disable_auto_save()
         .build()
@@ -38,6 +39,7 @@ pub fn get_settings_store_config_bool(
     default: bool,
 ) -> Result<bool, String> {
     let store = get_store(app_handle)?;
+
     let value = store
         .get(config.as_str())
         .and_then(|v| v.as_bool())
@@ -51,6 +53,7 @@ pub fn get_settings_store_config_u64(
     default: u64,
 ) -> Result<u64, String> {
     let store = get_store(app_handle)?;
+
     let value = store
         .get(config.as_str())
         .and_then(|v| v.as_u64())
