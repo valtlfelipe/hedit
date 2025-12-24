@@ -54,14 +54,14 @@
     settingsStore.setQuitOnClose(isQuitOnClose.value)
   }
 
-  const toggleAutoStart = () => {
+  const toggleAutoStart = async () => {
     if (isAutoStart.value) {
-      enable().catch((e) => {
+      await enable().catch((e) => {
         console.error('Failed to enable auto start:', e)
         isAutoStart.value = false // Revert the toggle on failure
       })
     } else {
-      disable().catch((e) => {
+      await disable().catch((e) => {
         console.error('Failed to disable auto start:', e)
         isAutoStart.value = true // Revert the toggle on failure
       })
