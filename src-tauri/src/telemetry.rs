@@ -2,9 +2,10 @@ use once_cell::sync::Lazy;
 use reqwest::Client;
 use serde_json::json;
 use std::env;
-use tauri::{command, AppHandle, Manager};
-use tauri_plugin_store::StoreBuilder;
+use tauri::{command, AppHandle};
 use uuid::Uuid;
+
+use crate::settings_store::{get_settings_store_config_bool, ConfigKey};
 
 // Disclosure: I just want bare minimum telemetry to understand usage patterns
 // No personal data is collected or stored
@@ -24,32 +25,9 @@ fn is_telemetry_disabled(app_handle: &AppHandle) -> bool {
         return true;
     }
 
-    // Try to get app data directory
-    let app_dir = match app_handle.path().app_data_dir() {
-        Ok(dir) => dir,
-        Err(e) => {
-            eprintln!("Failed to get app data directory: {}", e);
-            return true;
-        }
-    };
-
-    // Try to create/load settings store
-    let store = match StoreBuilder::new(app_handle, app_dir.join("settings.json"))
-        .disable_auto_save()
-        .build()
-    {
-        Ok(store) => store,
-        Err(e) => {
-            eprintln!("Failed to create settings store: {}", e);
-            return true;
-        }
-    };
-
     // Check if telemetry is disabled in settings
-    let is_disabled = store
-        .get("disableTelemetry")
-        .and_then(|v| v.as_bool())
-        .unwrap_or(false);
+    let is_disabled =
+        get_settings_store_config_bool(app_handle, ConfigKey::DisableTelemetry, false).unwrap();
 
     if is_disabled {
         println!("Telemetry is disabled by user settings.");
