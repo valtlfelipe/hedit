@@ -8,6 +8,7 @@ mod sync_remote_hosts;
 mod telemetry;
 mod update_checker;
 use std::fs::create_dir_all;
+use tauri::image::Image;
 use tauri::tray::TrayIconBuilder;
 use tauri::{ActivationPolicy, LogicalPosition, Manager, WebviewUrl, WebviewWindowBuilder};
 
@@ -69,7 +70,7 @@ pub fn run() {
             ));
 
             let _tray = TrayIconBuilder::new()
-                .icon(app.default_window_icon().unwrap().clone())
+                .icon(Image::from_path("./icons/tray/tray-icon.png").expect("Failed to load icon"))
                 .menu(&menu::get_tray_menu(app.handle())?)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show_app" => {
