@@ -9,6 +9,7 @@ mod telemetry;
 mod update_checker;
 use std::fs::create_dir_all;
 use tauri::image::Image;
+use tauri::path::BaseDirectory;
 use tauri::tray::TrayIconBuilder;
 use tauri::{ActivationPolicy, LogicalPosition, Manager, WebviewUrl, WebviewWindowBuilder};
 
@@ -69,8 +70,11 @@ pub fn run() {
                 app.handle().clone(),
             ));
 
+            let resource_path = app
+                .path()
+                .resolve("icons/tray/tray-icon.png", BaseDirectory::Resource)?;
             let _tray = TrayIconBuilder::new()
-                .icon(Image::from_path("./icons/tray/tray-icon.png").expect("Failed to load icon"))
+                .icon(Image::from_path(&resource_path).expect("Failed to load icon"))
                 .menu(&menu::get_tray_menu(app.handle())?)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show_app" => {

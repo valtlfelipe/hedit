@@ -42,7 +42,10 @@
     ],
     "macOS": {
       "signingIdentity": "-"
-    }
+    },
+    "resources": [
+      "./icons/tray/tray-icon.png"
+    ]
   },
   "plugins": {}
 }
