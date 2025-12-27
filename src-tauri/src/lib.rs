@@ -11,7 +11,7 @@ use std::fs::create_dir_all;
 use tauri::image::Image;
 use tauri::path::BaseDirectory;
 use tauri::tray::TrayIconBuilder;
-use tauri::{ActivationPolicy, LogicalPosition, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::{LogicalPosition, Manager, WebviewUrl, WebviewWindowBuilder};
 
 /// Background color for macOS window (RGB values)
 #[cfg(target_os = "macos")]
@@ -23,6 +23,7 @@ const MIN_WINDOW_SIZE: (f64, f64) = (1000.0, 650.0);
 fn show_app(app: &tauri::AppHandle) {
     #[cfg(target_os = "macos")]
     {
+        use tauri::ActivationPolicy;
         let _ = app.set_activation_policy(ActivationPolicy::Regular);
     }
     if let Some(window) = app.get_webview_window("main") {
@@ -147,6 +148,7 @@ pub fn run() {
                 let _ = window.hide();
                 #[cfg(target_os = "macos")]
                 {
+                    use tauri::ActivationPolicy;
                     let _ = window
                         .app_handle()
                         .set_activation_policy(ActivationPolicy::Accessory);
@@ -172,6 +174,7 @@ pub fn run() {
                 api.prevent_close();
                 #[cfg(target_os = "macos")]
                 {
+                    use tauri::ActivationPolicy;
                     let _ = window
                         .app_handle()
                         .set_activation_policy(ActivationPolicy::Accessory);
