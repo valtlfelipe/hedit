@@ -3,11 +3,11 @@ _(pronounced **H-edit**)_
 
 Fast and intuitive hosts file management. The modern hosts file editor for people who care about their tools.
 
-![image](https://github.com/user-attachments/assets/0eef8114-1369-448a-8f20-932304acc7fc)
+![image](https://github.com/user-attachments/assets/66d04a9e-e7af-4cbd-a412-3b28300d234d)
 
 <div align="center">
   <a href="https://hedit.app/download">
-    <img src="https://img.shields.io/badge/Download-Hedit-purple?style=for-the-badge" alt="Download Hedit" />
+    <img src="https://img.shields.io/badge/Download-Hedit-blue?style=for-the-badge" alt="Download Hedit" />
   </a>
 </div>
 
@@ -22,6 +22,11 @@ This application is available on macOS and Linux. Windows support is planned for
 *   **Auto Sync:** Enable automatic remote file synchronization so remote files are always up to date.
 *   **Run in background:** Allow Hedit to run in the background (system tray) so Auto Sync can operate continuously.
 *   **Syntax highlighting:** Edit your hosts file with syntax highlighting and validation.
+
+These people help make it happen. You can buy a <a href="https://hedit.app/pricing">licenses</a> or <a href="https://github.com/sponsors/valtlfelipe">become a sponsor</a> to support Hedit. Thanks for your support! 🫶🏻
+<p>
+  <!-- sponsors --><!-- sponsors -->
+</p>
 
 ## ⬇️ Installation & Usage (macOS)
 
