@@ -9,7 +9,7 @@
       <div
         class="bg-gray-50/95 dark:bg-zinc-800/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg w-full max-w-2xl mx-4"
       >
-        <div class="flex flex-col h-[600px]">
+        <div class="flex flex-col h-150">
           <!-- Header -->
           <div
             class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700"
@@ -34,7 +34,7 @@
                   @click="activeTab = tab.id"
                   class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
                   :class="{
-                  'bg-gray-200/80 dark:bg-zinc-700/80 text-gray-900 dark:text-gray-100': activeTab === tab.id
+                  'bg-primary-500/10 text-primary-700 dark:bg-primary-500/20 dark:text-primary-300': activeTab === tab.id
                 }"
                 >
                   <component :is="tab.icon" class="w-4 h-4"/>

@@ -8,7 +8,7 @@
 
       <button
         @click="openLicenseModal"
-        class="flex items-center justify-center gap-2 px-4 py-2 text-sm text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors"
+        class="flex items-center justify-center gap-2 px-4 py-2 text-sm text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors"
       >
         <span>{{ settingsStore.isActivated ? 'Manage License' : 'Activate License' }}</span>
       </button>

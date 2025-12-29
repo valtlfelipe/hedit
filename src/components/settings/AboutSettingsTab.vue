@@ -24,7 +24,7 @@
           <span class="text-sm text-gray-600 dark:text-gray-400">Feedback:</span>
           <button
             @click="openFeedbackLink"
-            class="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors hover:cursor-pointer"
+            class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors hover:cursor-pointer"
           >
             Report an issue
           </button>
@@ -34,7 +34,7 @@
           <span class="text-sm text-gray-600 dark:text-gray-400">Open Source:</span>
           <button
             @click="openSourceLink"
-            class="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors hover:cursor-pointer"
+            class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors hover:cursor-pointer"
           >
             GitHub Repository
           </button>

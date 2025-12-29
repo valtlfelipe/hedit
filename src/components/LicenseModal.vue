@@ -22,8 +22,8 @@
             <p class="mb-3">
               If you are using this app for commercial use, you need to activate a license.
             </p>
-            <div class="flex items-start p-3 bg-purple-50 rounded-lg dark:bg-purple-900/20">
-              <Heart class="shrink-0 w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5"/>
+            <div class="flex items-start p-3 bg-primary-50 rounded-lg dark:bg-primary-900/20">
+              <Heart class="shrink-0 w-5 h-5 text-primary-600 dark:text-primary-400 mt-0.5"/>
               <p class="ml-3">
                 Hedit is a fully indie project, and every license helps keep it that way. Thank you
                 for your support!
@@ -39,7 +39,7 @@
                   v-model="personalUseOnly"
                   :disabled="settingsStore.isActivated"
                   type="checkbox"
-                  class="h-4 w-4 text-purple-600 border-gray-300 rounded dark:border-zinc-600 focus:ring-purple-500"
+                  class="h-4 w-4 text-primary-600 border-gray-300 rounded dark:border-zinc-600 focus:ring-primary-500"
                   @change="onPersonalUseChange"
                 >
               </div>
@@ -63,7 +63,7 @@
                 :disabled="settingsStore.isActivated"
                 :required="true"
                 type="text"
-                :class="['block w-full px-3 py-2 text-gray-900 bg-white rounded-md shadow-sm dark:bg-zinc-700 dark:text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm border', error ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-zinc-600']"
+                :class="['block w-full px-3 py-2 text-gray-900 bg-white rounded-md shadow-sm dark:bg-zinc-700 dark:text-white focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm border', error ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-zinc-600']"
                 placeholder="Enter your license key"
               >
               <div v-if="error" class="mt-2 text-sm text-red-600 dark:text-red-400">
@@ -75,14 +75,14 @@
           <div class="mt-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <a
               href="#"
-              class="text-sm text-purple-600 hover:text-purple-800 hover:underline dark:hover:text-purple-400"
+              class="text-sm text-primary-600 hover:text-primary-800 hover:underline dark:hover:text-primary-400"
               @click.prevent="openPurchasePage()"
             >
               Purchase License
             </a>
             <div class="flex space-x-3">
               <button
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-zinc-700 dark:border-zinc-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-zinc-700 dark:border-zinc-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                 @click="emit('close')"
               >
                 {{ settingsStore.isActivated || personalUseOnly ? 'Close' : 'Cancel' }}
@@ -91,7 +91,7 @@
                 <button
                   v-if="!settingsStore.isActivated"
                   :disabled="isLoading"
-                  class="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 flex items-center justify-center min-w-[100px]"
+                  class="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center justify-center min-w-[100px]"
                   @click="activate"
                 >
                   <span v-if="isLoading" class="mr-2">

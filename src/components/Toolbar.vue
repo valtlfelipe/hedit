@@ -51,7 +51,7 @@
 
       <Tooltip text="Activate File" :shortcut="`${modifier}+⇧+A`">
         <button
-          class="flex items-center space-x-2 px-3 py-1.5 text-sm text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors"
+          class="flex items-center space-x-2 px-3 py-1.5 text-sm text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors"
           :disabled="!allowActivate"
           :class="{ 'opacity-50 cursor-not-allowed': !allowActivate }"
           @click="$emit('activateFile')"
@@ -70,7 +70,7 @@
           @click="openUpdatePage"
         >
           <Download class="w-4 h-4 text-gray-600 dark:text-gray-200"/>
-          <span class="absolute -top-1 -right-1 w-2 h-2 bg-purple-600 rounded-full"></span>
+          <span class="absolute -top-1 -right-1 w-2 h-2 bg-primary-600 rounded-full"></span>
         </button>
       </Tooltip>
 

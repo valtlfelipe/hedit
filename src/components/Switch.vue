@@ -10,7 +10,7 @@
       >
       <div
         class="w-10 h-6 bg-gray-300 rounded-full shadow-inner transition-colors duration-200 dark:bg-gray-600 cursor-pointer"
-        :class="{ 'bg-purple-600': computedValue }"
+        :class="{ 'bg-primary-600': computedValue }"
         @click="toggleValue"
       ></div>
       <div

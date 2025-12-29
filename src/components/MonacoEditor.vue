@@ -69,7 +69,7 @@
       base: 'vs',
       inherit: true,
       rules: [
-        { token: 'number', foreground: 'db70b8' },
+        { token: 'number', foreground: 'fb4d9f' },
         { token: 'string', foreground: '000000' },
       ],
       colors: {
@@ -82,7 +82,7 @@
       base: 'vs-dark',
       inherit: true,
       rules: [
-        { token: 'number', foreground: 'db70b8' },
+        { token: 'number', foreground: 'fb4d9f' },
         { token: 'string', foreground: 'ffffff' },
       ],
       colors: { 'editor.background': '#18181b' },
