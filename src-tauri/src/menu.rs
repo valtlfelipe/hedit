@@ -29,6 +29,7 @@ pub fn get_menu<R: Runtime>(app_handle: &AppHandle<R>) -> tauri::Result<Menu<R>>
         &[
             &PredefinedMenuItem::minimize(app_handle, None)?,
             &PredefinedMenuItem::maximize(app_handle, None)?,
+            &PredefinedMenuItem::close_window(app_handle, None)?,
         ],
     )?;
 

@@ -1,4 +1,5 @@
 # Hedit
+
 _(pronounced **H-edit**)_
 
 Fast and intuitive hosts file management. The modern hosts file editor for people who care about their tools.
@@ -23,7 +24,10 @@ This application is available on macOS and Linux. Windows support is planned for
 *   **Run in background:** Allow Hedit to run in the background (system tray) so Auto Sync can operate continuously.
 *   **Syntax highlighting:** Edit your hosts file with syntax highlighting and validation.
 
-These people help make it happen. You can buy a <a href="https://hedit.app/pricing">licenses</a> or <a href="https://github.com/sponsors/valtlfelipe">become a sponsor</a> to support Hedit. Thanks for your support! 🫶🏻
+<hr>
+
+These people help make it happen. You can buy a <a href="https://hedit.app/pricing">license</a> or <a href="https://github.com/sponsors/valtlfelipe">become a sponsor</a> to support Hedit. Thanks for your support! 🫶🏻
+
 <p>
   <!-- sponsors --><!-- sponsors -->
 </p>
