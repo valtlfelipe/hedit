@@ -16,21 +16,27 @@
           :class="[
             'w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 transition-colors',
             file.isSelected
-              ? 'bg-purple-500/10 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300'
-              : 'text-gray-700 hover:bg-gray-200/80 dark:text-gray-300 dark:hover:bg-zinc-800/80',
+              ? 'bg-primary-500/10 text-primary-700 dark:bg-primary-500/20 dark:text-primary-300'
+              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80',
           ]"
           @click="$emit('fileSelect', file.id)"
           @contextmenu.prevent="showFileContextMenu($event, file)"
         >
           <Tooltip v-if="!file.type || file.type === HostsFileType.LOCAL" text="Local File">
-            <File class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+            <File
+              class="w-4 h-4 text-gray-500 dark:text-gray-400"
+              :class="{'text-primary-700 dark:text-primary-300': file.isSelected}"
+            />
           </Tooltip>
           <Tooltip v-else-if="file.type === HostsFileType.REMOTE" text="Remote File">
-            <Globe class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+            <Globe
+              class="w-4 h-4 text-gray-500 dark:text-gray-400"
+              :class="{'text-primary-700 dark:text-primary-300': file.isSelected}"
+            />
           </Tooltip>
           <span class="text-sm font-medium flex-1 select-none truncate">{{ file.name }}</span>
           <Tooltip v-if="file.isActive" text="Current Active">
-            <Play v-if="file.isActive" class="w-4 h-4 text-purple-700 dark:text-purple-300"/>
+            <Play v-if="file.isActive" class="w-4 h-4 text-primary-700 dark:text-primary-300"/>
           </Tooltip>
         </button>
       </div>

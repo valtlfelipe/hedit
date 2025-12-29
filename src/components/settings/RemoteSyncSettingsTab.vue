@@ -28,7 +28,7 @@
               type="number"
               min="1"
               :max="maxIntervalHours"
-              class="w-20 px-3 py-2 text-sm bg-gray-100 border border-gray-300 rounded focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+              class="w-20 px-3 py-2 text-sm bg-gray-100 border border-gray-300 rounded focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
               :disabled="!autoUpdateEnabled"
               @change="updateAutoUpdateSettings"
             >
@@ -40,7 +40,7 @@
 
         <div class="pt-2" v-if="autoUpdateEnabled">
           <button
-            class="flex items-center justify-center gap-2 px-4 py-2 text-sm text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors"
+            class="flex items-center justify-center gap-2 px-4 py-2 text-sm text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors"
             @click="triggerManualSync"
             :disabled="!autoUpdateEnabled || isSyncing"
           >
