@@ -92,7 +92,7 @@ export const hostsStore = reactive({
 
       return id
     } catch (error) {
-      file.status = 'save_error'
+      this.files = this.files.filter((existingFile) => existingFile.id !== id)
       throw error
     }
   },

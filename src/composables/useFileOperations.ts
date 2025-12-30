@@ -54,15 +54,17 @@ export function useFileOperations() {
     if (!id) return
 
     const file = hostsStore.files.find((f) => f.id === id)
-
     if (!file || file.isActive) return
+
     const currentActive = hostsStore.files.find((f) => f.isActive)
 
     hostsStore.setActive(id)
     try {
       await hostsStore.saveContent(id)
     } catch (error) {
-      hostsStore.setActive(currentActive?.id || '')
+      if (currentActive?.id) {
+        hostsStore.setActive(currentActive.id)
+      }
       console.error(error)
       toast.error('Error activating file', {
         description: error instanceof Error ? error.message : String(error),
