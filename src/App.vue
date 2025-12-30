@@ -86,7 +86,7 @@
   const fileOperations = useFileOperations()
   const { initializeTheme } = useTheme()
 
-  const { selectedFile } = fileOperations
+  const { selectedFile, handleReloadContent, setFileStatus } = fileOperations
 
   const codeEditor = ref<InstanceType<typeof MonacoEditor> | null>(null)
 
@@ -154,7 +154,7 @@
 
   listen('remote-hosts-updated', (event) => {
     const id = event.payload as string
-    return hostsStore.reloadContent(id)
+    handleReloadContent(id)
   })
 
   // Watch for file content changes
@@ -184,7 +184,7 @@
       }
 
       // Only mark as modified if it's a real user change
-      selectedFile.value.status = 'modified'
+      setFileStatus(selectedFile.value.id, 'modified')
     },
   )
 

@@ -62,29 +62,39 @@ export const hostsStore = reactive({
       type: remote ? HostsFileType.REMOTE : HostsFileType.LOCAL,
       remoteUrl: remote ? remoteUrl : null,
       content,
-      status: '',
+      status: 'creating',
     }
 
-    const dirExists = await exists('files', {
-      baseDir: BaseDirectory.AppData,
-    })
+    try {
+      const dirExists = await exists('files', {
+        baseDir: BaseDirectory.AppData,
+      })
 
-    if (!dirExists) {
-      await mkdir(`files`, { baseDir: BaseDirectory.AppData })
+      if (!dirExists) {
+        await mkdir(`files`, { baseDir: BaseDirectory.AppData })
+      }
+
+      await writeTextFile(`files/${id}.hosts`, content, {
+        baseDir: BaseDirectory.AppData,
+      })
+
+      this.files = [...this.files, file]
+      this.saveMetadata()
+
+      if (remote && file.remoteUrl) {
+        await this.refreshRemoteFile(id)
+      }
+
+      file.status = 'created'
+      setTimeout(() => {
+        file.status = ''
+      }, 3000)
+
+      return id
+    } catch (error) {
+      file.status = 'save_error'
+      throw error
     }
-
-    await writeTextFile(`files/${id}.hosts`, content, {
-      baseDir: BaseDirectory.AppData,
-    })
-
-    this.files = [...this.files, file]
-    this.saveMetadata()
-
-    if (remote && file.remoteUrl) {
-      await this.refreshRemoteFile(id)
-    }
-
-    return id
   },
   async load() {
     const filesData = await metadataStore.get<HostsFile[]>('files')
@@ -98,6 +108,13 @@ export const hostsStore = reactive({
         })
       }),
     )
+  },
+  async init() {
+    await this.load()
+    if (this.files.length === 0) {
+      const content = await readTextFile('/etc/hosts')
+      await this.create('Original File', content, true)
+    }
   },
   renameFile(id: string, newName: string) {
     this.files = this.files.map((file) => (file.id === id ? { ...file, name: newName } : file))
@@ -139,12 +156,22 @@ export const hostsStore = reactive({
     const file = this.files.find((file) => file.id === id)
     if (!file) return
 
-    await writeTextFile(`files/${file.id}.hosts`, file.content, {
-      baseDir: BaseDirectory.AppData,
-    })
+    file.status = 'saving'
+    try {
+      await writeTextFile(`files/${file.id}.hosts`, file.content, {
+        baseDir: BaseDirectory.AppData,
+      })
 
-    if (file.isActive) {
-      await invoke('write_system_hosts', { content: file.content })
+      if (file.isActive) {
+        await invoke('write_system_hosts', { content: file.content })
+      }
+      file.status = 'saved'
+      setTimeout(() => {
+        file.status = ''
+      }, 3000)
+    } catch (error) {
+      file.status = 'save_error'
+      throw error
     }
   },
   async reloadContent(id: string) {
