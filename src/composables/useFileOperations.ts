@@ -31,7 +31,7 @@ export function useFileOperations() {
       selectedFile.value.status = 'save_error'
       console.error(error)
       toast.error(`Error ${isActivating ? 'activating' : 'saving'} file`, {
-        description: error as string,
+        description: error instanceof Error ? error.message : String(error),
       })
     }
   }
@@ -60,7 +60,7 @@ export function useFileOperations() {
       }
       console.error('Error creating file:', error)
       toast.error(`Error creating file`, {
-        description: error as string,
+        description: error instanceof Error ? error.message : String(error),
       })
     }
   }
