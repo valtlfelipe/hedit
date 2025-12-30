@@ -2,6 +2,7 @@ import { readTextFile } from '@tauri-apps/plugin-fs'
 import { computed, ref } from 'vue'
 import type { HostsFile } from '../stores/files'
 import { hostsStore } from '../stores/files'
+import { toast } from 'vue-sonner'
 
 export function useFileOperations() {
   const selectedFile = computed(() => hostsStore.files.find((f) => f.isSelected))
@@ -29,6 +30,9 @@ export function useFileOperations() {
     } catch (error) {
       selectedFile.value.status = 'save_error'
       console.error(error)
+      toast.error(`Error ${isActivating ? 'activating' : 'saving'} file`, {
+        description: error instanceof Error ? error.message : String(error),
+      })
     }
   }
 
@@ -55,6 +59,9 @@ export function useFileOperations() {
         selectedFile.value.status = 'save_error'
       }
       console.error('Error creating file:', error)
+      toast.error(`Error creating file`, {
+        description: error instanceof Error ? error.message : String(error),
+      })
     }
   }
 

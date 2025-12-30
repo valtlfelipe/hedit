@@ -1,4 +1,11 @@
 <template>
+  <Toaster
+    richColors
+    :theme="settingsStore.isDarkTheme ? 'dark' : 'light'"
+    :closeButton="true"
+    closeButtonPosition="top-right"
+    :duration="10000"
+  />
   <AppWindow :title="title">
     <div class="flex flex-col h-full flex-1 min-h-0">
       <Toolbar
@@ -63,6 +70,7 @@
   import { useTheme } from './composables/useTheme'
   import { hostsStore } from './stores/files'
   import { settingsStore } from './stores/settings'
+  import { Toaster } from 'vue-sonner'
 
   const MonacoEditor = defineAsyncComponent(() => import('./components/MonacoEditor.vue'))
 

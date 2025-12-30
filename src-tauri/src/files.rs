@@ -1,3 +1,4 @@
+use crate::hosts_parser;
 use std::process::Command;
 use tauri::{command, Manager};
 use tokio::fs;
@@ -14,17 +15,22 @@ pub async fn write_system_hosts_from_file(
     let content = fs::read_to_string(file_path)
         .await
         .map_err(|e| e.to_string())?;
-    write_system_hosts(content).await
+
+    let filtered_content = hosts_parser::validate_hosts_file(&content)?;
+
+    write_system_hosts(filtered_content).await
 }
 
 #[command]
 pub async fn write_system_hosts(content: String) -> Result<(), String> {
     let platform = tauri_plugin_os::platform();
 
+    let filtered_content = hosts_parser::validate_hosts_file(&content)?;
+
     if platform == "linux" {
-        return update_hosts_file_sudo(content).await;
+        return update_hosts_file_sudo(filtered_content).await;
     } else if platform == "macos" {
-        return update_hosts_file(content).await;
+        return update_hosts_file(filtered_content).await;
     } else {
         return Err(format!("Unsupported platform: {}", platform));
     }
