@@ -185,7 +185,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             license::activate,
-            files::write_system_hosts,
+            files::write_file,
             remote_hosts::fetch_remote_hosts_file,
             sync_remote_hosts::trigger_manual_sync,
             telemetry::send_telemetry_event,

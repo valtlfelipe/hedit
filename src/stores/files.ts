@@ -135,18 +135,17 @@ export const hostsStore = reactive({
 
     try {
       file.status = 'fetching'
-      await invoke('fetch_remote_hosts_file', { url: file.remoteUrl, fileName: `${id}.hosts` })
+      await invoke('fetch_remote_hosts_file', { url: file.remoteUrl, fileName: `${id}.hosts`, isActive: file.isActive })
 
-      // Reload the content after fetching
+      // Reload the content after fetching for the editor to update
       file.content = await readTextFile(`files/${id}.hosts`, {
         baseDir: BaseDirectory.AppData,
       })
-      file.status = 'loaded'
 
-      // If the file is active, update the system hosts as well
-      if (file.isActive) {
-        await invoke('write_system_hosts', { content: file.content })
-      }
+      file.status = 'loaded'
+      setTimeout(() => {
+        file.status = ''
+      }, 3000)
     } catch (error) {
       file.status = 'fetch_error'
       throw error
@@ -158,13 +157,8 @@ export const hostsStore = reactive({
 
     file.status = 'saving'
     try {
-      await writeTextFile(`files/${file.id}.hosts`, file.content, {
-        baseDir: BaseDirectory.AppData,
-      })
+      await invoke('write_file', { fileName: `${file.id}.hosts`, content: file.content, isActive: file.isActive })
 
-      if (file.isActive) {
-        await invoke('write_system_hosts', { content: file.content })
-      }
       file.status = 'saved'
       setTimeout(() => {
         file.status = ''
