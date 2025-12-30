@@ -135,7 +135,11 @@ export const hostsStore = reactive({
 
     try {
       file.status = 'fetching'
-      await invoke('fetch_remote_hosts_file', { url: file.remoteUrl, fileName: `${id}.hosts`, isActive: file.isActive })
+      await invoke('fetch_remote_hosts_file', {
+        url: file.remoteUrl,
+        fileName: `${id}.hosts`,
+        isActive: file.isActive,
+      })
 
       // Reload the content after fetching for the editor to update
       file.content = await readTextFile(`files/${id}.hosts`, {
@@ -157,7 +161,11 @@ export const hostsStore = reactive({
 
     file.status = 'saving'
     try {
-      await invoke('write_file', { fileName: `${file.id}.hosts`, content: file.content, isActive: file.isActive })
+      await invoke('write_file', {
+        fileName: `${file.id}.hosts`,
+        content: file.content,
+        isActive: file.isActive,
+      })
 
       file.status = 'saved'
       setTimeout(() => {
