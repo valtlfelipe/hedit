@@ -36,6 +36,7 @@ url = "2.5.7"
 uuid = { version = "1.19.0", features = ["v4"] }
 once_cell = "1.21.3"
 chrono = "0.4.42"
+regex = "1.10"
 
 [target."cfg(target_os = \"macos\")".dependencies]
 cocoa = "0.26"

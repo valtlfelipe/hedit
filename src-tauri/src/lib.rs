@@ -1,5 +1,6 @@
 use std::env;
 mod files;
+mod hosts_parser;
 mod license;
 mod menu;
 mod remote_hosts;

@@ -55,7 +55,8 @@
           [/#.*$/, 'comment'],
           [/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/, 'number'], // IPv4
           [/([a-fA-F0-9:]+:+)+[a-fA-F0-9]+/, 'number'], // IPv6
-          [/[a-zA-Z0-9\-. Advance]/, 'string'], // Hostnames
+          [/[a-zA-Z0-9\-.]/, 'string'], // Hostnames
+          [/@(remote|local)/, 'keyword'], // Functions
         ],
       },
     })
@@ -113,6 +114,50 @@
       }
 
       const parts = line.split(/\s+/)
+      const isFunctionLine = parts[0].startsWith('@')
+
+      if (isFunctionLine) {
+        const functionName = parts[0].substring(1).split('(')[0]
+        const funcParam = parts[0].substring(1).split('(')[1]?.slice(0, -1).trim()
+        if (functionName !== 'remote' && functionName !== 'local') {
+          markers.push({
+            message: `Unknown function: ${functionName}`,
+            severity: monaco.MarkerSeverity.Error,
+            startLineNumber: lineNumber,
+            startColumn: lineContent.indexOf(parts[0]) + 1,
+            endLineNumber: lineNumber,
+            endColumn: lineContent.indexOf(parts[0]) + parts[0].length + 1,
+          })
+        } else if (!funcParam || funcParam.length === 0) {
+          markers.push({
+            message: `Function @${functionName} requires a parameter.`,
+            severity: monaco.MarkerSeverity.Error,
+            startLineNumber: lineNumber,
+            startColumn: lineContent.indexOf(parts[0]) + 1,
+            endLineNumber: lineNumber,
+            endColumn: lineContent.indexOf(parts[0]) + parts[0].length + 1,
+          })
+        } else if (functionName === 'remote') {
+          let url: URL | null = null
+          try {
+            url = new URL(funcParam)
+          } catch (e) {}
+
+          if (!url || url.protocol !== 'https:') {
+            const startColumn = lineContent.indexOf(funcParam) + 1
+            markers.push({
+              message: `Invalid URL in @remote function: ${funcParam}`,
+              severity: monaco.MarkerSeverity.Error,
+              startLineNumber: lineNumber,
+              startColumn,
+              endLineNumber: lineNumber,
+              endColumn: startColumn + funcParam.length,
+            })
+          }
+        }
+        return
+      }
+
       const ip = parts[0]
       const hostnames = parts.slice(1)
 

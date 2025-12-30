@@ -28,10 +28,12 @@
     "@tauri-apps/plugin-os": "~2.3.2",
     "@tauri-apps/plugin-store": "~2.4.1",
     "@vueuse/core": "^14.1.0",
+    "install": "^0.13.0",
     "lucide-vue-next": "^0.562.0",
     "monaco-editor": "^0.55.1",
     "tailwindcss": "^4.1.18",
-    "vue": "^3.5.26"
+    "vue": "^3.5.26",
+    "vue-sonner": "^2.0.9"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",
