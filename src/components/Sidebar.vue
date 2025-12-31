@@ -63,6 +63,7 @@
         @edit="editFile"
         @delete="showConfirmModal"
         @refresh="refreshFile"
+        @copyId="copyIdToClipboard"
         @click.stop
       />
     </div>
@@ -250,6 +251,12 @@
     refreshingFiles.add(fileId)
     await handleRefreshFile(fileId)
     refreshingFiles.delete(fileId)
+    hideContextMenu()
+  }
+
+  function copyIdToClipboard() {
+    if (!fileContextMenu.file) return
+    navigator.clipboard.writeText(fileContextMenu.file.id)
     hideContextMenu()
   }
 

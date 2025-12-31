@@ -22,6 +22,13 @@
           <span>Rename File</span>
         </li>
         <li
+          class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
+          @click.prevent="$emit('copyId')"
+        >
+          <Clipboard class="w-4 h-4"/>
+          <span>Copy ID</span>
+        </li>
+        <li
           v-if="isRemote"
           class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
           @click.prevent="$emit('refresh')"
@@ -44,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-  import { Pencil, Play, RefreshCw, Trash2 } from 'lucide-vue-next'
+  import { Clipboard, Pencil, Play, RefreshCw, Trash2 } from 'lucide-vue-next'
 
   defineProps<{
     x: number
@@ -59,6 +66,7 @@
     edit: []
     delete: []
     refresh: []
+    copyId: []
   }>()
 </script>
 
