@@ -6,14 +6,12 @@ use url::Url;
 
 use crate::files::write_system_hosts_from_file;
 
-/// Internal function to fetch a remote hosts file
-pub async fn fetch_remote_hosts_file_internal(
+pub async fn fetch_remote_url(
     app_handle: &tauri::AppHandle,
     url: &str,
-    file_name: &str,
-) -> Result<(), String> {
-    if url.is_empty() || file_name.is_empty() {
-        return Err("URL or file name is empty".to_string());
+) -> Result<reqwest::Response, String> {
+    if url.is_empty() {
+        return Err("URL is empty".to_string());
     }
 
     let fetch_url = Url::parse(&url).map_err(|e| format!("Invalid URL: {}", e))?;
@@ -30,7 +28,7 @@ pub async fn fetch_remote_hosts_file_internal(
         .build()
         .map_err(|e| format!("Error building HTTP client: {}", e))?;
 
-    let mut response = client
+    let response = client
         .get(fetch_url)
         .header(reqwest::header::ACCEPT, "text/plain")
         .send()
@@ -51,6 +49,20 @@ pub async fn fetch_remote_hosts_file_internal(
             content_type
         ));
     }
+
+    Ok(response)
+}
+
+pub async fn fetch_remote_url_to_file(
+    app_handle: &tauri::AppHandle,
+    url: &str,
+    file_name: &str,
+) -> Result<(), String> {
+    if url.is_empty() || file_name.is_empty() {
+        return Err("URL or file name is empty".to_string());
+    }
+
+    let mut response = fetch_remote_url(app_handle, url).await?;
 
     let dir = app_handle.path().app_data_dir().unwrap();
     let file_path = dir.join("files").join(&file_name);
@@ -90,7 +102,7 @@ pub async fn fetch_remote_hosts_file(
     file_name: String,
     is_active: bool,
 ) -> Result<(), String> {
-    fetch_remote_hosts_file_internal(&app_handle, &url, &file_name).await?;
+    fetch_remote_url_to_file(&app_handle, &url, &file_name).await?;
 
     if is_active {
         write_system_hosts_from_file(&app_handle, &file_name).await?;

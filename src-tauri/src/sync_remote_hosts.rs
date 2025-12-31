@@ -1,4 +1,4 @@
-use crate::{files, remote_hosts::fetch_remote_hosts_file_internal, settings_store};
+use crate::{files, remote_hosts::fetch_remote_url_to_file, settings_store};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use tauri::{command, AppHandle, Emitter};
@@ -45,6 +45,7 @@ async fn update_remote_hosts_files(app: &AppHandle) -> Result<(), Box<dyn std::e
 
     for file_value in files_data {
         if let Ok(file) = serde_json::from_value::<HostsFileMetadata>(file_value) {
+            // TODO: add support for combo files
             if file.file_type == "remote" && file.remote_url.is_some() {
                 remote_files.push(file);
             }
@@ -77,7 +78,7 @@ async fn update_remote_hosts_files(app: &AppHandle) -> Result<(), Box<dyn std::e
     for file in remote_files {
         if let Some(url) = &file.remote_url {
             let file_name = format!("{}.hosts", file.id);
-            match fetch_remote_hosts_file_internal(app, url, &file_name).await {
+            match fetch_remote_url_to_file(app, url, &file_name).await {
                 Ok(_) => {
                     println!("Successfully updated remote hosts file: {}", file.name);
                     // Emit event to notify frontend about the update
