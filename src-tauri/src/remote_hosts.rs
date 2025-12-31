@@ -4,6 +4,8 @@ use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 use url::Url;
 
+use crate::files::write_system_hosts_from_file;
+
 /// Internal function to fetch a remote hosts file
 pub async fn fetch_remote_hosts_file_internal(
     app_handle: &tauri::AppHandle,
@@ -86,6 +88,13 @@ pub async fn fetch_remote_hosts_file(
     app_handle: tauri::AppHandle,
     url: String,
     file_name: String,
+    is_active: bool,
 ) -> Result<(), String> {
-    fetch_remote_hosts_file_internal(&app_handle, &url, &file_name).await
+    fetch_remote_hosts_file_internal(&app_handle, &url, &file_name).await?;
+
+    if is_active {
+        write_system_hosts_from_file(&app_handle, &file_name).await?;
+    }
+
+    Ok(())
 }

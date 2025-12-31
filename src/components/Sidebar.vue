@@ -100,7 +100,8 @@
   import { File, Globe, Play, SquareDot } from 'lucide-vue-next'
   import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
   import type { HostsFile } from '../stores/files'
-  import { HostsFileType, hostsStore } from '../stores/files'
+  import { HostsFileType } from '../stores/files'
+  import { useFileOperations } from '../composables/useFileOperations'
   import ConfirmModal from './ConfirmModal.vue'
   import FileContextMenu from './FileContextMenu.vue'
   import EditFileModal from './EditFileModal.vue'
@@ -120,6 +121,8 @@
     activateFile: [fileId: string]
     createFile: [{ remote?: boolean; fileName?: string; remoteUrl?: string }]
   }>()
+
+  const { handleDeleteFile, handleRenameFile, handleRefreshFile } = useFileOperations()
 
   const contextMenuContainer = ref<HTMLElement | null>(null)
   const fileContextMenuContainer = ref<HTMLElement | null>(null)
@@ -210,8 +213,7 @@
   }
 
   function confirmDelete() {
-    hostsStore.deleteFile(confirmModal.fileId)
-    hostsStore.setSelected(hostsStore.files[0]?.id)
+    handleDeleteFile(confirmModal.fileId)
     hideConfirmModal()
   }
 
@@ -220,7 +222,7 @@
   }
 
   function saveNewName(newName: string) {
-    hostsStore.renameFile(editModal.fileId, newName)
+    handleRenameFile(editModal.fileId, newName)
     hideEditModal()
   }
 
@@ -246,14 +248,8 @@
     if (!fileContextMenu.file) return
     const fileId = fileContextMenu.file.id
     refreshingFiles.add(fileId)
-    try {
-      await hostsStore.refreshRemoteFile(fileId)
-    } catch (error) {
-      // Error is already handled in the store by setting status to 'fetch_error'
-      console.error('Failed to refresh remote file:', error)
-    } finally {
-      refreshingFiles.delete(fileId)
-    }
+    await handleRefreshFile(fileId)
+    refreshingFiles.delete(fileId)
     hideContextMenu()
   }
 
