@@ -4,7 +4,7 @@ _(pronounced **H-edit**)_
 
 Fast and intuitive hosts file management. The modern hosts file editor for people who care about their tools.
 
-![image](https://github.com/user-attachments/assets/f72ba644-0bd6-4e5f-96bb-29587afd9420)
+![image](https://github.com/user-attachments/assets/cd843e7b-6563-495a-82fa-a62b18c6dd78)
 
 <div align="center">
   <a href="https://hedit.app/download">
