@@ -182,6 +182,7 @@
         isSelected: false,
         type: HostsFileType.REMOTE,
         remoteUrl: remoteUrlTrimmed,
+        isCombo: false,
         content,
         status: 'loaded',
       }

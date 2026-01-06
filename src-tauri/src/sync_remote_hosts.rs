@@ -17,6 +17,8 @@ struct HostsFileMetadata {
     remote_url: Option<String>,
     #[serde(rename = "isActive")]
     is_active: bool,
+    #[serde(rename = "isCombo")]
+    is_combo: bool,
 }
 
 /// Update all remote hosts files
@@ -41,41 +43,50 @@ async fn update_remote_hosts_files(app: &AppHandle) -> Result<(), Box<dyn std::e
         .and_then(|v| v.as_array().cloned())
         .unwrap_or_default();
 
-    let mut remote_files = Vec::new();
+    let mut files_to_sync = Vec::new();
 
     for file_value in files_data {
-        if let Ok(file) = serde_json::from_value::<HostsFileMetadata>(file_value) {
-            // TODO: add support for combo files
-            if file.file_type == "remote" && file.remote_url.is_some() {
-                remote_files.push(file);
+        match serde_json::from_value::<HostsFileMetadata>(file_value.clone()) {
+            Ok(file) => {
+                if (file.file_type == "remote" && file.remote_url.is_some())
+                    || (file.is_combo && file.is_active)
+                {
+                    files_to_sync.push(file);
+                }
+            }
+            Err(e) => {
+                eprintln!(
+                    "Failed to parse hosts file metadata: {:?} - Error: {}",
+                    file_value, e
+                );
             }
         }
     }
 
-    if remote_files.is_empty() {
+    if files_to_sync.is_empty() {
         let _ = app.emit(
             "sync-status-update",
             serde_json::json!({
                 "status": "idle",
-                "message": "No remote hosts files to sync"
+                "message": "No hosts files to sync"
             }),
         );
-        println!("No remote hosts files to update");
+        println!("No hosts files to update");
         return Ok(());
     }
 
-    println!("Updating {} remote hosts files", remote_files.len());
+    println!("Updating {} hosts files", files_to_sync.len());
 
     // Emit sync started event
     let _ = app.emit(
         "sync-status-update",
         serde_json::json!({
             "status": "in_progress",
-            "message": "Syncing remote hosts..."
+            "message": "Syncing hosts..."
         }),
     );
 
-    for file in remote_files {
+    for file in files_to_sync {
         if let Some(url) = &file.remote_url {
             let file_name = format!("{}.hosts", file.id);
             match fetch_remote_url_to_file(app, url, &file_name).await {
@@ -109,6 +120,18 @@ async fn update_remote_hosts_files(app: &AppHandle) -> Result<(), Box<dyn std::e
                     continue;
                 }
             }
+        } else if file.is_combo {
+            let file_name = format!("{}.hosts", file.id);
+            files::write_system_hosts_from_file(app, &file_name)
+                .await
+                .unwrap_or_else(|e| {
+                    eprintln!(
+                        "Failed to write updated combo hosts file '{}' to system hosts: {}",
+                        file.name, e
+                    )
+                });
+
+            println!("Successfully updated combo hosts file: {}", file.name);
         }
     }
 

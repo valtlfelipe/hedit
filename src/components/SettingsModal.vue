@@ -48,8 +48,8 @@
               <!-- General Settings -->
               <GeneralSettingsTab v-if="activeTab === 'general'"/>
 
-              <!-- Remote Sync Settings -->
-              <RemoteSyncSettingsTab v-if="activeTab === 'remote-sync'"/>
+              <!-- Auto Sync Settings -->
+              <AutoSyncSettingsTab v-if="activeTab === 'auto-sync'"/>
 
               <!-- License Settings -->
               <LicenseSettingsTab
@@ -69,9 +69,9 @@
 
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted } from 'vue'
-  import { X, Info, Globe, Settings as SettingsIcon, KeyRound } from 'lucide-vue-next'
+  import { X, Info, Settings as SettingsIcon, KeyRound, RefreshCw } from 'lucide-vue-next'
   import GeneralSettingsTab from './settings/GeneralSettingsTab.vue'
-  import RemoteSyncSettingsTab from './settings/RemoteSyncSettingsTab.vue'
+  import AutoSyncSettingsTab from './settings/AutoSyncSettingsTab.vue'
   import LicenseSettingsTab from './settings/LicenseSettingsTab.vue'
   import AboutSettingsTab from './settings/AboutSettingsTab.vue'
 
@@ -86,7 +86,7 @@
 
   const tabs = [
     { id: 'general', name: 'General', icon: SettingsIcon },
-    { id: 'remote-sync', name: 'Remote Sync', icon: Globe },
+    { id: 'auto-sync', name: 'Auto Sync', icon: RefreshCw },
     { id: 'license', name: 'License', icon: KeyRound },
     { id: 'about', name: 'About', icon: Info },
   ]
