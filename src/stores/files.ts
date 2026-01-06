@@ -22,6 +22,7 @@ export interface HostsFile {
   isSelected: boolean
   type: HostsFileType
   remoteUrl?: string | null
+  isCombo: boolean
   content: string
   status: string
 }
@@ -59,6 +60,7 @@ export const hostsStore = reactive({
       name,
       isActive: !!isFirst,
       isSelected: !!isFirst,
+      isCombo: false,
       type: remote ? HostsFileType.REMOTE : HostsFileType.LOCAL,
       remoteUrl: remote ? remoteUrl : null,
       content,
@@ -101,13 +103,31 @@ export const hostsStore = reactive({
     if (filesData) {
       this.files = filesData
     }
+
+    let needsSave = false
     await Promise.all(
       this.files.map(async (file) => {
         file.content = await readTextFile(`files/${file.id}.hosts`, {
           baseDir: BaseDirectory.AppData,
         })
+
+        // TODO: remove in future versions
+        const prevIsCombo = file.isCombo
+        if (file.content.includes('@local') || file.content.includes('@remote')) {
+          file.isCombo = true
+        } else {
+          file.isCombo = false
+        }
+
+        if (prevIsCombo !== file.isCombo) {
+          needsSave = true
+        }
       }),
     )
+
+    if (needsSave) {
+      this.saveMetadata()
+    }
   },
   async init() {
     await this.load()
@@ -167,6 +187,14 @@ export const hostsStore = reactive({
         isActive: file.isActive,
       })
 
+      if (file.content.includes('@local') || file.content.includes('@remote')) {
+        file.isCombo = true
+      } else {
+        file.isCombo = false
+      }
+
+      this.saveMetadata()
+
       file.status = 'saved'
       setTimeout(() => {
         file.status = ''
@@ -187,13 +215,14 @@ export const hostsStore = reactive({
   saveMetadata() {
     return metadataStore.set(
       'files',
-      this.files.map(({ id, name, type, remoteUrl, isActive, isSelected }) => ({
+      this.files.map(({ id, name, type, remoteUrl, isActive, isSelected, isCombo }) => ({
         id,
         name,
         type,
         remoteUrl,
         isActive,
         isSelected,
+        isCombo,
       })),
     )
   },

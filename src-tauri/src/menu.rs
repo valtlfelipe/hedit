@@ -128,7 +128,6 @@ pub fn get_menu<R: Runtime>(app_handle: &AppHandle<R>) -> tauri::Result<Menu<R>>
                 &[
                     &PredefinedMenuItem::about(app_handle, None, Some(about_data))?,
                     &PredefinedMenuItem::separator(app_handle)?,
-                    // TODO:
                     &MenuItemBuilder::with_id("open_settings".to_string(), "Settings")
                         .accelerator("CmdOrCtrl+,")
                         .build(app_handle)?,
