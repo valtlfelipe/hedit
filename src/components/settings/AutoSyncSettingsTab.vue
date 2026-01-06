@@ -1,9 +1,9 @@
 <template>
   <div class="space-y-6">
     <div>
-      <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Remote Sync</h3>
+      <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Auto Sync</h3>
       <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        Automatically sync your remote hosts files at regular intervals.
+        Automatically sync your remote hosts at regular intervals.
       </p>
 
       <div class="space-y-4">
