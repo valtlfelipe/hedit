@@ -97,8 +97,8 @@
                 <Settings class="w-4 h-4"/>
                 <span>Settings</span>
               </li>
-              <div class="border-t border-gray-200 dark:border-zinc-700 my-1"></div>
               <li
+                v-if="licenseType === 'FREE'"
                 class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out"
                 @click="openLicenseModal"
               >
@@ -151,6 +151,7 @@
 
   defineProps<{
     allowActivate: boolean
+    licenseType: string
   }>()
 
   const emit = defineEmits<{
@@ -158,8 +159,8 @@
     createRemoteFile: []
     saveFile: []
     activateFile: []
-    showLicenseModal: []
     openSettingsModal: []
+    openSettingsModalWithTab: [tab: string]
   }>()
 
   const showSettings = ref(false)
@@ -202,11 +203,6 @@
     window.removeEventListener('keydown', handleKeydown)
   })
 
-  const openLicenseModal = () => {
-    showSettings.value = false
-    emit('showLicenseModal')
-  }
-
   const openFeedbackLink = () => {
     openUrl('https://github.com/valtlfelipe/hedit/issues/new/choose')
     showSettings.value = false
@@ -215,6 +211,11 @@
   const openSettingsModal = () => {
     showSettings.value = false
     emit('openSettingsModal')
+  }
+
+  const openLicenseModal = () => {
+    showSettings.value = false
+    emit('openSettingsModalWithTab', 'license')
   }
 
   const openUpdatePage = () => {

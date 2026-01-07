@@ -10,12 +10,13 @@
     <div class="flex flex-col h-full flex-1 min-h-0">
       <Toolbar
         :allow-activate="!selectedFile?.isActive"
+        :license-type="settingsStore.licenseType"
         @create-local-file="() => handleCreateFile()"
         @create-remote-file="() => handleCreateFile({ remote: true })"
         @save-file="() => handleSaveFile()"
         @activate-file="handleActivateFile"
-        @show-license-modal="showLicenseModal = true"
         @open-settings-modal="showSettingsModal = true"
+        @open-settings-modal-with-tab="handleOpenSettingsModalWithTab"
       />
 
       <div class="flex flex-1 min-h-0 h-full">
@@ -45,11 +46,16 @@
         </Suspense>
       </div>
     </div>
-    <LicenseModal :show="showLicenseModal" @close="handleLicenseModalClose"/>
+    <WelcomeModal :show="showWelcomeModal" @close="showWelcomeModal = false"/>
+    <UpgradePromptModal
+      :show="showUpgradePromptModal"
+      :message="upgradePromptMessage"
+      @close="showUpgradePromptModal = false"
+    />
     <SettingsModal
       :show="showSettingsModal"
+      :initial-tab="settingsModalInitialTab"
       @close="showSettingsModal = false"
-      @showLicenseModal="showLicenseModal = true"
     />
   </AppWindow>
 </template>
@@ -58,8 +64,9 @@
   import { listen } from '@tauri-apps/api/event'
   import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
   import AppWindow from './components/AppWindow.vue'
-  import LicenseModal from './components/LicenseModal.vue'
   import SettingsModal from './components/SettingsModal.vue'
+  import WelcomeModal from './components/WelcomeModal.vue'
+  import UpgradePromptModal from './components/UpgradePromptModal.vue'
   import LoadingSpinner from './components/LoadingSpinner.vue'
   import Sidebar from './components/Sidebar.vue'
   import Toolbar from './components/Toolbar.vue'
@@ -77,8 +84,11 @@
   const { trackEvent } = useTelemetry()
 
   const title = ref('Hedit')
-  const showLicenseModal = ref(false)
   const showSettingsModal = ref(false)
+  const settingsModalInitialTab = ref<string | undefined>(undefined)
+  const showWelcomeModal = ref(false)
+  const showUpgradePromptModal = ref(false)
+  const upgradePromptMessage = ref('')
   const isContentValid = ref(true)
   const sidebarRef = ref()
 
@@ -100,6 +110,17 @@
   }
 
   const handleCreateFile = async ({ remote = false, fileName = '', remoteUrl = '' } = {}) => {
+    // Check if user is in Free mode and trying to create a second file
+    if (
+      (!settingsStore.licenseType || settingsStore.licenseType === 'FREE') &&
+      hostsStore.files.length >= 1
+    ) {
+      upgradePromptMessage.value =
+        'Upgrade to Pro to create unlimited hosts files. You can currently only use 1 file in Free mode.'
+      showUpgradePromptModal.value = true
+      return
+    }
+
     if (remote && !fileName && !remoteUrl) {
       // Open remote file modal instead of creating directly
       sidebarRef.value?.showRemoteFileModal()
@@ -122,6 +143,11 @@
     fileOperations.handleActivateFile(id)
   }
 
+  const handleOpenSettingsModalWithTab = (tab: string) => {
+    settingsModalInitialTab.value = tab
+    showSettingsModal.value = true
+  }
+
   // Initialize event listeners and watchers
   const keyboardShortcuts = useKeyboardShortcuts(
     handleCreateFile,
@@ -132,20 +158,20 @@
   keyboardShortcuts.initializeEventListeners()
   initializeTheme()
 
-  const handleLicenseModalClose = () => {
-    showLicenseModal.value = false
-    if (!settingsStore.personalUseOnly && !settingsStore.activationId) {
-      title.value = 'Hedit (Unlicensed)'
-    } else if (settingsStore.personalUseOnly) {
-      title.value = 'Hedit (Personal Use Only)'
-    }
-  }
-
   // Handle license invalid event
-  listen('license-invalid', async () => {
-    console.warn('License is invalid, do something')
-    title.value = 'Hedit (License Invalid)'
-    showLicenseModal.value = true
+  listen('license-update', async (event) => {
+    const type = event.payload as string
+    if (type === 'wrong-build') {
+      showUpgradePromptModal.value = true
+      upgradePromptMessage.value =
+        'Your license is not valid for this build of Hedit. You can continue using Hedit in Free mode.'
+    } else if (type === 'expired') {
+      showUpgradePromptModal.value = true
+      upgradePromptMessage.value =
+        'Your Pro license has expired. You can continue using Hedit normally, but you will not receive updates until you renew your license.'
+    } else if (type === 'invalid') {
+      title.value = 'Hedit (License Invalid)'
+    }
   })
 
   listen('open_settings', async () => {
@@ -200,18 +226,25 @@
 
   const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
-      showLicenseModal.value = false
+      showSettingsModal.value = false
+      showUpgradePromptModal.value = false
+      showWelcomeModal.value = false
     }
   }
 
   // Initialize on mount
   onMounted(() => {
     settingsStore.load().then(() => {
-      if (!settingsStore.personalUseOnly && !settingsStore.activationId) {
-        showLicenseModal.value = true
-        title.value = 'Hedit (Unlicensed)'
-      } else if (settingsStore.personalUseOnly) {
-        title.value = 'Hedit (Personal Use Only)'
+      // Show welcome modal on first launch if onboarding not completed
+      if (!settingsStore.hasCompletedOnboarding && settingsStore.licenseType === 'FREE') {
+        showWelcomeModal.value = true
+        title.value = 'Hedit'
+      } else if (settingsStore.licenseType === 'FREE') {
+        title.value = 'Hedit'
+      } else if (settingsStore.licenseType === 'PRO_ACTIVE') {
+        title.value = 'Hedit (Pro)'
+      } else if (settingsStore.licenseType === 'PRO_EXPIRED') {
+        title.value = 'Hedit (Pro - Updates Expired)'
       }
     })
     fileOperations.loadFiles().then(() => {

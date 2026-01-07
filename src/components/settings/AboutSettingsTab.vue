@@ -7,13 +7,18 @@
       </p>
       <!-- biome-ignore format: biome is removing necessary spaces -->
       <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        © {{ new Date().getFullYear() }} FVM Tec. All rights reserved.
+        © {{ new Date(buildDate).getFullYear() }} FVM Tec. All rights reserved.
       </p>
 
       <div class="space-y-2">
         <div class="flex items-center gap-2">
           <span class="text-sm text-gray-600 dark:text-gray-400">Version:</span>
           <span class="text-sm font-mono text-gray-800 dark:text-gray-200">{{ appVersion }}</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Build Date:</span>
+          <span class="text-sm font-mono text-gray-800 dark:text-gray-200">{{ buildDate }}</span>
         </div>
 
         <!-- TODO: add option to check for updates -->
@@ -47,12 +52,15 @@
 <script setup lang="ts">
   import { openUrl } from '@tauri-apps/plugin-opener'
   import { getVersion } from '@tauri-apps/api/app'
+  import { invoke } from '@tauri-apps/api/core'
   import { onMounted, ref } from 'vue'
 
   const appVersion = ref('')
+  const buildDate = ref('')
 
   onMounted(async () => {
     appVersion.value = await getVersion()
+    buildDate.value = await invoke('get_build_date_command')
   })
 
   const openFeedbackLink = () => {

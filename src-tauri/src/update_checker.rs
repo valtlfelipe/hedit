@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use tauri::{AppHandle, Emitter};
+use tauri_plugin_store::StoreBuilder;
 use tokio::time::sleep;
 
 // TODO: consider using https://hedit.app/api/latest-release
@@ -91,6 +92,32 @@ async fn check_for_updates(app: AppHandle) -> Result<(), Box<dyn std::error::Err
 
 /// Background task that checks for updates on launch and every 24 hours
 pub async fn check_updates_periodically(app: AppHandle) {
+    // Disable update checking if license status is PRO_EXPIRED
+    const STORE_FILENAME: &str = "settings.json";
+    const STORE_KEY_LICENSE_TYPE: &str = "licenseType";
+    const LICENSE_TYPE_PRO_EXPIRED: &str = "PRO_EXPIRED";
+
+    let store = match StoreBuilder::new(&app, STORE_FILENAME)
+        .disable_auto_save()
+        .build()
+    {
+        Ok(store) => store,
+        Err(e) => {
+            eprintln!("Failed to create store: {}", e);
+            return;
+        }
+    };
+
+    let license_type = store
+        .get(STORE_KEY_LICENSE_TYPE)
+        .and_then(|v| v.as_str().map(|s| s.to_string()))
+        .unwrap_or_default();
+
+    if license_type == LICENSE_TYPE_PRO_EXPIRED {
+        println!("Update checking disabled: license is PRO_EXPIRED");
+        return;
+    }
+
     sleep(Duration::from_secs(5)).await; // slight delay to ensure frontend is ready
 
     // Initial check on app launch

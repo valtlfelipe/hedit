@@ -13,8 +13,9 @@ export const settingsStore = reactive({
   isDarkTheme: false,
   license: '',
   activationId: '',
-  personalUseOnly: false,
-  isActivated: false,
+  licenseType: 'FREE', // FREE, PRO_ACTIVE, PRO_EXPIRED
+  updateExpirationDate: '',
+  hasCompletedOnboarding: false,
   autoUpdateHostsEnabled: false,
   autoUpdateHostsInterval: 24, // hours
   quitOnClose: false,
@@ -25,8 +26,9 @@ export const settingsStore = reactive({
     this.isDarkTheme = !savedTheme ? preferredTheme : savedTheme === 'dark'
     this.license = (await store.get<string>('license')) || ''
     this.activationId = (await store.get<string>('activationId')) || ''
-    this.personalUseOnly = (await store.get<boolean>('personalUseOnly')) || false
-    this.isActivated = (await store.get<boolean>('isActivated')) || false
+    this.licenseType = (await store.get<string>('licenseType')) || 'FREE'
+    this.updateExpirationDate = (await store.get<string>('updateExpirationDate')) || ''
+    this.hasCompletedOnboarding = (await store.get<boolean>('hasCompletedOnboarding')) || false
     this.autoUpdateHostsEnabled = (await store.get<boolean>('autoUpdateHostsEnabled')) || false
     this.autoUpdateHostsInterval = (await store.get<number>('autoUpdateHostsInterval')) || 24
     this.quitOnClose = (await store.get<boolean>('quitOnClose')) || false
@@ -36,8 +38,8 @@ export const settingsStore = reactive({
     this.isDarkTheme = isDark
     this.save()
   },
-  setPersonalUseOnly(personalUseOnly: boolean) {
-    this.personalUseOnly = personalUseOnly
+  setHasCompletedOnboarding(completed: boolean) {
+    this.hasCompletedOnboarding = completed
     this.save()
   },
   setAutoUpdateHosts(enabled: boolean, interval: number) {
@@ -53,12 +55,17 @@ export const settingsStore = reactive({
     this.autoStart = autoStart
     this.save()
   },
+  setLicenseType(licenseType: string) {
+    this.licenseType = licenseType
+    this.save()
+  },
   async save() {
     await store.set('theme', this.isDarkTheme ? 'dark' : 'light')
     await store.set('license', this.license)
     await store.set('activationId', this.activationId)
-    await store.set('personalUseOnly', this.personalUseOnly)
-    await store.set('isActivated', this.isActivated)
+    await store.set('licenseType', this.licenseType)
+    await store.set('updateExpirationDate', this.updateExpirationDate)
+    await store.set('hasCompletedOnboarding', this.hasCompletedOnboarding)
     await store.set('autoUpdateHostsEnabled', this.autoUpdateHostsEnabled)
     await store.set('autoUpdateHostsInterval', this.autoUpdateHostsInterval)
     await store.set('quitOnClose', this.quitOnClose)
