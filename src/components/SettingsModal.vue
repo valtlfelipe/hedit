@@ -52,9 +52,7 @@
               <AutoSyncSettingsTab v-if="activeTab === 'auto-sync'"/>
 
               <!-- License Settings -->
-              <LicenseSettingsTab
-                v-if="activeTab === 'license'"
-              />
+              <LicenseSettingsTab v-if="activeTab === 'license'"/>
 
               <!-- About -->
               <AboutSettingsTab v-if="activeTab === 'about'"/>
@@ -67,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted } from 'vue'
+  import { ref, watch, onMounted, onUnmounted } from 'vue'
   import { X, Info, Settings as SettingsIcon, KeyRound, RefreshCw } from 'lucide-vue-next'
   import GeneralSettingsTab from './settings/GeneralSettingsTab.vue'
   import AutoSyncSettingsTab from './settings/AutoSyncSettingsTab.vue'
@@ -76,6 +74,7 @@
 
   const props = defineProps<{
     show: boolean
+    initialTab?: string
   }>()
 
   const emit = defineEmits<{
@@ -89,7 +88,17 @@
     { id: 'about', name: 'About', icon: Info },
   ]
 
-  const activeTab = ref('general')
+  const activeTab = ref(props.initialTab || 'general')
+
+  // Reset to initial tab when modal opens
+  watch(
+    () => props.show,
+    (newShow) => {
+      if (newShow) {
+        activeTab.value = props.initialTab || 'general'
+      }
+    },
+  )
 
   const close = () => {
     emit('close')

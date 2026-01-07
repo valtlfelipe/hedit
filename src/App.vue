@@ -10,11 +10,13 @@
     <div class="flex flex-col h-full flex-1 min-h-0">
       <Toolbar
         :allow-activate="!selectedFile?.isActive"
+        :license-type="settingsStore.licenseType"
         @create-local-file="() => handleCreateFile()"
         @create-remote-file="() => handleCreateFile({ remote: true })"
         @save-file="() => handleSaveFile()"
         @activate-file="handleActivateFile"
         @open-settings-modal="showSettingsModal = true"
+        @open-settings-modal-with-tab="handleOpenSettingsModalWithTab"
       />
 
       <div class="flex flex-1 min-h-0 h-full">
@@ -50,7 +52,11 @@
       :message="upgradePromptMessage"
       @close="showUpgradePromptModal = false"
     />
-    <SettingsModal :show="showSettingsModal" @close="showSettingsModal = false"/>
+    <SettingsModal
+      :show="showSettingsModal"
+      :initial-tab="settingsModalInitialTab"
+      @close="showSettingsModal = false"
+    />
   </AppWindow>
 </template>
 
@@ -79,6 +85,7 @@
 
   const title = ref('Hedit')
   const showSettingsModal = ref(false)
+  const settingsModalInitialTab = ref<string | undefined>(undefined)
   const showWelcomeModal = ref(false)
   const showUpgradePromptModal = ref(false)
   const upgradePromptMessage = ref('')
@@ -131,6 +138,11 @@
 
   const handleActivateFile = (id?: string) => {
     fileOperations.handleActivateFile(id)
+  }
+
+  const handleOpenSettingsModalWithTab = (tab: string) => {
+    settingsModalInitialTab.value = tab
+    showSettingsModal.value = true
   }
 
   // Initialize event listeners and watchers
