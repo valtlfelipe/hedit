@@ -20,6 +20,7 @@ strip = true # Ensures debug symbols are removed.
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
+chrono = "0.4"
 
 [dependencies]
 tauri = { version = "2", features = ["macos-private-api", "tray-icon", "image-png"] }

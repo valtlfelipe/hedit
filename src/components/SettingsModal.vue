@@ -54,7 +54,6 @@
               <!-- License Settings -->
               <LicenseSettingsTab
                 v-if="activeTab === 'license'"
-                @showLicenseModal="openLicenseModal"
               />
 
               <!-- About -->
@@ -81,7 +80,6 @@
 
   const emit = defineEmits<{
     close: []
-    showLicenseModal: []
   }>()
 
   const tabs = [
@@ -95,11 +93,6 @@
 
   const close = () => {
     emit('close')
-  }
-
-  const openLicenseModal = () => {
-    close()
-    emit('showLicenseModal')
   }
 
   const handleKeydown = (event: KeyboardEvent) => {

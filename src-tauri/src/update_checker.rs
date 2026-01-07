@@ -3,6 +3,8 @@ use std::time::Duration;
 use tauri::{AppHandle, Emitter};
 use tokio::time::sleep;
 
+// TODO: disable if license status is PRO_EXPIRED
+
 // TODO: consider using https://hedit.app/api/latest-release
 const GITHUB_API_URL: &str = "https://api.github.com/repos/valtlfelipe/hedit/releases/latest";
 const CHECK_INTERVAL: Duration = Duration::from_secs(24 * 60 * 60); // 24 hours

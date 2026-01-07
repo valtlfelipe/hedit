@@ -100,14 +100,6 @@
               <div class="border-t border-gray-200 dark:border-zinc-700 my-1"></div>
               <li
                 class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out"
-                @click="openLicenseModal"
-              >
-                <KeyRound class="w-4 h-4"/>
-                <span>Activate License</span>
-              </li>
-              <div class="border-t border-gray-200 dark:border-zinc-700 my-1"></div>
-              <li
-                class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out"
                 @click="openFeedbackLink"
               >
                 <MessageSquare class="w-4 h-4"/>
@@ -128,7 +120,6 @@
   import {
     ChevronDown,
     Download,
-    KeyRound,
     MessageSquare,
     Play,
     Plus,
@@ -158,7 +149,6 @@
     createRemoteFile: []
     saveFile: []
     activateFile: []
-    showLicenseModal: []
     openSettingsModal: []
   }>()
 
@@ -201,11 +191,6 @@
     document.removeEventListener('click', handleClickOutside)
     window.removeEventListener('keydown', handleKeydown)
   })
-
-  const openLicenseModal = () => {
-    showSettings.value = false
-    emit('showLicenseModal')
-  }
 
   const openFeedbackLink = () => {
     openUrl('https://github.com/valtlfelipe/hedit/issues/new/choose')
