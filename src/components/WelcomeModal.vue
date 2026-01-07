@@ -87,7 +87,6 @@
 
   const upgradeToPro = () => {
     settingsStore.setHasCompletedOnboarding(true)
-    settingsStore.setLicenseType('FREE')
     openUrl('https://hedit.app/pricing?ref=welcome_modal')
     emit('close')
   }

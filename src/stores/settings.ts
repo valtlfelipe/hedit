@@ -59,10 +59,6 @@ export const settingsStore = reactive({
     this.licenseType = licenseType
     this.save()
   },
-  setUpdateExpirationDate(date: string) {
-    this.updateExpirationDate = date
-    this.save()
-  },
   async save() {
     await store.set('theme', this.isDarkTheme ? 'dark' : 'light')
     await store.set('license', this.license)
