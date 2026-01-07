@@ -110,17 +110,20 @@
   }
 
   const handleCreateFile = async ({ remote = false, fileName = '', remoteUrl = '' } = {}) => {
-    if (remote && !fileName && !remoteUrl) {
-      // Open remote file modal instead of creating directly
-      sidebarRef.value?.showRemoteFileModal()
-      return
-    }
-
     // Check if user is in Free mode and trying to create a second file
-    if (settingsStore.licenseType === 'FREE' && hostsStore.files.length >= 1) {
+    if (
+      (!settingsStore.licenseType || settingsStore.licenseType === 'FREE') &&
+      hostsStore.files.length >= 1
+    ) {
       upgradePromptMessage.value =
         'Upgrade to Pro to create unlimited hosts files. You can currently only use 1 file in Free mode.'
       showUpgradePromptModal.value = true
+      return
+    }
+
+    if (remote && !fileName && !remoteUrl) {
+      // Open remote file modal instead of creating directly
+      sidebarRef.value?.showRemoteFileModal()
       return
     }
 
