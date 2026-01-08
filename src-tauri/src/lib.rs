@@ -190,6 +190,7 @@ pub fn run() {
             remote_hosts::fetch_remote_hosts_file,
             sync_remote_hosts::trigger_manual_sync,
             telemetry::send_telemetry_event,
+            update_checker::check_for_updates_manual,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
