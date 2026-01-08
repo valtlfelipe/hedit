@@ -1,3 +1,4 @@
+use chrono::{DateTime, NaiveDate, Utc};
 use tauri::{command, AppHandle, Emitter};
 use tauri_plugin_http::reqwest;
 use tauri_plugin_store::StoreBuilder;
@@ -131,44 +132,61 @@ fn update_valid_until(app_handle: &AppHandle, valid_until: &str) -> Result<(), S
     Ok(())
 }
 
-/// Handle an inactive license response
-fn handle_inactive_license(
-    app_handle: &AppHandle,
-    check_response: &CheckResponse,
-    build_date: &str,
-) {
-    let valid_until = check_response.valid_until.as_deref();
+/// Compare build date with valid_until date
+///
+/// Returns:
+/// - Some(true) if build_date > valid_until (build is newer than license allows)
+/// - Some(false) if build_date <= valid_until (build is valid for license)
+/// - None if date parsing failed
+fn compare_build_date_with_license(build_date: &str, valid_until: &str) -> Option<bool> {
+    // Try to parse the valid_until date (ISO 8601 format)
+    let valid_until_parsed = DateTime::parse_from_rfc3339(valid_until)
+        .map(|dt| dt.with_timezone(&Utc))
+        .ok();
 
-    match valid_until {
-        Some(date) if date < build_date => {
+    // Try to parse the build date (YYYY-MM-DD format)
+    let build_date_parsed = NaiveDate::parse_from_str(build_date, "%Y-%m-%d")
+        .map(|nd| nd.and_hms_opt(0, 0, 0).unwrap_or_default().and_utc())
+        .ok();
+
+    match (valid_until_parsed, build_date_parsed) {
+        (Some(valid_until_dt), Some(build_date_dt)) => Some(build_date_dt > valid_until_dt),
+        _ => {
+            // Failed to parse dates
+            None
+        }
+    }
+}
+
+/// Handle an inactive license response
+fn handle_inactive_license(app_handle: &AppHandle, check_response: &CheckResponse) {
+    let build_date = get_build_date();
+    let Some(date) = check_response.valid_until.as_deref() else {
+        // No validUntil date provided, treat as invalid
+        eprintln!("License is invalid (no validUntil date)");
+        let _ = update_license_type(app_handle, LicenseType::Free);
+        let _ = app_handle.emit(EVENT_LICENSE_UPDATE, "invalid");
+        return;
+    };
+
+    match compare_build_date_with_license(&build_date, date) {
+        Some(true) => {
             // License has expired and build date is after validUntil
             eprintln!("License is not valid for this build");
-            if let Err(e) = update_license_type(app_handle, LicenseType::Free) {
-                eprintln!("{}", e);
-            }
-            if let Err(e) = app_handle.emit(EVENT_LICENSE_UPDATE, "wrong-build") {
-                eprintln!("Failed to emit license-invalid event: {}", e);
-            }
+            let _ = update_license_type(app_handle, LicenseType::Free);
+            let _ = app_handle.emit(EVENT_LICENSE_UPDATE, "wrong-build");
         }
-        Some(_) => {
+        Some(false) => {
             // License is still valid but expired
             eprintln!("License is expired");
-            if let Err(e) = update_license_type(app_handle, LicenseType::ProExpired) {
-                eprintln!("{}", e);
-            }
-            if let Err(e) = app_handle.emit(EVENT_LICENSE_UPDATE, "expired") {
-                eprintln!("Failed to emit license-invalid event: {}", e);
-            }
+            let _ = update_license_type(app_handle, LicenseType::ProExpired);
+            let _ = app_handle.emit(EVENT_LICENSE_UPDATE, "expired");
         }
         None => {
-            // No validUntil date provided, treat as invalid
-            eprintln!("License is invalid (no validUntil date)");
-            if let Err(e) = update_license_type(app_handle, LicenseType::Free) {
-                eprintln!("{}", e);
-            }
-            if let Err(e) = app_handle.emit(EVENT_LICENSE_UPDATE, "invalid") {
-                eprintln!("Failed to emit license-invalid event: {}", e);
-            }
+            // Failed to parse dates, treat as invalid
+            eprintln!("Failed to parse dates, treating license as invalid");
+            let _ = update_license_type(app_handle, LicenseType::Free);
+            let _ = app_handle.emit(EVENT_LICENSE_UPDATE, "invalid");
         }
     }
 }
@@ -342,8 +360,7 @@ pub async fn check_license(app_handle: AppHandle) {
     if !check_response.is_active {
         // Even if license is invalid, don't block usage - just show a warning
         // The app will continue to work in PRO_EXPIRED mode
-        let build_date = get_build_date();
-        handle_inactive_license(&app_handle, &check_response, &build_date);
+        handle_inactive_license(&app_handle, &check_response);
     }
 }
 
