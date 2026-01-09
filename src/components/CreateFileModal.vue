@@ -8,7 +8,7 @@
     >
       <transition name="slide-up">
         <div v-if="show" class="w-full max-w-md p-6 bg-white rounded-lg shadow-xl dark:bg-zinc-800">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Create Remote File</h2>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Create New File</h2>
           <div class="mt-4">
             <label
               for="filename"
@@ -26,6 +26,20 @@
             >
           </div>
           <div class="mt-4">
+            <div class="flex items-center justify-between">
+              <label
+                for="remote-toggle"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Remote File
+              </label>
+              <Switch id="remote-toggle" v-model="isRemote"/>
+            </div>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              {{ isRemote ? 'Fetch file content from a remote URL' : 'Create a local file' }}
+            </p>
+          </div>
+          <div v-if="isRemote" class="mt-4">
             <label for="url" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Remote URL
             </label>
@@ -57,7 +71,7 @@
             </button>
             <button
               class="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              :disabled="!fileName.trim() || !isValidUrl || isLoading"
+              :disabled="!fileName.trim() || (isRemote && !isValidUrl) || isLoading"
               @click="create"
             >
               <span v-if="isLoading" class="flex items-center">
@@ -93,10 +107,10 @@
 </template>
 
 <script setup lang="ts">
-  import { invoke } from '@tauri-apps/api/core'
-  import { BaseDirectory, exists, mkdir, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
   import { computed, nextTick, ref, watch } from 'vue'
-  import { HostsFileType, hostsStore } from '../stores/files'
+  import { useFileOperations } from '../composables/useFileOperations'
+  import { useTelemetry } from '../composables/useTelemetry'
+  import Switch from './Switch.vue'
 
   const props = defineProps<{
     show: boolean
@@ -105,11 +119,17 @@
   const emit = defineEmits<{
     close: []
     created: [fileId: string]
+    showUpgradePrompt: [message: string]
   }>()
 
+  const { trackEvent } = useTelemetry()
+  const { handleCreateFile } = useFileOperations()
+
   const filenameInput = ref<HTMLInputElement | null>(null)
+  const urlInput = ref<HTMLInputElement | null>(null)
 
   const fileName = ref('')
+  const isRemote = ref(false)
   const remoteUrl = ref('')
   const isLoading = ref(false)
   const error = ref('')
@@ -128,7 +148,8 @@
     () => props.show,
     (show) => {
       if (show) {
-        fileName.value = 'New Remote File'
+        fileName.value = 'New File'
+        isRemote.value = false
         remoteUrl.value = ''
         isLoading.value = false
         error.value = ''
@@ -139,8 +160,16 @@
     },
   )
 
+  watch(isRemote, (newValue) => {
+    if (newValue) {
+      nextTick(() => {
+        urlInput.value?.focus()
+      })
+    }
+  })
+
   async function create() {
-    if (!fileName.value.trim() || !isValidUrl.value || isLoading.value) {
+    if (!fileName.value.trim() || (isRemote.value && !isValidUrl.value) || isLoading.value) {
       return
     }
 
@@ -148,52 +177,20 @@
     error.value = ''
 
     try {
-      const id = crypto.randomUUID()
-      const fileNameTrimmed = fileName.value.trim()
-      const remoteUrlTrimmed = remoteUrl.value.trim()
+      trackEvent(`create_${isRemote.value ? 'remote' : 'local'}_file`)
 
-      // Ensure files directory exists
-      const dirExists = await exists('files', {
-        baseDir: BaseDirectory.AppData,
+      const id = await handleCreateFile({
+        remote: isRemote.value,
+        fileName: fileName.value.trim(),
+        remoteUrl: remoteUrl.value.trim(),
       })
 
-      if (!dirExists) {
-        await mkdir('files', { baseDir: BaseDirectory.AppData })
+      if (id) {
+        emit('created', id)
+        emit('close')
       }
-
-      // Create empty file first
-      await writeTextFile(`files/${id}.hosts`, '', {
-        baseDir: BaseDirectory.AppData,
-      })
-
-      // Fetch remote content
-      await invoke('fetch_remote_hosts_file', { url: remoteUrlTrimmed, fileName: `${id}.hosts` })
-
-      // Read the fetched content
-      const content = await readTextFile(`files/${id}.hosts`, {
-        baseDir: BaseDirectory.AppData,
-      })
-
-      // Create file object and add to store
-      const file = {
-        id,
-        name: fileNameTrimmed,
-        isActive: false,
-        isSelected: false,
-        type: HostsFileType.REMOTE,
-        remoteUrl: remoteUrlTrimmed,
-        isCombo: false,
-        content,
-        status: 'loaded',
-      }
-
-      hostsStore.files = [...hostsStore.files, file]
-      hostsStore.saveMetadata()
-
-      emit('created', id)
-      emit('close')
     } catch (err) {
-      console.error('Error creating remote file:', err)
+      console.error('Error creating file:', err)
 
       // Provide more user-friendly error messages
       if (err instanceof Error) {

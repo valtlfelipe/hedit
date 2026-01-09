@@ -72,8 +72,7 @@
         v-if="contextMenu.show"
         :x="contextMenu.x"
         :y="contextMenu.y"
-        @create-local="createFile"
-        @create-remote="showRemoteFileModal"
+        @create-file="showCreateFileModal"
       />
     </div>
     <EditFileModal
@@ -89,11 +88,6 @@
       @close="hideConfirmModal"
       @confirm="confirmDelete"
     />
-    <RemoteFileModal
-      :show="remoteFileModal.show"
-      @close="hideRemoteFileModal"
-      @created="handleRemoteFileCreated"
-    />
   </div>
 </template>
 
@@ -106,7 +100,6 @@
   import ConfirmModal from './ConfirmModal.vue'
   import FileContextMenu from './FileContextMenu.vue'
   import EditFileModal from './EditFileModal.vue'
-  import RemoteFileModal from './RemoteFileModal.vue'
   import Tooltip from './Tooltip.vue'
   import SidebarContextMenu from './SidebarContextMenu.vue'
 
@@ -120,7 +113,7 @@
   const emit = defineEmits<{
     fileSelect: [fileId: string]
     activateFile: [fileId: string]
-    createFile: [{ remote?: boolean; fileName?: string; remoteUrl?: string }]
+    createFile: []
   }>()
 
   const { handleDeleteFile, handleRenameFile, handleRefreshFile } = useFileOperations()
@@ -154,10 +147,6 @@
     fileId: '',
   })
 
-  const remoteFileModal = reactive({
-    show: false,
-  })
-
   const refreshingFiles = reactive(new Set<string>())
 
   function activateFile() {
@@ -166,8 +155,8 @@
     hideContextMenu()
   }
 
-  function createFile({ remote = false } = {}) {
-    emit('createFile', { remote })
+  function showCreateFileModal() {
+    emit('createFile')
     hideContextMenu()
   }
 
@@ -227,23 +216,9 @@
     hideEditModal()
   }
 
-  function showRemoteFileModal() {
-    remoteFileModal.show = true
-    hideContextMenu()
-  }
-
   defineExpose({
-    showRemoteFileModal,
+    showCreateFileModal,
   })
-
-  function hideRemoteFileModal() {
-    remoteFileModal.show = false
-  }
-
-  function handleRemoteFileCreated(fileId: string) {
-    emit('fileSelect', fileId)
-    hideRemoteFileModal()
-  }
 
   async function refreshFile() {
     if (!fileContextMenu.file) return
@@ -302,7 +277,6 @@
       hideContextMenu()
       hideEditModal()
       hideConfirmModal()
-      hideRemoteFileModal()
     }
   }
 

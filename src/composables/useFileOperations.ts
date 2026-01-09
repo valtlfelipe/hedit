@@ -16,16 +16,9 @@ export function useFileOperations() {
   }
 
   const handleCreateFile = async ({ remote = false, fileName = '', remoteUrl = '' } = {}) => {
-    try {
-      const name = fileName || `New ${remote ? 'Remote' : 'Local'} File ${hostsStore.files.length}`
-      const id = await hostsStore.create(name, '', false, remote, remoteUrl)
-      return id
-    } catch (error) {
-      console.error('Error creating file:', error)
-      toast.error(`Error creating file`, {
-        description: error instanceof Error ? error.message : String(error),
-      })
-    }
+    const name = fileName || `New ${remote ? 'Remote' : 'Local'} File ${hostsStore.files.length}`
+    const id = await hostsStore.create(name, '', false, remote, remoteUrl)
+    return id
   }
 
   const handleSaveFile = async (hasErrors: boolean) => {
