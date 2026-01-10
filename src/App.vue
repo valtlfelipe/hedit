@@ -11,8 +11,7 @@
       <Toolbar
         :allow-activate="!selectedFile?.isActive"
         :license-type="settingsStore.licenseType"
-        @create-local-file="() => handleCreateFile()"
-        @create-remote-file="() => handleCreateFile({ remote: true })"
+        @create-file="handleCreateFile"
         @save-file="() => handleSaveFile()"
         @activate-file="handleActivateFile"
         @open-settings-modal="showSettingsModal = true"
@@ -21,7 +20,6 @@
 
       <div class="flex flex-1 min-h-0 h-full">
         <Sidebar
-          ref="sidebarRef"
           :files="hostsStore.files"
           :status="selectedFile?.status || ''"
           @file-select="handleFileSelect"
@@ -57,6 +55,12 @@
       :initial-tab="settingsModalInitialTab"
       @close="showSettingsModal = false"
     />
+    <CreateFileModal
+      :show="showCreateFileModal"
+      @close="showCreateFileModal = false"
+      @created="handleFileCreated"
+      @show-upgrade-prompt="showUpgradePrompt"
+    />
   </AppWindow>
 </template>
 
@@ -70,18 +74,17 @@
   import LoadingSpinner from './components/LoadingSpinner.vue'
   import Sidebar from './components/Sidebar.vue'
   import Toolbar from './components/Toolbar.vue'
+  import CreateFileModal from './components/CreateFileModal.vue'
 
   import { useFileOperations } from './composables/useFileOperations'
   import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts'
-  import { useTelemetry } from './composables/useTelemetry'
   import { useTheme } from './composables/useTheme'
+  import { useTelemetry } from './composables/useTelemetry'
   import { hostsStore } from './stores/files'
   import { settingsStore } from './stores/settings'
   import { Toaster } from 'vue-sonner'
 
   const MonacoEditor = defineAsyncComponent(() => import('./components/MonacoEditor.vue'))
-
-  const { trackEvent } = useTelemetry()
 
   const title = ref('Hedit')
   const showSettingsModal = ref(false)
@@ -90,11 +93,12 @@
   const showUpgradePromptModal = ref(false)
   const upgradePromptMessage = ref('')
   const isContentValid = ref(true)
-  const sidebarRef = ref()
+  const showCreateFileModal = ref(false)
 
   // Initialize composables
   const fileOperations = useFileOperations()
   const { initializeTheme } = useTheme()
+  const { trackEvent } = useTelemetry()
 
   const { selectedFile, handleReloadContent, setFileStatus } = fileOperations
 
@@ -104,35 +108,34 @@
     isContentValid.value = isValid
   }
 
-  // Enhanced handlers with additional logic
   const handleFileSelect = (fileId: string) => {
     fileOperations.handleFileSelect(fileId)
   }
 
-  const handleCreateFile = async ({ remote = false, fileName = '', remoteUrl = '' } = {}) => {
+  const handleCreateFile = () => {
     // Check if user is in Free mode and trying to create a second file
     if (
       (!settingsStore.licenseType || settingsStore.licenseType === 'FREE') &&
       hostsStore.files.length >= 1
     ) {
-      upgradePromptMessage.value =
-        'Upgrade to Pro to create unlimited hosts files. You can currently only use 1 file in Free mode.'
-      showUpgradePromptModal.value = true
+      showUpgradePrompt(
+        'Upgrade to Pro to create unlimited hosts files. You can currently only use 1 file in Free mode.',
+      )
       return
     }
 
-    if (remote && !fileName && !remoteUrl) {
-      // Open remote file modal instead of creating directly
-      sidebarRef.value?.showRemoteFileModal()
-      return
-    }
+    showCreateFileModal.value = true
+  }
 
-    trackEvent(`create_${remote ? 'remote' : 'local'}_file`)
+  const handleFileCreated = (fileId: string) => {
+    handleFileSelect(fileId)
+    showCreateFileModal.value = false
+  }
 
-    const id = await fileOperations.handleCreateFile({ remote, fileName, remoteUrl })
-    if (id) {
-      handleFileSelect(id)
-    }
+  const showUpgradePrompt = (message: string) => {
+    upgradePromptMessage.value = message
+    showUpgradePromptModal.value = true
+    trackEvent('show_upgrade_prompt')
   }
 
   const handleSaveFile = () => {
@@ -162,13 +165,13 @@
   listen('license-update', async (event) => {
     const type = event.payload as string
     if (type === 'wrong-build') {
-      showUpgradePromptModal.value = true
-      upgradePromptMessage.value =
-        'Your license is not valid for this build of Hedit. You can continue using Hedit in Free mode.'
+      showUpgradePrompt(
+        'Your license is not valid for this build of Hedit. You can continue using Hedit in Free mode.',
+      )
     } else if (type === 'expired') {
-      showUpgradePromptModal.value = true
-      upgradePromptMessage.value =
-        'Your Pro license has expired. You can continue using Hedit normally, but you will not receive updates until you renew your license.'
+      showUpgradePrompt(
+        'Your Pro license has expired. You can continue using Hedit normally, but you will not receive updates until you renew your license.',
+      )
     } else if (type === 'invalid') {
       title.value = 'Hedit (License Invalid)'
     }
@@ -229,6 +232,7 @@
       showSettingsModal.value = false
       showUpgradePromptModal.value = false
       showWelcomeModal.value = false
+      showCreateFileModal.value = false
     }
   }
 

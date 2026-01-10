@@ -8,17 +8,10 @@
       <ul class="p-1 text-sm text-gray-800 dark:text-gray-200">
         <li
           class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
-          @click.prevent="$emit('createLocal')"
+          @click.prevent="$emit('createFile')"
         >
-          <File class="w-4 h-4 "/>
-          <span>New Local File...</span>
-        </li>
-        <li
-          class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
-          @click.prevent="$emit('createRemote')"
-        >
-          <Globe class="w-4 h-4 "/>
-          <span>New Remote File...</span>
+          <Plus class="w-4 h-4 "/>
+          <span>New File...</span>
         </li>
       </ul>
     </div>
@@ -26,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-  import { File, Globe } from 'lucide-vue-next'
+  import { Plus } from 'lucide-vue-next'
 
   defineProps<{
     x: number
@@ -34,8 +27,7 @@
   }>()
 
   defineEmits<{
-    createLocal: []
-    createRemote: []
+    createFile: []
   }>()
 </script>
 

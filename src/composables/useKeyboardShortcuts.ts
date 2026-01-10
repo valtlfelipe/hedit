@@ -4,7 +4,7 @@ import { zoomUtils } from '../utils/zoomUtils'
 import { useZoom } from './useZoom'
 
 export function useKeyboardShortcuts(
-  handleCreateFile: (options?: { remote?: boolean }) => Promise<void>,
+  handleCreateFile: () => void,
   handleSaveFile: () => void,
   handleActivateFile: () => void,
 ) {
@@ -17,9 +17,6 @@ export function useKeyboardShortcuts(
     } else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'n') {
       e.preventDefault()
       handleCreateFile()
-    } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'n') {
-      e.preventDefault()
-      handleCreateFile({ remote: true })
     } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'a') {
       e.preventDefault()
       handleActivateFile()
@@ -41,7 +38,6 @@ export function useKeyboardShortcuts(
 
       // Tauri event listeners
       listen('new_file', async () => handleCreateFile())
-      listen('new_remote_file', async () => handleCreateFile({ remote: true }))
       listen('activate_file', async () => handleActivateFile())
       listen('save_file', async () => handleSaveFile())
       listen('zoom_reset', () => zoomUtils.handleZoomReset())
