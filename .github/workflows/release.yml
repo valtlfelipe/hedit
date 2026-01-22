@@ -72,12 +72,12 @@ jobs:
       - name: verify certificate
         if: matrix.platform == 'macos-latest'
         run: |
-          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application")
+          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Apple Development")
           CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
           echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
           echo "Certificate imported."
 
-      - name: save private key ID to environment
+      - name: save private key to environment
         if: matrix.platform == 'macos-latest'
         run: echo "$APPLE_API_PRIVATE_KEY_ID" >> /tmp/private_key_id.p8
 
