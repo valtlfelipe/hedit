@@ -29,7 +29,7 @@ This application is available on macOS and Linux. Windows support is planned for
 
 These people help make it happen. You can buy a <a href="https://hedit.app/pricing">license</a> or <a href="https://github.com/sponsors/valtlfelipe">become a sponsor</a> to support Hedit. Thanks for your support! 🫶🏻
 <p>
-  <!-- sponsors --><a href="https://github.com/JayBrown"><img src="https:&#x2F;&#x2F;github.com&#x2F;JayBrown.png" width="60px" alt="User avatar: Joss Brown" /></a><!-- sponsors -->
+  <!-- sponsors --><!-- sponsors -->
 </p>
 
 ## ⬇️ Installation & Usage (macOS)
