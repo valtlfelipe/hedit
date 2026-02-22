@@ -1,71 +1,71 @@
 {
-    "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
-    "vcs": {
-        "enabled": false,
-        "clientKind": "git",
-        "useIgnoreFile": true
+  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "includes": ["src/**/*.{js,ts,vue,css,html}"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "useButtonType": "off",
+        "noSvgWithoutTitle": "off"
+      }
     },
-    "files": {
-        "includes": [
-            "src/**/*.{js,ts,vue,css,html}"
-        ]
-    },
+    "domains": {
+      "vue": "recommended"
+    }
+  },
+  "html": {
     "formatter": {
-        "enabled": true,
-        "indentStyle": "space",
-        "indentWidth": 2,
-        "lineWidth": 100
+      "enabled": true,
+      "indentScriptAndStyle": true
+    },
+    "experimentalFullSupportEnabled": true
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "asNeeded"
+    }
+  },
+  "css": {
+    "formatter": {
+      "quoteStyle": "single"
     },
     "linter": {
-        "enabled": true,
+      "enabled": false
+    },
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.vue"],
+      "linter": {
         "rules": {
-            "recommended": true
-        },
-        "domains": {
-            "vue": "recommended"
+          "style": {
+            "useConst": "off",
+            "useImportType": "off"
+          },
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
         }
-    },
-    "html": {
-        "formatter": {
-            "enabled": true,
-            "indentScriptAndStyle": true
-        },
-        "experimentalFullSupportEnabled": true
-    },
-    "javascript": {
-        "formatter": {
-            "quoteStyle": "single",
-            "semicolons": "asNeeded"
-        }
-    },
-    "css": {
-        "formatter": {
-            "quoteStyle": "single"
-        },
-        "linter": {
-            "enabled": false
-        },
-        "parser": {
-            "tailwindDirectives": true
-        }
-    },
-    "overrides": [
-        {
-            "includes": [
-                "**/*.vue"
-            ],
-            "linter": {
-                "rules": {
-                    "style": {
-                        "useConst": "off",
-                        "useImportType": "off"
-                    },
-                    "correctness": {
-                        "noUnusedVariables": "off",
-                        "noUnusedImports": "off"
-                    }
-                }
-            }
-        }
-    ]
+      }
+    }
+  ]
 }
