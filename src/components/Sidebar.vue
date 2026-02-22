@@ -36,7 +36,7 @@
           </Tooltip>
           <span class="text-sm font-medium flex-1 select-none truncate">{{ file.name }}</span>
           <Tooltip v-if="file.isActive" text="Current Active">
-            <Play v-if="file.isActive" class="w-4 h-4 text-primary-700 dark:text-primary-300"/>
+            <Play v-if="file.isActive" class="w-4 h-4 text-primary-700 dark:text-primary-300" />
           </Tooltip>
         </button>
       </div>
@@ -47,7 +47,7 @@
       class="px-3 py-2 border-t border-gray-200 dark:border-zinc-800 bg-gray-100 dark:bg-zinc-900"
     >
       <div class="flex items-center space-x-2">
-        <SquareDot class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+        <SquareDot class="w-4 h-4 text-gray-500 dark:text-gray-400" />
         <span class="text-xs text-gray-600 dark:text-gray-400 font-medium">{{ statusText }}</span>
       </div>
     </div>

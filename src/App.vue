@@ -28,9 +28,7 @@
         />
 
         <Suspense>
-          <template #fallback>
-            <LoadingSpinner class="m-auto"/>
-          </template>
+          <template #fallback> <LoadingSpinner class="m-auto" /> </template>
 
           <MonacoEditor
             v-if="selectedFile?.content || selectedFile?.content === ''"
@@ -40,11 +38,11 @@
             :is-dark-theme="settingsStore.isDarkTheme"
             @validation-status="handleValidationStatus"
           />
-          <LoadingSpinner v-else class="m-auto"/>
+          <LoadingSpinner v-else class="m-auto" />
         </Suspense>
       </div>
     </div>
-    <WelcomeModal :show="showWelcomeModal" @close="showWelcomeModal = false"/>
+    <WelcomeModal :show="showWelcomeModal" @close="showWelcomeModal = false" />
     <UpgradePromptModal
       :show="showUpgradePromptModal"
       :message="upgradePromptMessage"

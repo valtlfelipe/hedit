@@ -19,7 +19,7 @@
               class="p-1 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-200 dark:hover:bg-zinc-700"
               @click="close"
             >
-              <X class="w-5 h-5"/>
+              <X class="w-5 h-5" />
             </button>
           </div>
 
@@ -37,7 +37,7 @@
                   'bg-primary-500/10 text-primary-700 dark:bg-primary-500/20 dark:text-primary-300': activeTab === tab.id
                 }"
                 >
-                  <component :is="tab.icon" class="w-4 h-4"/>
+                  <component :is="tab.icon" class="w-4 h-4" />
                   <span>{{ tab.name }}</span>
                 </button>
               </nav>
@@ -46,16 +46,16 @@
             <!-- Tab Content -->
             <div class="flex-1 overflow-y-auto p-4">
               <!-- General Settings -->
-              <GeneralSettingsTab v-if="activeTab === 'general'"/>
+              <GeneralSettingsTab v-if="activeTab === 'general'" />
 
               <!-- Auto Sync Settings -->
-              <AutoSyncSettingsTab v-if="activeTab === 'auto-sync'"/>
+              <AutoSyncSettingsTab v-if="activeTab === 'auto-sync'" />
 
               <!-- License Settings -->
-              <LicenseSettingsTab v-if="activeTab === 'license'"/>
+              <LicenseSettingsTab v-if="activeTab === 'license'" />
 
               <!-- About -->
-              <AboutSettingsTab v-if="activeTab === 'about'"/>
+              <AboutSettingsTab v-if="activeTab === 'about'" />
             </div>
           </div>
         </div>

@@ -33,7 +33,7 @@
               >
                 Remote File
               </label>
-              <Switch id="remote-toggle" v-model="isRemote"/>
+              <Switch id="remote-toggle" v-model="isRemote" />
             </div>
             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
               {{ isRemote ? 'Fetch file content from a remote URL' : 'Create a local file' }}
