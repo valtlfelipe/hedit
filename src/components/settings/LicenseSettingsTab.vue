@@ -6,7 +6,7 @@
       <div v-if="settingsStore.licenseType === 'FREE'" class="mb-4">
         <div class="flex items-start gap-2">
           <div class="flex-shrink-0">
-            <Info class="w-5 h-5 text-blue-500 dark:text-blue-400 mt-0.5"/>
+            <Info class="w-5 h-5 text-blue-500 dark:text-blue-400 mt-0.5" />
           </div>
           <div>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
@@ -22,7 +22,7 @@
       <div v-if="settingsStore.licenseType === 'PRO_ACTIVE'" class="mb-4">
         <div class="flex items-start gap-2">
           <div class="flex-shrink-0">
-            <CheckCircle2 class="w-5 h-5 text-green-500 dark:text-green-400 mt-0.5"/>
+            <CheckCircle2 class="w-5 h-5 text-green-500 dark:text-green-400 mt-0.5" />
           </div>
           <div>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
@@ -35,7 +35,7 @@
       <div v-if="settingsStore.licenseType === 'PRO_EXPIRED'" class="mb-4">
         <div class="flex items-start gap-2">
           <div class="flex-shrink-0">
-            <AlertTriangle class="w-5 h-5 text-yellow-500 dark:text-yellow-400 mt-0.5"/>
+            <AlertTriangle class="w-5 h-5 text-yellow-500 dark:text-yellow-400 mt-0.5" />
           </div>
           <div>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
@@ -82,7 +82,7 @@
             v-if="error"
             class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
           >
-            <AlertCircle class="w-4 h-4"/>
+            <AlertCircle class="w-4 h-4" />
             <span>{{ errorText }}</span>
           </div>
         </div>

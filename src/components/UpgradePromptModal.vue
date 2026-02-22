@@ -14,7 +14,7 @@
               class="p-1 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-200 dark:hover:bg-zinc-700"
               @click="emit('close')"
             >
-              <X class="w-5 h-5"/>
+              <X class="w-5 h-5" />
             </button>
           </div>
 

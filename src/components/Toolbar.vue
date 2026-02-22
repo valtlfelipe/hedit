@@ -9,7 +9,7 @@
           class="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
           @click="$emit('createFile')"
         >
-          <Plus class="w-4 h-4"/>
+          <Plus class="w-4 h-4" />
           <span>New File</span>
         </button>
       </Tooltip>
@@ -19,7 +19,7 @@
           class="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
           @click="$emit('saveFile')"
         >
-          <Save class="w-4 h-4 text-gray-600 dark:text-gray-300"/>
+          <Save class="w-4 h-4 text-gray-600 dark:text-gray-300" />
           <span>Save</span>
         </button>
       </Tooltip>
@@ -31,7 +31,7 @@
           :class="{ 'opacity-50 cursor-not-allowed': !allowActivate }"
           @click="$emit('activateFile')"
         >
-          <Play class="w-4 h-4"/>
+          <Play class="w-4 h-4" />
         </button>
       </Tooltip>
 
@@ -44,7 +44,7 @@
           class="p-1.5 hover:bg-gray-300/80 dark:hover:bg-zinc-700/80 rounded-md transition-colors relative"
           @click="openUpdatePage"
         >
-          <Download class="w-4 h-4 text-gray-600 dark:text-gray-200"/>
+          <Download class="w-4 h-4 text-gray-600 dark:text-gray-200" />
           <span class="absolute -top-1 -right-1 w-2 h-2 bg-primary-600 rounded-full"></span>
         </button>
       </Tooltip>
@@ -55,7 +55,7 @@
             class="p-1.5 hover:bg-gray-300/80 dark:hover:bg-zinc-700/80 rounded-md transition-colors"
             @click="showSettings = !showSettings"
           >
-            <Settings class="w-4 h-4 text-gray-600 dark:text-gray-200"/>
+            <Settings class="w-4 h-4 text-gray-600 dark:text-gray-200" />
           </button>
         </Tooltip>
 
@@ -69,7 +69,7 @@
                 class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out"
                 @click="openSettingsModal"
               >
-                <Settings class="w-4 h-4"/>
+                <Settings class="w-4 h-4" />
                 <span>Settings</span>
               </li>
               <li
@@ -77,7 +77,7 @@
                 class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out"
                 @click="openLicenseModal"
               >
-                <KeyRound class="w-4 h-4"/>
+                <KeyRound class="w-4 h-4" />
                 <span>Activate License</span>
               </li>
               <div class="border-t border-gray-200 dark:border-zinc-700 my-1"></div>
@@ -85,7 +85,7 @@
                 class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out"
                 @click="openFeedbackLink"
               >
-                <MessageSquare class="w-4 h-4"/>
+                <MessageSquare class="w-4 h-4" />
                 <span>Feedback</span>
               </li>
             </ul>

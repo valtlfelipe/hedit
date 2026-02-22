@@ -14,7 +14,7 @@
               class="p-1 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-200 dark:hover:bg-zinc-700"
               @click="emit('close')"
             >
-              <X class="w-5 h-5"/>
+              <X class="w-5 h-5" />
             </button>
           </div>
 
@@ -40,7 +40,7 @@
 
             <div class="flex items-start">
               <div class="flex items-center h-5">
-                <Zap class="w-5 h-5 text-primary-600 dark:text-primary-400 mr-3 flex-shrink-0"/>
+                <Zap class="w-5 h-5 text-primary-600 dark:text-primary-400 mr-3 flex-shrink-0" />
               </div>
               <div class="text-sm">
                 <p class="font-medium text-gray-700 dark:text-gray-300">

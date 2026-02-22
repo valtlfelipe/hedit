@@ -44,7 +44,7 @@
             @click="triggerManualSync"
             :disabled="!autoUpdateEnabled || isSyncing"
           >
-            <RefreshCw class="w-4 h-4" :class="{'animate-spin': isSyncing}"/>
+            <RefreshCw class="w-4 h-4" :class="{'animate-spin': isSyncing}" />
             <span>Sync Now</span>
           </button>
         </div>

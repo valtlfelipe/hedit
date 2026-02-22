@@ -37,24 +37,24 @@
           class="w-8 h-8 bg-transparent hover:bg-gray-300 dark:hover:bg-zinc-700 rounded flex items-center justify-center group"
           @click="appWindow.minimize()"
         >
-          <Minus class="w-4 h-4 text-gray-800 dark:text-gray-200"/>
+          <Minus class="w-4 h-4 text-gray-800 dark:text-gray-200" />
         </button>
         <button
           class="w-8 h-8 bg-transparent hover:bg-gray-300 dark:hover:bg-zinc-700 rounded flex items-center justify-center group"
           @click="appWindow.toggleMaximize()"
         >
-          <Square class="w-4 h-4 text-gray-800 dark:text-gray-200"/>
+          <Square class="w-4 h-4 text-gray-800 dark:text-gray-200" />
         </button>
         <button
           class="w-8 h-8 bg-transparent hover:bg-red-500 rounded flex items-center justify-center group"
           @click="appWindow.close()"
         >
-          <X class="w-4 h-4 text-gray-800 dark:text-gray-200 group-hover:text-white"/>
+          <X class="w-4 h-4 text-gray-800 dark:text-gray-200 group-hover:text-white" />
         </button>
       </div>
     </div>
 
-    <slot/>
+    <slot />
   </div>
 </template>
 

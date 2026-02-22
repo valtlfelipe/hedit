@@ -10,7 +10,7 @@
           class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out select-none"
           @click.prevent="$emit('createFile')"
         >
-          <Plus class="w-4 h-4 "/>
+          <Plus class="w-4 h-4 " />
           <span>New File...</span>
         </li>
       </ul>
