@@ -188,6 +188,8 @@ pub fn run() {
             license::activate,
             license::get_build_date_command,
             files::write_file,
+            files::get_hosts_path,
+            files::read_system_hosts,
             remote_hosts::fetch_remote_hosts_file,
             sync_remote_hosts::trigger_manual_sync,
             telemetry::send_telemetry_event,

@@ -31,7 +31,8 @@
       "dmg",
       "deb",
       "appimage",
-      "rpm"
+      "rpm",
+      "nsis"
     ],
     "icon": [
       "icons/32x32.png",

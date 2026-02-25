@@ -28,6 +28,9 @@
           "path": "/etc/hosts"
         },
         {
+          "path": "C:\\Windows\\System32\\drivers\\etc\\hosts"
+        },
+        {
           "path": "$APPDATA/*"
         },
         {

@@ -86,6 +86,10 @@ pub fn get_menu<R: Runtime>(app_handle: &AppHandle<R>) -> tauri::Result<Menu<R>>
         &[
             #[cfg(target_os = "macos")]
             &PredefinedMenuItem::fullscreen(app_handle, None)?,
+            #[cfg(not(target_os = "macos"))]
+            &MenuItemBuilder::with_id("fullscreen".to_string(), "Fullscreen")
+                .accelerator("F11")
+                .build(app_handle)?,
             #[cfg(target_os = "macos")]
             &PredefinedMenuItem::separator(app_handle)?,
             &MenuItemBuilder::with_id("zoom_reset".to_string(), "Reset Zoom")
@@ -193,6 +197,14 @@ pub fn handle_menu_event(app_handle: &tauri::AppHandle, event: &MenuEvent) {
         "zoom_out" => {
             if let Err(e) = app_handle.emit("zoom_out", true) {
                 eprintln!("Failed to emit zoom_out event: {}", e);
+            }
+        }
+        "fullscreen" => {
+            if let Some(window) = app_handle.get_webview_window("main") {
+                let is_fullscreen = window.is_fullscreen().unwrap_or(false);
+                if let Err(e) = window.set_fullscreen(!is_fullscreen) {
+                    eprintln!("Failed to toggle fullscreen: {}", e);
+                }
             }
         }
         "open_feedback" => {

@@ -5,6 +5,38 @@ use tokio::fs;
 
 use tauri::AppHandle;
 
+const WINDOWS_HOSTS_PATH: &str = r"C:\Windows\System32\drivers\etc\hosts";
+const LINUX_HOSTS_PATH: &str = "/etc/hosts";
+const MACOS_HOSTS_PATH: &str = "/etc/hosts";
+
+#[command]
+pub fn get_hosts_path() -> String {
+    let platform = tauri_plugin_os::platform();
+    if platform == "windows" {
+        WINDOWS_HOSTS_PATH.to_string()
+    } else if platform == "linux" {
+        LINUX_HOSTS_PATH.to_string()
+    } else {
+        MACOS_HOSTS_PATH.to_string()
+    }
+}
+
+#[command]
+pub async fn read_system_hosts() -> Result<String, String> {
+    let platform = tauri_plugin_os::platform();
+    let path = if platform == "windows" {
+        WINDOWS_HOSTS_PATH
+    } else if platform == "linux" {
+        LINUX_HOSTS_PATH
+    } else {
+        MACOS_HOSTS_PATH
+    };
+
+    tokio::fs::read_to_string(path)
+        .await
+        .map_err(|e| e.to_string())
+}
+
 #[command]
 pub async fn write_file(
     app_handle: tauri::AppHandle,
@@ -56,27 +88,73 @@ pub async fn write_system_hosts(app_handle: &AppHandle, content: String) -> Resu
     if platform == "linux" {
         return update_hosts_file_sudo(final_content).await;
     } else if platform == "macos" {
-        return update_hosts_file(final_content).await;
+        return update_hosts_file_macos(final_content).await;
+    } else if platform == "windows" {
+        return update_hosts_file_windows(final_content).await;
     } else {
         return Err(format!("Unsupported platform: {}", platform));
     }
 }
 
-pub async fn update_hosts_file(content: String) -> Result<(), String> {
-    std::fs::write("/etc/hosts", &content).map_err(|e| e.to_string())?;
+pub async fn update_hosts_file_macos(content: String) -> Result<(), String> {
+    std::fs::write(MACOS_HOSTS_PATH, &content).map_err(|e| e.to_string())?;
     Ok(())
 }
 
+pub async fn update_hosts_file_windows(content: String) -> Result<(), String> {
+    std::fs::write(WINDOWS_HOSTS_PATH, &content).map_err(|e| {
+        if e.kind() == std::io::ErrorKind::PermissionDenied {
+            return runas_elevation_windows(content);
+        }
+        e.to_string()
+    })?;
+
+    Ok(())
+}
+
+fn runas_elevation_windows(content: String) -> String {
+    let temp_path = std::env::temp_dir().join("hedit_hosts_update");
+    if let Err(e) = std::fs::write(&temp_path, &content) {
+        return format!("Failed to write temp file: {}", e);
+    }
+
+    let temp_path_str = temp_path.to_string_lossy();
+    let hosts_path = WINDOWS_HOSTS_PATH;
+
+    let output = Command::new("powershell")
+        .args([
+            "-Command",
+            &format!(
+                "Start-Process -FilePath 'cmd' -ArgumentList '/c copy /Y \"{}\" \"{}\"' -Verb RunAs -Wait",
+                temp_path_str, hosts_path
+            ),
+        ])
+        .output();
+
+    let _ = std::fs::remove_file(&temp_path);
+
+    match output {
+        Ok(output) => {
+            if output.status.success() {
+                String::new()
+            } else {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                format!("Elevation failed: {} {}", stderr, stdout)
+            }
+        }
+        Err(e) => format!("Failed to run elevation: {}", e),
+    }
+}
+
 pub async fn update_hosts_file_sudo(content: String) -> Result<(), String> {
-    // Write content to temporary file first
     let temp_path = "/tmp/hedit_hosts_update";
     std::fs::write(temp_path, &content).map_err(|e| e.to_string())?;
 
-    // Use pkexec with cp to copy temp file to /etc/hosts
     let output = Command::new("pkexec")
         .arg("cp")
         .arg(temp_path)
-        .arg("/etc/hosts")
+        .arg(LINUX_HOSTS_PATH)
         .output()
         .map_err(|e| e.to_string())?;
 

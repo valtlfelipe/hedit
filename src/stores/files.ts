@@ -4,8 +4,8 @@ import {
   exists,
   mkdir,
   readTextFile,
-  writeTextFile,
   remove,
+  writeTextFile,
 } from '@tauri-apps/plugin-fs'
 import { load } from '@tauri-apps/plugin-store'
 import { reactive } from 'vue'
@@ -132,7 +132,7 @@ export const hostsStore = reactive({
   async init() {
     await this.load()
     if (this.files.length === 0) {
-      const content = await readTextFile('/etc/hosts')
+      const content = await invoke<string>('read_system_hosts')
       await this.create('Original File', content, true)
     }
   },
