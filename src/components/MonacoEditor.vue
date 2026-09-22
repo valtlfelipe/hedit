@@ -6,16 +6,12 @@
 </template>
 
 <script setup lang="ts">
-  // import * as monaco from 'monaco-editor'
   // import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 
-  // @ts-expect-error
-  import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
-  import 'monaco-editor/esm/vs/editor/contrib/comment/browser/comment.js'
-  import 'monaco-editor/esm/vs/editor/contrib/find/browser/findController.js'
-  import 'monaco-editor/esm/vs/editor/contrib/find/browser/findWidget.css'
-  import 'monaco-editor/esm/vs/editor/contrib/hover/browser/hoverContribution.js'
-  import 'monaco-editor/esm/vs/base/browser/ui/codicons/codicon/codicon.css'
+  import * as monaco from 'monaco-editor/editor'
+  import 'monaco-editor/features/comment/register'
+  import 'monaco-editor/features/find/register'
+  import 'monaco-editor/features/hover/register'
 
   import { nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue'
   import LoadingSpinner from './LoadingSpinner.vue'
@@ -143,7 +139,7 @@
             url = new URL(funcParam)
           } catch (e) {}
 
-          if (!url || url.protocol !== 'https:') {
+          if (url?.protocol !== 'https:') {
             const startColumn = lineContent.indexOf(funcParam) + 1
             markers.push({
               message: `Invalid URL in @remote function: ${funcParam}`,

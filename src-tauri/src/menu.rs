@@ -2,8 +2,10 @@ use tauri::menu::{
     AboutMetadata, Menu, MenuEvent, MenuItemBuilder, PredefinedMenuItem, Submenu, HELP_SUBMENU_ID,
     WINDOW_SUBMENU_ID,
 };
+#[cfg(dev)]
+use tauri::Manager;
+use tauri::Runtime;
 use tauri::{AppHandle, Emitter};
-use tauri::{Manager, Runtime};
 use tauri_plugin_opener::OpenerExt;
 
 /// Feedback URL for macOS menu

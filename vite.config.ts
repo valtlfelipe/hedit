@@ -1,13 +1,12 @@
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
-import topLevelAwait from 'vite-plugin-top-level-await'
 
 const host = process.env.TAURI_DEV_HOST
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-  plugins: [vue(), tailwindcss(), topLevelAwait()],
+  plugins: [vue(), tailwindcss()],
 
   optimizeDeps: {
     exclude: ['lucide-vue-next'],

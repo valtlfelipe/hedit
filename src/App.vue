@@ -1,9 +1,9 @@
 <template>
   <Toaster
-    richColors
+    rich-colors
     :theme="settingsStore.isDarkTheme ? 'dark' : 'light'"
-    :closeButton="true"
-    closeButtonPosition="top-right"
+    :close-button="true"
+    close-button-position="top-right"
     :duration="10000"
   />
   <AppWindow title="Hedit">
