@@ -25,6 +25,57 @@ This application is available on macOS and Linux. Windows support is planned for
 *   **Run in background:** Allow Hedit to run in the background (system tray) so Auto Sync can operate continuously.
 *   **Syntax highlighting:** Edit your hosts file with syntax highlighting and validation.
 
+## 📖 Syntax
+
+Hedit supports standard hosts file entries and two directives for combining local and remote files.
+
+### Hosts entries
+
+Each entry must contain a valid IPv4 or IPv6 address followed by one hostname. You can also use blank lines, full-line comments, and inline comments.
+
+```hosts
+# Local development
+127.0.0.1 app.local
+127.0.0.1 api.app.local # Optional inline comment
+::1 ipv6.app.local
+```
+
+Hedit validates entries before activation and rejects invalid addresses, invalid hostnames, multiple hostnames on the same line, and duplicate custom hostnames.
+
+### Combo files
+
+Combo files let you build one hosts file from other files managed by Hedit and from remote sources. Add each directive on its own line; Hedit expands them in order when the combo file is activated.
+
+#### Include another Hedit file
+
+```hosts
+@local(550e8400-e29b-41d4-a716-446655440000)
+```
+
+Right-click the file in the sidebar, select **Copy ID**, and use that ID inside `@local(...)`.
+
+#### Include a remote hosts file
+
+```hosts
+@remote(https://example.com/hosts.txt)
+```
+
+Remote URLs must use HTTPS and return a `text/plain` response. Included files should contain standard hosts entries; directives are not expanded recursively.
+
+#### Complete example
+
+```hosts
+# Project-specific entries
+127.0.0.1 app.local
+127.0.0.1 api.app.local
+
+# Include another file managed by Hedit
+@local(550e8400-e29b-41d4-a716-446655440000)
+
+# Include a remote blocklist
+@remote(https://example.com/hosts.txt)
+```
+
 <hr>
 
 These people help make it happen. You can <a href="https://github.com/sponsors/valtlfelipe">become a sponsor</a> to support Hedit. Thanks for your support! 🫶🏻
@@ -32,18 +83,10 @@ These people help make it happen. You can <a href="https://github.com/sponsors/v
   <!-- sponsors --><!-- sponsors -->
 </p>
 
-## ⬇️ Installation & Usage (macOS)
+## ⚠️ Known issue
 
-Since this application is not yet signed, you'll need to follow these steps to open it on macOS:
+### Permission denied when saving on macOS
 
-1.  **Download the latest `.dmg` or `.app` file** from the [Releases page](https://github.com/valtlfelipe/hedit/releases).
-2.  **Drag the application** to your Applications folder.
-3.  **Right-click** on the `Hedit.app` icon in your Applications folder.
-4.  Select **"Open"** from the context menu.
-5.  If a warning dialog appears stating "Hedit.app cannot be opened because it is from an unidentified developer," click **"Open"** again.
-6.  If the app still doesn't open, go to **System Settings** (or System Preferences) > **Privacy & Security**.
-7.  Scroll down to the "Security" section. You should see a message like "Hedit.app was blocked from opening because it is not from an identified developer."
-8.  Click the **"Open Anyway"** button next to this message.
-9.  You will be prompted to confirm. Click **"Open"**.
+On some macOS systems, activating a file may fail with a permission error when Hedit tries to write to `/etc/hosts`. Follow the investigation in [issue #30](https://github.com/valtlfelipe/hedit/issues/30).
 
-The application should now launch successfully.
+You can change the file's permissions to let your user edit it without sudo. I would recommend to do quick search before if you want to go that route, just do it knowing the tradeoffs.
