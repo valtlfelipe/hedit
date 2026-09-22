@@ -109,7 +109,6 @@
 <script setup lang="ts">
   import { computed, nextTick, ref, watch } from 'vue'
   import { useFileOperations } from '../composables/useFileOperations'
-  import { useTelemetry } from '../composables/useTelemetry'
   import Switch from './Switch.vue'
 
   const props = defineProps<{
@@ -121,7 +120,6 @@
     created: [fileId: string]
   }>()
 
-  const { trackEvent } = useTelemetry()
   const { handleCreateFile } = useFileOperations()
 
   const filenameInput = ref<HTMLInputElement | null>(null)
@@ -176,8 +174,6 @@
     error.value = ''
 
     try {
-      trackEvent(`create_${isRemote.value ? 'remote' : 'local'}_file`)
-
       const id = await handleCreateFile({
         remote: isRemote.value,
         fileName: fileName.value.trim(),

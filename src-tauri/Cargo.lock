@@ -1560,7 +1560,6 @@ dependencies = [
  "tauri-plugin-window-state",
  "tokio",
  "url",
- "uuid",
 ]
 
 [[package]]

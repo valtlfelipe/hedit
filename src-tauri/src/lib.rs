@@ -6,7 +6,6 @@ mod menu;
 mod remote_hosts;
 mod settings_store;
 mod sync_remote_hosts;
-mod telemetry;
 mod update_checker;
 use std::fs::create_dir_all;
 use tauri::image::Image;
@@ -60,10 +59,6 @@ pub fn run() {
                 .map_err(|e| format!("Failed to create app directory: {}", e))?;
 
             // Spawn background tasks
-            tauri::async_runtime::spawn(telemetry::send_telemetry(
-                app.handle().clone(),
-                "app_opened",
-            ));
             tauri::async_runtime::spawn(update_checker::check_updates_periodically(
                 app.handle().clone(),
             ));
@@ -187,7 +182,6 @@ pub fn run() {
             files::write_file,
             remote_hosts::fetch_remote_hosts_file,
             sync_remote_hosts::trigger_manual_sync,
-            telemetry::send_telemetry_event,
             update_checker::check_for_updates_manual,
         ])
         .run(tauri::generate_context!())

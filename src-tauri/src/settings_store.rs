@@ -7,7 +7,6 @@ pub enum ConfigKey {
     QuitOnClose,
     AutoUpdateHostsEnabled,
     AutoUpdateHostsInterval,
-    DisableTelemetry,
 }
 
 impl ConfigKey {
@@ -16,7 +15,6 @@ impl ConfigKey {
             ConfigKey::QuitOnClose => "quitOnClose",
             ConfigKey::AutoUpdateHostsEnabled => "autoUpdateHostsEnabled",
             ConfigKey::AutoUpdateHostsInterval => "autoUpdateHostsInterval",
-            ConfigKey::DisableTelemetry => "disableTelemetry",
         }
     }
 }
