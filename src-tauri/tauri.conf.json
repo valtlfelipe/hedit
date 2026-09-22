@@ -21,7 +21,7 @@
     "publisher": "FVM",
     "license": "MIT",
     "copyright": "FVM - Hedit",
-    "homepage": "https://hedit.app",
+    "homepage": "https://github.com/valtlfelipe/hedit",
     "category": "DeveloperTool",
     "longDescription": "The modern hosts file editor for people who care about their tools.",
     "shortDescription": "Manage your hosts file with ease.",

@@ -3,7 +3,9 @@ use std::time::Duration;
 use tauri::{AppHandle, Emitter};
 use tokio::time::sleep;
 
-const API_URL: &str = "https://hedit.app/api/latest-release";
+const API_URL: &str = "https://api.github.com/repos/valtlfelipe/hedit/releases/latest";
+const REPOSITORY_URL: &str = "https://github.com/valtlfelipe/hedit";
+const GITHUB_API_VERSION: &str = "2022-11-28";
 const CHECK_INTERVAL: Duration = Duration::from_secs(24 * 60 * 60); // 24 hours
 
 #[derive(Debug, Deserialize)]
@@ -52,7 +54,7 @@ fn create_http_client(
     current_version: &str,
 ) -> Result<reqwest::Client, Box<dyn std::error::Error>> {
     reqwest::Client::builder()
-        .user_agent(format!("hedit.app/{}", current_version))
+        .user_agent(format!("Hedit/{} (+{})", current_version, REPOSITORY_URL))
         .timeout(Duration::from_secs(10))
         .build()
         .map_err(|e| e.into())
@@ -62,7 +64,12 @@ fn create_http_client(
 async fn fetch_latest_release(
     client: &reqwest::Client,
 ) -> Result<GitHubRelease, Box<dyn std::error::Error>> {
-    let response = client.get(API_URL).send().await?;
+    let response = client
+        .get(API_URL)
+        .header(reqwest::header::ACCEPT, "application/vnd.github+json")
+        .header("X-GitHub-Api-Version", GITHUB_API_VERSION)
+        .send()
+        .await?;
 
     if !response.status().is_success() {
         return Err(format!("API returned status: {}", response.status()).into());

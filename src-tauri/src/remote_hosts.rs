@@ -23,7 +23,10 @@ pub async fn fetch_remote_url(
     let app_version = app_handle.package_info().version.to_string();
 
     let client = reqwest::Client::builder()
-        .user_agent(format!("hedit.app/{}", app_version))
+        .user_agent(format!(
+            "Hedit/{} (+https://github.com/valtlfelipe/hedit)",
+            app_version
+        ))
         .timeout(Duration::from_secs(10))
         .build()
         .map_err(|e| format!("Error building HTTP client: {}", e))?;

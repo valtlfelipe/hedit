@@ -7,7 +7,7 @@ Fast and intuitive hosts file management. The modern hosts file editor for peopl
 ![image](https://github.com/user-attachments/assets/cd843e7b-6563-495a-82fa-a62b18c6dd78)
 
 <div align="center">
-  <a href="https://hedit.app/download">
+  <a href="https://github.com/valtlfelipe/hedit/releases">
     <img src="https://img.shields.io/badge/Download-Hedit-blue?style=for-the-badge" alt="Download Hedit" />
   </a>
 </div>
@@ -36,7 +36,7 @@ These people help make it happen. You can <a href="https://github.com/sponsors/v
 
 Since this application is not yet signed, you'll need to follow these steps to open it on macOS:
 
-1.  **Download the latest `.dmg` or `.app` file** from the [Releases page](https://github.com/valtlfelipe/hedit/releases) (link will be updated once releases are available).
+1.  **Download the latest `.dmg` or `.app` file** from the [Releases page](https://github.com/valtlfelipe/hedit/releases).
 2.  **Drag the application** to your Applications folder.
 3.  **Right-click** on the `Hedit.app` icon in your Applications folder.
 4.  Select **"Open"** from the context menu.
