@@ -119,7 +119,6 @@
   const emit = defineEmits<{
     close: []
     created: [fileId: string]
-    showUpgradePrompt: [message: string]
   }>()
 
   const { trackEvent } = useTelemetry()

@@ -51,9 +51,6 @@
               <!-- Auto Sync Settings -->
               <AutoSyncSettingsTab v-if="activeTab === 'auto-sync'" />
 
-              <!-- License Settings -->
-              <LicenseSettingsTab v-if="activeTab === 'license'" />
-
               <!-- About -->
               <AboutSettingsTab v-if="activeTab === 'about'" />
             </div>
@@ -66,15 +63,13 @@
 
 <script setup lang="ts">
   import { ref, watch, onMounted, onUnmounted } from 'vue'
-  import { X, Info, Settings as SettingsIcon, KeyRound, RefreshCw } from 'lucide-vue-next'
+  import { X, Info, Settings as SettingsIcon, RefreshCw } from 'lucide-vue-next'
   import GeneralSettingsTab from './settings/GeneralSettingsTab.vue'
   import AutoSyncSettingsTab from './settings/AutoSyncSettingsTab.vue'
-  import LicenseSettingsTab from './settings/LicenseSettingsTab.vue'
   import AboutSettingsTab from './settings/AboutSettingsTab.vue'
 
   const props = defineProps<{
     show: boolean
-    initialTab?: string
   }>()
 
   const emit = defineEmits<{
@@ -84,18 +79,17 @@
   const tabs = [
     { id: 'general', name: 'General', icon: SettingsIcon },
     { id: 'auto-sync', name: 'Auto Sync', icon: RefreshCw },
-    { id: 'license', name: 'License', icon: KeyRound },
     { id: 'about', name: 'About', icon: Info },
   ]
 
-  const activeTab = ref(props.initialTab || 'general')
+  const activeTab = ref('general')
 
-  // Reset to initial tab when modal opens
+  // Reset to the default tab when the modal opens
   watch(
     () => props.show,
     (newShow) => {
       if (newShow) {
-        activeTab.value = props.initialTab || 'general'
+        activeTab.value = 'general'
       }
     },
   )

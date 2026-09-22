@@ -35,17 +35,6 @@
         }
       ]
     },
-    {
-      "identifier": "http:default",
-      "allow": [
-        {
-          "url": "https://activate.felipevm.dev"
-        },
-        {
-          "url": "https://*"
-        }
-      ]
-    },
     "os:default",
     "autostart:allow-enable",
     "autostart:allow-disable",

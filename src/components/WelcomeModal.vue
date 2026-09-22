@@ -20,49 +20,18 @@
 
           <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
             <p class="mb-3">
-              Hedit is a powerful hosts file editor for macOS. Get started with the Free version or
-              upgrade to Pro for more features.
+              Hedit is a fast, open-source hosts file editor for managing local, remote, and
+              combined configurations.
             </p>
+            <p>Create as many hosts files as you need and switch between them whenever you want.</p>
           </div>
 
-          <div class="mt-6 space-y-4">
-            <div class="flex items-start">
-              <div class="flex items-center h-5">
-                <CheckCircle2
-                  class="w-5 h-5 text-primary-600 dark:text-primary-400 mr-3 flex-shrink-0"
-                />
-              </div>
-              <div class="text-sm">
-                <p class="font-medium text-gray-700 dark:text-gray-300">Free Version</p>
-                <p class="text-gray-600 dark:text-gray-400">1 hosts file, personal use only</p>
-              </div>
-            </div>
-
-            <div class="flex items-start">
-              <div class="flex items-center h-5">
-                <Zap class="w-5 h-5 text-primary-600 dark:text-primary-400 mr-3 flex-shrink-0" />
-              </div>
-              <div class="text-sm">
-                <p class="font-medium text-gray-700 dark:text-gray-300">
-                  Pro Version ($25/license)
-                </p>
-                <p class="text-gray-600 dark:text-gray-400">Unlimited files, use forever</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div class="mt-8 flex justify-end">
             <button
               class="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center justify-center"
-              @click="startFree"
+              @click="getStarted"
             >
-              Start with Free
-            </button>
-            <button
-              class="px-4 py-2 text-sm font-medium text-primary-600 bg-white border border-primary-600 rounded-md shadow-sm hover:bg-primary-50 dark:bg-zinc-700 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-              @click="upgradeToPro"
-            >
-              Upgrade to Pro
+              Get Started
             </button>
           </div>
         </div>
@@ -72,22 +41,14 @@
 </template>
 
 <script setup lang="ts">
-  import { X, CheckCircle2, Zap } from 'lucide-vue-next'
+  import { X } from 'lucide-vue-next'
   import { settingsStore } from '../stores/settings'
-  import { openUrl } from '@tauri-apps/plugin-opener'
 
   const emit = defineEmits(['close'])
   const props = defineProps<{ show: boolean }>()
 
-  const startFree = () => {
+  const getStarted = () => {
     settingsStore.setHasCompletedOnboarding(true)
-    settingsStore.setLicenseType('FREE')
-    emit('close')
-  }
-
-  const upgradeToPro = () => {
-    settingsStore.setHasCompletedOnboarding(true)
-    openUrl('https://hedit.app/pricing?ref=welcome_modal')
     emit('close')
   }
 </script>

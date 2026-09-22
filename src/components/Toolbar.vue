@@ -72,14 +72,6 @@
                 <Settings class="w-4 h-4" />
                 <span>Settings</span>
               </li>
-              <li
-                v-if="licenseType === 'FREE'"
-                class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out"
-                @click="openLicenseModal"
-              >
-                <KeyRound class="w-4 h-4" />
-                <span>Activate License</span>
-              </li>
               <div class="border-t border-gray-200 dark:border-zinc-700 my-1"></div>
               <li
                 class="rounded-lg flex items-center gap-2 px-2 py-1 hover:bg-gray-200/80 dark:hover:bg-zinc-700/80 cursor-pointer transition-colors duration-150 ease-in-out"
@@ -100,7 +92,7 @@
   import Tooltip from './Tooltip.vue'
   import { usePlatform } from '../composables/usePlatform'
   import { openUrl } from '@tauri-apps/plugin-opener'
-  import { Download, KeyRound, MessageSquare, Play, Plus, Save, Settings } from 'lucide-vue-next'
+  import { Download, MessageSquare, Play, Plus, Save, Settings } from 'lucide-vue-next'
   import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
   import { listen } from '@tauri-apps/api/event'
 
@@ -115,7 +107,6 @@
 
   defineProps<{
     allowActivate: boolean
-    licenseType: string
   }>()
 
   const emit = defineEmits<{
@@ -123,7 +114,6 @@
     saveFile: []
     activateFile: []
     openSettingsModal: []
-    openSettingsModalWithTab: [tab: string]
   }>()
 
   const showSettings = ref(false)
@@ -168,11 +158,6 @@
   const openSettingsModal = () => {
     showSettings.value = false
     emit('openSettingsModal')
-  }
-
-  const openLicenseModal = () => {
-    showSettings.value = false
-    emit('openSettingsModalWithTab', 'license')
   }
 
   const openUpdatePage = () => {

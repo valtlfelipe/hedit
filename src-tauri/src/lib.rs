@@ -1,7 +1,7 @@
 use std::env;
+mod app_info;
 mod files;
 mod hosts_parser;
-mod license;
 mod menu;
 mod remote_hosts;
 mod settings_store;
@@ -46,7 +46,6 @@ pub fn run() {
             show_app(app);
         }))
         .plugin(tauri_plugin_os::init())
-        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
@@ -65,7 +64,6 @@ pub fn run() {
                 app.handle().clone(),
                 "app_opened",
             ));
-            tauri::async_runtime::spawn(license::check_license(app.handle().clone()));
             tauri::async_runtime::spawn(update_checker::check_updates_periodically(
                 app.handle().clone(),
             ));
@@ -185,8 +183,7 @@ pub fn run() {
             _ => {}
         })
         .invoke_handler(tauri::generate_handler![
-            license::activate,
-            license::get_build_date_command,
+            app_info::get_build_date_command,
             files::write_file,
             remote_hosts::fetch_remote_hosts_file,
             sync_remote_hosts::trigger_manual_sync,

@@ -6,16 +6,14 @@
     closeButtonPosition="top-right"
     :duration="10000"
   />
-  <AppWindow :title="title">
+  <AppWindow title="Hedit">
     <div class="flex flex-col h-full flex-1 min-h-0">
       <Toolbar
         :allow-activate="!selectedFile?.isActive"
-        :license-type="settingsStore.licenseType"
         @create-file="handleCreateFile"
         @save-file="() => handleSaveFile()"
         @activate-file="handleActivateFile"
         @open-settings-modal="showSettingsModal = true"
-        @open-settings-modal-with-tab="handleOpenSettingsModalWithTab"
       />
 
       <div class="flex flex-1 min-h-0 h-full">
@@ -43,21 +41,11 @@
       </div>
     </div>
     <WelcomeModal :show="showWelcomeModal" @close="showWelcomeModal = false" />
-    <UpgradePromptModal
-      :show="showUpgradePromptModal"
-      :message="upgradePromptMessage"
-      @close="showUpgradePromptModal = false"
-    />
-    <SettingsModal
-      :show="showSettingsModal"
-      :initial-tab="settingsModalInitialTab"
-      @close="showSettingsModal = false"
-    />
+    <SettingsModal :show="showSettingsModal" @close="showSettingsModal = false" />
     <CreateFileModal
       :show="showCreateFileModal"
       @close="showCreateFileModal = false"
       @created="handleFileCreated"
-      @show-upgrade-prompt="showUpgradePrompt"
     />
   </AppWindow>
 </template>
@@ -68,7 +56,6 @@
   import AppWindow from './components/AppWindow.vue'
   import SettingsModal from './components/SettingsModal.vue'
   import WelcomeModal from './components/WelcomeModal.vue'
-  import UpgradePromptModal from './components/UpgradePromptModal.vue'
   import LoadingSpinner from './components/LoadingSpinner.vue'
   import Sidebar from './components/Sidebar.vue'
   import Toolbar from './components/Toolbar.vue'
@@ -77,26 +64,20 @@
   import { useFileOperations } from './composables/useFileOperations'
   import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts'
   import { useTheme } from './composables/useTheme'
-  import { useTelemetry } from './composables/useTelemetry'
   import { hostsStore } from './stores/files'
   import { settingsStore } from './stores/settings'
   import { Toaster } from 'vue-sonner'
 
   const MonacoEditor = defineAsyncComponent(() => import('./components/MonacoEditor.vue'))
 
-  const title = ref('Hedit')
   const showSettingsModal = ref(false)
-  const settingsModalInitialTab = ref<string | undefined>(undefined)
   const showWelcomeModal = ref(false)
-  const showUpgradePromptModal = ref(false)
-  const upgradePromptMessage = ref('')
   const isContentValid = ref(true)
   const showCreateFileModal = ref(false)
 
   // Initialize composables
   const fileOperations = useFileOperations()
   const { initializeTheme } = useTheme()
-  const { trackEvent } = useTelemetry()
 
   const { selectedFile, handleReloadContent, setFileStatus } = fileOperations
 
@@ -111,17 +92,6 @@
   }
 
   const handleCreateFile = () => {
-    // Check if user is in Free mode and trying to create a second file
-    if (
-      (!settingsStore.licenseType || settingsStore.licenseType === 'FREE') &&
-      hostsStore.files.length >= 1
-    ) {
-      showUpgradePrompt(
-        'Upgrade to Pro to create unlimited hosts files. You can currently only use 1 file in Free mode.',
-      )
-      return
-    }
-
     showCreateFileModal.value = true
   }
 
@@ -130,23 +100,12 @@
     showCreateFileModal.value = false
   }
 
-  const showUpgradePrompt = (message: string) => {
-    upgradePromptMessage.value = message
-    showUpgradePromptModal.value = true
-    trackEvent('show_upgrade_prompt')
-  }
-
   const handleSaveFile = () => {
     fileOperations.handleSaveFile(!isContentValid.value)
   }
 
   const handleActivateFile = (id?: string) => {
     fileOperations.handleActivateFile(id)
-  }
-
-  const handleOpenSettingsModalWithTab = (tab: string) => {
-    settingsModalInitialTab.value = tab
-    showSettingsModal.value = true
   }
 
   // Initialize event listeners and watchers
@@ -158,22 +117,6 @@
 
   keyboardShortcuts.initializeEventListeners()
   initializeTheme()
-
-  // Handle license invalid event
-  listen('license-update', async (event) => {
-    const type = event.payload as string
-    if (type === 'wrong-build') {
-      showUpgradePrompt(
-        'Your license is not valid for this build of Hedit. You can continue using Hedit in Free mode.',
-      )
-    } else if (type === 'expired') {
-      showUpgradePrompt(
-        'Your Pro license has expired. You can continue using Hedit normally, but you will not receive updates until you renew your license.',
-      )
-    } else if (type === 'invalid') {
-      title.value = 'Hedit (License Invalid)'
-    }
-  })
 
   listen('open_settings', async () => {
     showSettingsModal.value = true
@@ -228,7 +171,6 @@
   const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
       showSettingsModal.value = false
-      showUpgradePromptModal.value = false
       showWelcomeModal.value = false
       showCreateFileModal.value = false
     }
@@ -238,15 +180,8 @@
   onMounted(() => {
     settingsStore.load().then(() => {
       // Show welcome modal on first launch if onboarding not completed
-      if (!settingsStore.hasCompletedOnboarding && settingsStore.licenseType === 'FREE') {
+      if (!settingsStore.hasCompletedOnboarding) {
         showWelcomeModal.value = true
-        title.value = 'Hedit'
-      } else if (settingsStore.licenseType === 'FREE') {
-        title.value = 'Hedit'
-      } else if (settingsStore.licenseType === 'PRO_ACTIVE') {
-        title.value = 'Hedit (Pro)'
-      } else if (settingsStore.licenseType === 'PRO_EXPIRED') {
-        title.value = 'Hedit (Pro - Updates Expired)'
       }
     })
     fileOperations.loadFiles().then(() => {

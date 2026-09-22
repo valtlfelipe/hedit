@@ -62,12 +62,6 @@
         </div>
       </div>
     </div>
-
-    <UpgradePromptModal
-      :show="showUpgradePrompt"
-      message="Your Pro license has expired. Upgrade to continue receiving updates and premium features."
-      @close="showUpgradePrompt = false"
-    />
   </div>
 </template>
 
@@ -76,8 +70,6 @@
   import { getVersion } from '@tauri-apps/api/app'
   import { invoke } from '@tauri-apps/api/core'
   import { onMounted, ref } from 'vue'
-  import { settingsStore } from '../../stores/settings'
-  import UpgradePromptModal from '../UpgradePromptModal.vue'
 
   interface UpdateInfo {
     available: boolean
@@ -92,7 +84,6 @@
   const updateMessage = ref('')
   const updateAvailable = ref(false)
   const downloadUrl = ref('')
-  const showUpgradePrompt = ref(false)
 
   onMounted(async () => {
     appVersion.value = await getVersion()
@@ -100,12 +91,6 @@
   })
 
   const checkForUpdates = async () => {
-    // Check if license is expired and show upgrade prompt
-    if (settingsStore.licenseType === 'PRO_EXPIRED') {
-      showUpgradePrompt.value = true
-      return
-    }
-
     isCheckingUpdate.value = true
     updateMessage.value = ''
     downloadUrl.value = ''
